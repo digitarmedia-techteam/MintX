@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/navigation_quiz"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Quiz" />
+    <item
+        android:id="@+id/navigation_prediction"
+        android:icon="@drawable/data_model"
+        android:title="Predict" />
+    <item
+        android:id="@+id/navigation_earn"
+        android:icon="@drawable/salary"
+        android:title="Earn" />
+    <item
+        android:id="@+id/navigation_wallet"
+        android:icon="@drawable/wallet_bgr"
+        android:title="Wallet" />
+</menu>

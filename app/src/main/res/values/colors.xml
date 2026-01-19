@@ -2,4 +2,22 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- MintX Brand Colors -->
+    <color name="mint_gold">#FFD700</color>
+    <color name="mint_green">#00E676</color>
+    <color name="mint_background">#0F172A</color> <!-- Deep Slate Blue/Black -->
+    <color name="mint_surface">#1E293B</color>
+    <color name="mint_surface_light">#334155</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent_red">#FF4B2B</color>
+    <color name="accent_blue">#00D2FF</color>
+    <color name="accent_glass">#1AFFFFFF</color>
+    <color name="accent_glass_border">#33FFFFFF</color>
+    
+    <!-- Text Colors -->
+    <color name="text_headline">#FFFFFF</color>
+    <color name="text_subtext">#94A3B8</color> <!-- Muted Slate -->
+    <color name="text_hint">#64748B</color>
 </resources>

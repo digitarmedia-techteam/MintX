@@ -1,9 +1,37 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.MintX" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowBackground">@color/mint_background</item>
+        <item name="colorPrimary">@color/mint_gold</item>
+        
+        <!-- Transparent System Bars -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        
+        <!-- Full Screen Immersive (Handles Notches) -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="Theme.MintX" parent="Base.Theme.MintX" />
+
+    <!-- Text Styles -->
+    <style name="MintX.Headline" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textColor">@color/text_headline</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MintX.Subtext" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_subtext</item>
+    </style>
+
+    <style name="MintX.Button" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/mint_gold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="RoundedIcon" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
 </resources>

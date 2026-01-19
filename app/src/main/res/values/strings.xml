@@ -1,3 +1,83 @@
 <resources>
     <string name="app_name">MintX</string>
+    <string name="tagline">Mint Your Time.</string>
+
+    <!-- Home -->
+    <string name="home_headline">Mint Coins. Unlock Rewards.</string>
+    <string name="home_subtext">Play smart. Turn time into value.</string>
+    <string name="cta_mint_now">Mint Now</string>
+    <string name="dashboard_greeting">Good Morning, Alex!</string>
+    <string name="dashboard_title">My Dashboard</string>
+    <string name="daily_streak">Daily Streak</string>
+    <string name="streak_progress">%1$s / %2$s days</string>
+    <string name="live_now">LIVE NOW</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="play_quiz">Play Quiz</string>
+    <string name="predict">Predict</string>
+    <string name="earn">Earn</string>
+    <string name="use_now">Use Now</string>
+    <string name="coins_expiring_msg">%1$d Coins expiring in %2$d days</string>
+
+    <!-- Quiz -->
+    <string name="quiz_title">Trivia Contest</string>
+    <string name="quiz_progress">Question %1$d of %2$d</string>
+    <string name="quiz_timer">0:%1$02d</string>
+    <string name="quiz_reward_mint">Mint +%1$d Coins</string>
+    <string name="quiz_accuracy">Accuracy: %1$d%%</string>
+    <string name="quiz_success">Minted Successfully</string>
+    <string name="quiz_boost">Boost your mint with an ad</string>
+    <string name="quiz_next">Next Question</string>
+
+    <!-- Prediction -->
+    <string name="prediction_title">Predict &amp; Mint</string>
+    <string name="prediction_locked">Prediction Locked</string>
+    <string name="prediction_credited">Mint coins credited</string>
+    <string name="prediction_disclaimer">Disclaimer: Skill-based only. No real-money betting.</string>
+    <string name="match_countdown">Starts in: 02:45:10</string>
+    <string name="team_a_name">India</string>
+    <string name="team_b_name">Australia</string>
+    <string name="draw">Draw</string>
+    <string name="submit_prediction">Lock Prediction</string>
+    <string name="match_type">ICC World Cup • ODI</string>
+    <string name="predict_win_prompt">Who will win the match?</string>
+
+    <!-- Earn -->
+    <string name="earn_more_coins">Earn More Coins</string>
+    <string name="Task">Task</string>
+    <string name="tab_available">Available</string>
+    <string name="tab_pending">Pending</string>
+    <string name="tab_completed">Completed</string>
+    <string name="status_verified">Verified</string>
+    <string name="status_in_review">In Review</string>
+    <string name="status_action_required">Action Required</string>
+    <string name="partner_task">Partner Task</string>
+    <string name="mint_pending">Mint Pending</string>
+
+    <!-- Wallet -->
+    <string name="wallet_balance">Mint Balance</string>
+    <string name="wallet_history">Transaction History</string>
+    <string name="coins_expiring">Coins Expiring Soon</string>
+    <string name="tx_quiz">Quiz Reward</string>
+    <string name="tx_prediction">Prediction Win</string>
+    <string name="tx_offer">Offer Completed</string>
+    <string name="tx_redeem">Reward Redeemed</string>
+    <string name="wallet_disclaimer">Balances are updated every 15 minutes.</string>
+
+    <!-- Rewards -->
+    <string name="unlock_rewards">Unlock Rewards</string>
+    <string name="mint_required">Mint coins required</string>
+    <string name="reward_unlocked">Reward Unlocked</string>
+
+    <!-- Subscription -->
+    <string name="pro_title">MintX Pro</string>
+    <string name="pro_feature_ads">Ad-free minting</string>
+    <string name="pro_feature_speed">Faster rewards</string>
+    <string name="pro_feature_boost">Exclusive mint boosts</string>
+    <string name="cta_upgrade_pro">Upgrade to Pro</string>
+
+    <!-- Fraud-Safe Messaging -->
+    <string name="msg_rate_limit">You’ve reached today’s mint limit.</string>
+    <string name="msg_review">Mint coins under review.</string>
+    <string name="msg_delay">This reward will be credited shortly.</string>
+    <string name="msg_block">Please try again later.</string>
 </resources>
