@@ -1,7 +1,16 @@
 package com.digitar.mintx.data.model
 
-data class QuizCategory(
+data class SubCategory(
+    val id: String,
     val name: String,
-    val icon: Int? = null,
     var isSelected: Boolean = false
+)
+
+data class QuizCategory(
+    val id: String,
+    val name: String,
+    val description: String,
+    val icon: Int? = null,
+    val subCategories: List<SubCategory> = emptyList(),
+    var isExpanded: Boolean = false
 )

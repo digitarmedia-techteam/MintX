@@ -18,7 +18,6 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetQuizCategoriesBinding? = null
     private val binding get() = _binding!!
 
-    // Simple ViewModel Factory implementation
     private val viewModel: QuizViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -27,8 +26,8 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private lateinit var adapter: CategoryAdapter
-    var onQuizStarted: ((String) -> Unit)? = null
+    private lateinit var adapter: MainCategoryAdapter
+    var onQuizStarted: ((List<String>) -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,28 +44,40 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
         observeViewModel()
         
         binding.btnStartQuiz.setOnClickListener {
-            val selected = viewModel.getSelectedCategory()
-            if (selected != null) {
-                onQuizStarted?.invoke(selected.name)
+            val selectedSubs = viewModel.categories.value?.flatMap { it.subCategories ?: emptyList() }?.filter { it.isSelected } ?: emptyList()
+            if (selectedSubs.isNotEmpty()) {
+                onQuizStarted?.invoke(selectedSubs.map { it.name })
                 dismiss()
+            } else {
+                Toast.makeText(requireContext(), "Please select at least one sub-category", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        binding.btnClose.setOnClickListener {
+            dismiss()
         }
 
         viewModel.fetchCategories()
     }
 
     private fun setupRecyclerView() {
-        adapter = CategoryAdapter { category ->
-            viewModel.selectCategory(category.name)
-            binding.btnStartQuiz.isEnabled = true
+        adapter = MainCategoryAdapter {
+            updateStartButtonState()
         }
         binding.rvCategories.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCategories.adapter = adapter
     }
 
+    private fun updateStartButtonState() {
+        val selectedCount = viewModel.categories.value?.flatMap { it.subCategories ?: emptyList() }?.count { it.isSelected } ?: 0
+        binding.btnStartQuiz.isEnabled = selectedCount > 0
+        binding.btnStartQuiz.text = if (selectedCount > 0) "Start Quiz ($selectedCount)" else "Select Sub-Topics"
+    }
+
     private fun observeViewModel() {
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
             adapter.submitList(categories)
+            updateStartButtonState()
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->

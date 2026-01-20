@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.digitar.mintx.data.model.QuizCategory
 import com.digitar.mintx.data.model.QuizQuestion
 import com.digitar.mintx.data.repository.QuizRepository
-import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet.Companion.TAG
 import kotlinx.coroutines.launch
 
 class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
@@ -52,40 +51,54 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         }
     }
 
-
-    fun fetchQuestions(category: String? = null) {
+    fun fetchQuestions(categories: List<String> = emptyList()) {
         viewModelScope.launch {
-            Log.d(TAG, "fetchQuestions() called, category = $category")
-
             _loading.value = true
             _error.value = null
-
+            
             try {
-                Log.d(TAG, "Calling repository.getQuestions()")
+                // Mapping user sub-categories to valid quizapi.io categories/tags
+                // Valid categories: Linux, DevOps, Networking, Programming, Cloud, Docker, Kubernetes
+                val apiCategories = categories.map { name ->
+                    when (name.lowercase()) {
+                        "coding", "software", "programming" -> "Code"
+                        "linux & os", "linux", "operating systems" -> "Linux"
+                        "networking" -> "Networking"
+                        "devops" -> "DevOps"
+                        "cloud" -> "Cloud"
+                        "docker" -> "Docker"
+                        "kubernetes" -> "Kubernetes"
+                        else -> null // Will return random tech questions
+                    }
+                }.distinct()
 
-                val result = repository.getQuestions(category)
+                val allQuestions = mutableListOf<QuizQuestion>()
+                
+                if (apiCategories.isEmpty() || (apiCategories.size == 1 && apiCategories[0] == null)) {
+                    // Fetch random if nothing specific or only unknown categories selected
+                    val result = repository.getQuestions(null)
+                    if (result != null) allQuestions.addAll(result)
+                } else {
+                    // Fetch for each mapped category to ensure we get a mix
+                    apiCategories.forEach { cat ->
+                        val result = repository.getQuestions(cat)
+                        if (result != null) allQuestions.addAll(result)
+                    }
+                }
 
-                Log.d(TAG, "Questions result = $result")
-
-                if (result != null && result.isNotEmpty()) {
-                    _questions.value = result
+                if (allQuestions.isNotEmpty()) {
+                    // Shuffle to mix if from multiple categories
+                    _questions.value = allQuestions.shuffled().take(10)
                     _currentIndex.value = 0
                     _userAnswers.value = mutableMapOf()
                     _quizFinished.value = false
-
-                    Log.d(TAG, "Questions loaded successfully. Total = ${result.size}")
                 } else {
-                    _error.value = "Failed to load questions"
-                    Log.e(TAG, "Question list is null or empty")
+                    _error.value = "Failed to load questions. Please check your API key and connection."
                 }
-
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to fetch questions"
-                Log.e(TAG, "Exception while fetching questions", e)
-
             } finally {
                 _loading.value = false
-                Log.d(TAG, "Loading finished")
             }
         }
     }
@@ -151,16 +164,4 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val skippedCount: Int,
         val totalPoints: Int
     )
-
-    fun selectCategory(categoryName: String) {
-        val currentList = _categories.value ?: return
-        val newList = currentList.map {
-            it.copy(isSelected = it.name == categoryName)
-        }
-        _categories.value = newList
-    }
-
-    fun getSelectedCategory(): QuizCategory? {
-        return _categories.value?.find { it.isSelected }
-    }
 }

@@ -1,318 +1,440 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/mint_background">
 
-    <!-- Top Toolbar/Header -->
+    <!-- Quiz Content Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_quiz_header"
+        android:id="@+id/cl_quiz_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tv_quiz_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Question 3 of 5"
-            android:textColor="@color/text_subtext"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_quiz_accuracy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Accuracy: 100%"
-            android:textColor="@color/mint_green"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/pb_quiz_progress"
+        <!-- Top Toolbar/Header -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_quiz_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:progress="0"
-            app:indicatorColor="@color/mint_gold"
-            app:layout_constraintTop_toBottomOf="@id/tv_quiz_progress"
-            app:trackColor="@color/mint_surface_light"
-            app:trackCornerRadius="4dp" />
+            android:padding="10dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_quiz_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Question 3 of 5"
+                android:textColor="@color/text_subtext"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_quiz_accuracy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accuracy: 100%"
+                android:textColor="@color/mint_green"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/pb_quiz_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:progress="0"
+                app:indicatorColor="@color/mint_gold"
+                app:layout_constraintTop_toBottomOf="@id/tv_quiz_progress"
+                app:trackColor="@color/mint_surface_light"
+                app:trackCornerRadius="4dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_timer"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_quiz_header">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/pb_timer_ring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:progress="50"
+                app:indicatorColor="@color/mint_gold"
+                app:indicatorSize="64dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:trackColor="@color/accent_glass_border"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="4dp" />
+
+            <TextView
+                android:id="@+id/tv_timer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0:12"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Question Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="32dp"
+            app:cardBackgroundColor="@color/mint_surface"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cl_timer"
+            app:strokeColor="@color/accent_glass_border"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/tv_question_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="32dp"
+                android:text="In which year was the first Cricket World Cup held?"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Options List -->
+        <LinearLayout
+            android:id="@+id/ll_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_question">
+
+            <TextView
+                android:id="@+id/btn_option_1"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/pill_choice_selector"
+                android:gravity="center"
+                android:text="1971"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/btn_option_2"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/pill_choice_selector"
+                android:gravity="center"
+                android:text="1975"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/btn_option_3"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/pill_choice_selector"
+                android:gravity="center"
+                android:text="1979"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/btn_option_4"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/pill_choice_selector"
+                android:gravity="center"
+                android:text="1983"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Navigation Buttons -->
+        <LinearLayout
+            android:id="@+id/ll_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/ll_options">
+
+            <Button
+                android:id="@+id/btn_prev"
+                style="@style/MintX.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:alpha="0.5"
+                android:enabled="false"
+                android:text="Previous"
+                app:backgroundTint="@color/mint_surface_light" />
+
+            <Button
+                android:id="@+id/btn_next"
+                style="@style/MintX.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Next" />
+        </LinearLayout>
+
+        <!-- Footer Reward Info -->
+        <LinearLayout
+            android:id="@+id/ll_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/card_question"
+            app:layout_constraintEnd_toStartOf="@+id/cl_timer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cl_quiz_header">
+
+            <!--        <ImageView-->
+            <!--            android:layout_width="20dp"-->
+            <!--            android:layout_height="20dp"-->
+            <!--            android:src="@drawable/ic_coin" />-->
+
+            <TextView
+                android:id="@+id/tv_quiz_reward_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="categories"
+                android:textColor="@color/mint_gold"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_timer"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cl_quiz_header">
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/pb_timer_ring"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:progress="100"
-            app:indicatorColor="@color/mint_gold"
-            app:indicatorSize="64dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:trackColor="@color/accent_glass_border"
-            app:trackCornerRadius="4dp"
-            app:trackThickness="4dp" />
-
-        <TextView
-            android:id="@+id/tv_timer_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0:12"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Question Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_question"
+    <!-- Skeleton Layout -->
+    <include
+        android:id="@+id/layout_skeleton"
+        layout="@layout/layout_quiz_skeleton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="32dp"
-        app:cardBackgroundColor="@color/mint_surface"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:layout_constraintTop_toBottomOf="@id/cl_timer"
-        app:strokeColor="@color/accent_glass_border"
-        app:strokeWidth="1dp">
-
-        <TextView
-            android:id="@+id/tv_question_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="32dp"
-            android:text="In which year was the first Cricket World Cup held?"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Options List -->
-    <LinearLayout
-        android:id="@+id/ll_options"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="32dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_question">
-
-        <TextView
-            android:id="@+id/btn_option_1"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@drawable/pill_choice_selector"
-            android:gravity="center"
-            android:text="1971"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/btn_option_2"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/pill_choice_selector"
-            android:gravity="center"
-            android:text="1975"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/btn_option_3"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/pill_choice_selector"
-            android:gravity="center"
-            android:text="1979"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/btn_option_4"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/pill_choice_selector"
-            android:gravity="center"
-            android:text="1983"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <!-- Navigation Buttons -->
-    <LinearLayout
-        android:id="@+id/ll_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ll_options">
-
-        <Button
-            android:id="@+id/btn_prev"
-            style="@style/MintX.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:alpha="0.5"
-            android:enabled="false"
-            android:text="Previous"
-            app:backgroundTint="@color/mint_surface_light" />
-
-        <Button
-            android:id="@+id/btn_next"
-            style="@style/MintX.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="Next" />
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 
     <!-- Summary Screen (Hidden by default) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:id="@+id/cl_summary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/mint_background"
         android:elevation="10dp"
-        android:padding="24dp"
+        android:fillViewport="true"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tv_summary_title"
-            style="@style/MintX.Headline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:text="Quiz Summary"
-            android:textSize="32sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:cardBackgroundColor="@color/mint_surface"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_summary_title"
-            app:strokeColor="@color/accent_glass_border"
-            app:strokeWidth="1dp">
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tv_summary_title"
+                style="@style/MintX.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:text="Quiz Complete!"
+                android:textSize="28sp" />
+
+            <!-- Circular Accuracy Indicator -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_summary_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/pb_summary_ring"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    app:indicatorSize="140dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:trackColor="@color/accent_glass_border"
+                    app:trackCornerRadius="8dp"
+                    app:trackThickness="12dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv_summary_accuracy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0%"
+                        android:textColor="@color/text_headline"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Accuracy"
+                        android:textColor="@color/text_subtext"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Stats Breakdown Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_summary_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/accent_glass_border"
+                app:strokeWidth="1dp">
 
-                <include
-                    android:id="@+id/row_total"
-                    layout="@layout/item_summary_row" />
-
-                <include
-                    android:id="@+id/row_correct"
-                    layout="@layout/item_summary_row" />
-
-                <include
-                    android:id="@+id/row_wrong"
-                    layout="@layout/item_summary_row" />
-
-                <include
-                    android:id="@+id/row_skipped"
-                    layout="@layout/item_summary_row" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="16dp"
-                    android:background="@color/accent_glass_border" />
-
-                <TextView
-                    android:id="@+id/tv_total_points"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Total Points: 0"
-                    android:textAlignment="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <include
+                        android:id="@+id/row_total"
+                        layout="@layout/item_summary_row" />
+
+                    <include
+                        android:id="@+id/row_correct"
+                        layout="@layout/item_summary_row" />
+
+                    <include
+                        android:id="@+id/row_wrong"
+                        layout="@layout/item_summary_row" />
+
+                    <include
+                        android:id="@+id/row_skipped"
+                        layout="@layout/item_summary_row" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/accent_glass_border" />
+
+                    <TextView
+                        android:id="@+id/tv_total_points"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Points: 0"
+                        android:textAlignment="center"
+                        android:textColor="@color/mint_gold"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spacer to push content up if needed, or just let it flow -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/ll_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_watch_ad"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="Watch Ad &amp; Get 2X Points"
                     android:textColor="@color/mint_gold"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    app:strokeColor="@color/mint_gold"
+                    app:strokeWidth="1dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_play_again"
+                        style="@style/MintX.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/mint_surface"
+                        android:text="Play Again"
+                        android:textColor="@color/text_headline"
+                        app:strokeColor="@color/accent_glass_border"
+                        app:strokeWidth="1dp" />
+
+                    <Button
+                        android:id="@+id/btn_finish"
+                        style="@style/MintX.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Finish" />
+                </LinearLayout>
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <Button
-            android:id="@+id/btn_finish"
-            style="@style/MintX.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
-            android:text="Finish Quiz"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Footer Reward Info -->
-    <LinearLayout
-        android:id="@+id/ll_footer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/card_question"
-        app:layout_constraintEnd_toStartOf="@+id/cl_timer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cl_quiz_header">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_coin" />
-
-        <TextView
-            android:id="@+id/tv_quiz_reward_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Mint +10 Coins"
-            android:textColor="@color/mint_gold"
-            android:textStyle="bold" />
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

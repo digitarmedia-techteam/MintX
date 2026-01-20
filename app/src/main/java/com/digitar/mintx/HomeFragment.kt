@@ -9,6 +9,9 @@ import com.digitar.mintx.databinding.FragmentHomeBinding
 
 import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet
 
+import android.content.Intent
+import java.util.ArrayList
+
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -34,17 +37,40 @@ class HomeFragment : Fragment() {
         }
         
         binding.btnQuickQuiz.setOnClickListener {
-            showQuizCategorySelector()
+//            showQuizCategorySelector()
+            navigateToQuiz()
+        }
+
+        binding.btnRedeemHome.setOnClickListener {
+            startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
+        }
+
+        binding.reward.setOnClickListener {
+            startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
         }
     }
 
     private fun showQuizCategorySelector() {
         val bottomSheet = QuizCategoryBottomSheet.newInstance()
-        bottomSheet.onQuizStarted = { category ->
-            // Logic to start the actual quiz with the selected category
-            android.widget.Toast.makeText(requireContext(), "Starting $category Quiz!", android.widget.Toast.LENGTH_SHORT).show()
+        bottomSheet.onQuizStarted = { categories ->
+            // Pass categories via Fragment Result
+            parentFragmentManager.setFragmentResult("quiz_request", Bundle().apply {
+                putStringArrayList("categories", ArrayList(categories))
+            })
+            
+            // Navigate to Quiz tab
+            navigateToQuiz()
         }
         bottomSheet.show(childFragmentManager, QuizCategoryBottomSheet.TAG)
+    }
+
+    private fun navigateToQuiz() {
+        val mainActivity = requireActivity() as MainActivity
+        mainActivity
+            .findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+                R.id.bottom_navigation
+            )
+            .selectedItemId = R.id.navigation_quiz
     }
 
     override fun onDestroyView() {

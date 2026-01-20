@@ -80,4 +80,5 @@
     <string name="msg_review">Mint coins under review.</string>
     <string name="msg_delay">This reward will be credited shortly.</string>
     <string name="msg_block">Please try again later.</string>
+    <string name="redeem_now">Redeem Now</string>
 </resources>

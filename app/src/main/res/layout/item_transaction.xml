@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="Daily Quiz Win"
-        android:textColor="@color/white"
+        android:textColor="@color/text_headline"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/tv_tx_amount"

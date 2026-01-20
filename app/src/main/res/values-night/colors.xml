@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors (Adjusted for Dark Mode brightness if needed, or kept same) -->
+    <color name="mint_gold">#F59E0B</color>
+    <color name="mint_green">#10B981</color>
+    <color name="accent_red">#EF4444</color>
+
+    <!-- UI Colors (Dark Mode) -->
+    <color name="mint_background">#0F172A</color>
+    <color name="mint_surface">#1E293B</color>
+    <color name="mint_surface_light">#334155</color>
+    
+    <!-- Text Colors (Dark Mode) -->
+    <color name="text_headline">#F8FAFC</color>
+    <color name="text_subtext">#94A3B8</color>
+    <color name="text_hint">#64748B</color>
+
+    <!-- Glass/Borders (Dark Mode) -->
+    <color name="accent_glass">#1AFFFFFF</color>
+    <color name="accent_glass_border">#334155</color>
+</resources>

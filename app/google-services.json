@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "150365317778",
+    "project_id": "mintx-a0bf2",
+    "storage_bucket": "mintx-a0bf2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150365317778:android:3de1b2a2c3d2a1471a944b",
+        "android_client_info": {
+          "package_name": "com.digitar.mintx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALSJhoUIei6Xp-fdMK7htxlaFfSY24pSs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

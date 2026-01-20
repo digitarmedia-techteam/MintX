@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand Colors -->
+    <color name="mint_primary">#2DD4BF</color>
+    <color name="mint_secondary">#0EA5E9</color>
+    <color name="mint_gold">#D97706</color>
+    <color name="mint_green">#059669</color>
+    <color name="accent_red">#DC2626</color>
+
+    <!-- UI Colors (Light Mode Defaults) -->
+    <color name="mint_background">#F8FAFC</color>
+    <color name="mint_surface">#FFFFFF</color>
+    <color name="mint_surface_light">#F1F5F9</color>
+    
+    <!-- Text Colors (Light Mode) -->
+    <color name="text_headline">#0F172A</color>
+    <color name="text_subtext">#64748B</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_inverse">#FFFFFF</color>
+
+    <!-- Glass/Borders (Light Mode) -->
+    <color name="accent_glass">#1A000000</color>
+    <color name="accent_glass_border">#E2E8F0</color>
+
+    <!-- Legacy/Fixed Colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    
-    <!-- MintX Brand Colors -->
-    <color name="mint_gold">#FFD700</color>
-    <color name="mint_green">#00E676</color>
-    <color name="mint_background">#0F172A</color> <!-- Deep Slate Blue/Black -->
-    <color name="mint_surface">#1E293B</color>
-    <color name="mint_surface_light">#334155</color>
-    
-    <!-- Accent Colors -->
-    <color name="accent_red">#FF4B2B</color>
-    <color name="accent_blue">#00D2FF</color>
-    <color name="accent_glass">#1AFFFFFF</color>
-    <color name="accent_glass_border">#33FFFFFF</color>
-    
-    <!-- Text Colors -->
-    <color name="text_headline">#FFFFFF</color>
-    <color name="text_subtext">#94A3B8</color> <!-- Muted Slate -->
-    <color name="text_hint">#64748B</color>
+    <color name="fixed_white">#FFFFFF</color>
+    <color name="fixed_black">#000000</color>
 </resources>

@@ -22,10 +22,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 2. Set System Bar Icon Colors (Light icons for dark UI)
-        val controller = WindowInsetsControllerCompat(window, binding.root)
-        controller.isAppearanceLightStatusBars = false // false = white icons
-        controller.isAppearanceLightNavigationBars = false // false = white icons
+        // 2. Set System Bar Icon Colors - Handled by Theme (values/themes.xml)
+        // WindowInsetsControllerCompat(window, binding.root) // Not needed if XML handles it
 
         // 3. Handle Insets to prevent UI overlap (StatusBar and NavigationBar)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->

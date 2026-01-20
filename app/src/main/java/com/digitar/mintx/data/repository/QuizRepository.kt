@@ -16,15 +16,14 @@ class QuizRepository(private val context: Context) {
     private val gson = Gson()
 
     suspend fun getCategories(): List<QuizCategory> = withContext(Dispatchers.IO) {
-        // ... previous cache logic ...
-        val cachedJson = sharedPrefs.getString("categories_cache", null)
+        val cachedJson = sharedPrefs.getString("categories_cache_v2", null)
         if (cachedJson != null) {
             val type = object : TypeToken<List<QuizCategory>>() {}.type
             return@withContext gson.fromJson(cachedJson, type)
         }
 
-        val remoteCategories = ApiConstants.DEFAULT_CATEGORIES.map { QuizCategory(it) }
-        sharedPrefs.edit().putString("categories_cache", gson.toJson(remoteCategories)).apply()
+        val remoteCategories = ApiConstants.QUIZ_CATEGORIES
+        sharedPrefs.edit().putString("categories_cache_v2", gson.toJson(remoteCategories)).apply()
         return@withContext remoteCategories
     }
 

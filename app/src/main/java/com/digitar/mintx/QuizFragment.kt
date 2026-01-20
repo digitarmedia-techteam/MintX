@@ -3,6 +3,7 @@ package com.digitar.mintx
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
+import java.util.ArrayList
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -15,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.digitar.mintx.data.model.QuizQuestion
 import com.digitar.mintx.data.repository.QuizRepository
 import com.digitar.mintx.databinding.FragmentQuizBinding
+import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet
 import com.digitar.mintx.ui.quiz.QuizViewModel
 import java.util.Locale
 
@@ -49,9 +51,37 @@ class QuizFragment : Fragment() {
         setupClickListeners()
         observeViewModel()
         
-        // Initial fetch - using a default category or null for random
-        // "Code" is a verified valid category in QuizAPI.io
-        viewModel.fetchQuestions(category = "Code")
+        // Listen for category selection from Home or elsewhere
+        parentFragmentManager.setFragmentResultListener("quiz_request", viewLifecycleOwner) { _, bundle ->
+            val categories = bundle.getStringArrayList("categories")
+            if (!categories.isNullOrEmpty()) {
+                startQuizWithCategories(categories)
+            }
+        }
+
+        // Automatically show category selector if quiz hasn't started and no questions loaded
+        if (viewModel.questions.value.isNullOrEmpty()) {
+            showQuizCategorySelector()
+        }
+    }
+
+    private fun showQuizCategorySelector() {
+        val bottomSheet = QuizCategoryBottomSheet.newInstance()
+        bottomSheet.onQuizStarted = { categories ->
+            startQuizWithCategories(categories)
+        }
+        bottomSheet.show(childFragmentManager, QuizCategoryBottomSheet.TAG)
+    }
+
+    private fun startQuizWithCategories(categories: List<String>) {
+        // Update header to show category names
+        val categoryText = if (categories.size > 2) {
+            "${categories[0]} • ${categories[1]} +${categories.size - 2}"
+        } else {
+            categories.joinToString(" • ")
+        }
+        binding.tvQuizRewardLabel.text = categoryText
+        viewModel.fetchQuestions(categories = categories)
     }
 
     private fun setupClickListeners() {
@@ -72,7 +102,22 @@ class QuizFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.questions.observe(viewLifecycleOwner) { questions ->
             if (questions.isNotEmpty()) {
+                if (binding.layoutSkeleton.root.visibility == View.VISIBLE) {
+                    binding.layoutSkeleton.root.animate().alpha(0f).setDuration(300).withEndAction {
+                        binding.layoutSkeleton.root.visibility = View.GONE
+                    }
+                    binding.clQuizContent.alpha = 0f
+                    binding.clQuizContent.visibility = View.VISIBLE
+                    binding.clQuizContent.animate().alpha(1f).setDuration(300).start()
+                } else {
+                    binding.clQuizContent.visibility = View.VISIBLE
+                    binding.layoutSkeleton.root.visibility = View.GONE
+                }
                 updateUIForIndex(viewModel.currentIndex.value ?: 0)
+            } else {
+                binding.layoutSkeleton.root.visibility = View.VISIBLE
+                binding.layoutSkeleton.root.alpha = 1f
+                binding.clQuizContent.visibility = View.GONE
             }
         }
 
@@ -87,6 +132,8 @@ class QuizFragment : Fragment() {
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            // If loading but we already have questions, just show progress bar
+            // If loading and no questions, the skeleton is already visible
             binding.pbQuizProgress.isIndeterminate = isLoading
         }
 
@@ -255,6 +302,23 @@ class QuizFragment : Fragment() {
         }
         
         binding.tvTotalPoints.text = "Total Points: ${summary.totalPoints}"
+
+        // Summary Ring Logic
+        val accuracy = if (summary.totalQuestions > 0) {
+            ((summary.correctCount.toDouble() / summary.totalQuestions) * 100).toInt()
+        } else 0
+        
+        binding.tvSummaryAccuracy.text = "$accuracy%"
+        
+        // Determine Color based on highest count
+        val indicatorColor = when {
+            summary.correctCount >= summary.wrongCount && summary.correctCount >= summary.skippedCount -> R.color.mint_green
+            summary.wrongCount > summary.correctCount && summary.wrongCount >= summary.skippedCount -> R.color.accent_red
+            else -> R.color.mint_gold
+        }
+        
+        binding.pbSummaryRing.setIndicatorColor(ContextCompat.getColor(requireContext(), indicatorColor))
+        binding.pbSummaryRing.setProgressCompat(accuracy, true)
     }
 
     override fun onPause() {
