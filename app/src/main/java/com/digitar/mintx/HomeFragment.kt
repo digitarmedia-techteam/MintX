@@ -45,8 +45,25 @@ class HomeFragment : Fragment() {
             startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
         }
 
+        binding.btnRedeemHome.setOnClickListener {
+            startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
+        }
+
         binding.reward.setOnClickListener {
             startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
+        }
+
+        // Setup Profile Click
+        binding.navHeaderAvatar.setOnClickListener {
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Show basic user data
+        val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
+        val name = sessionManager.getUserName()
+        if (name != null) {
+            binding.tvGreeting.text = "Hello, $name 👋"
         }
     }
 

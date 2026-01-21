@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "150365317778",
+    "firebase_url": "https://mintx-a0bf2-default-rtdb.firebaseio.com",
     "project_id": "mintx-a0bf2",
     "storage_bucket": "mintx-a0bf2.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.digitar.mintx"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "150365317778-r89gujkr9s559l74q2c2vosvv44gcfuh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digitar.mintx",
+            "certificate_hash": "8d069ab603d5cbd4ea84590c19f3b563302ad9b0"
+          }
+        },
+        {
+          "client_id": "150365317778-g2du8au7kf79i5kcus2lv6csikm256qj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyALSJhoUIei6Xp-fdMK7htxlaFfSY24pSs"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150365317778-g2du8au7kf79i5kcus2lv6csikm256qj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

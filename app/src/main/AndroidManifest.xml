@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MintXApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,6 +26,15 @@
 
         <activity
             android:name=".RewardsStoreActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".auth.AuthActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+        
+        <activity
+            android:name=".ProfileActivity"
             android:exported="false" />
     </application>
 

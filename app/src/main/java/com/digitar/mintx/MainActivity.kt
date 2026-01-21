@@ -16,6 +16,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val sessionManager = com.digitar.mintx.utils.SessionManager(this)
+        if (!sessionManager.isLoggedIn()) {
+            val intent = android.content.Intent(this, com.digitar.mintx.auth.AuthActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         // 1. Enable Edge-to-Edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
         
@@ -49,6 +57,15 @@ class MainActivity : AppCompatActivity() {
             loadFragment(HomeFragment())
         }
     }
+    
+    // Note: If using Navigation Drawer, we would set up the listener here.
+    // Since we use Bottom Navigation and likely have a Header in HomeFragment or a Toolbar,
+    // we need to handle the click there.
+    // However, if the user specifically asked for "Nav Header Avatar" in "Navigation Drawer",
+    // maybe I should add a DrawerLayout? 
+    // BUT the current design is Bottom Nav. 
+    // I will assume the user refers to the Profile Icon in the Home Screen.
+    // I will check HomeFragment next.
 
     private fun setupNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
