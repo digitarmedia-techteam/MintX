@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Alternative badge background with shadow effect -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Shadow Layer -->
+    <item
+        android:left="0dp"
+        android:top="2dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#20000000" />
+        </shape>
+    </item>
+    
+    <!-- Main Badge -->
+    <item
+        android:bottom="2dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            
+            <gradient
+                android:angle="135"
+                android:startColor="@color/mint_surface"
+                android:endColor="@color/mint_surface_light"
+                android:type="linear" />
+            
+            <stroke
+                android:width="1.5dp"
+                android:color="@color/mint_gold" />
+            
+            <padding
+                android:bottom="8dp"
+                android:left="14dp"
+                android:right="14dp"
+                android:top="8dp" />
+        </shape>
+    </item>
+    
+</layer-list>

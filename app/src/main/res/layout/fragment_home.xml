@@ -270,7 +270,7 @@
                         android:layout_marginTop="12dp"
                         android:backgroundTint="@color/white"
                         android:text="Predict &amp; Win"
-                        android:textColor="@color/mint_background"
+                        android:textColor="@color/fixed_black"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_featured_title" />

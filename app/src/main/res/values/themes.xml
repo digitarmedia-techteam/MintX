@@ -14,7 +14,8 @@
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item> <!-- Default to light for Light Mode -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item> <!-- Default to light for Light Mode -->
         <!-- Backgrounds -->
         <item name="android:windowBackground">@color/mint_background</item>
         <item name="android:colorBackground">@color/mint_background</item>

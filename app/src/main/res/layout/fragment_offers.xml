@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_earn_title"
         app:tabIndicatorColor="@color/mint_green"
         app:tabIndicatorHeight="3dp"
-        app:tabSelectedTextColor="@color/white"
+        app:tabSelectedTextColor="@color/mint_green"
         app:tabTextColor="@color/text_subtext">
 
         <com.google.android.material.tabs.TabItem

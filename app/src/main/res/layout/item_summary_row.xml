@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:progress="0"
+            app:indicatorColor="@color/mint_primary"
             app:indicatorSize="48dp"
             app:trackColor="@color/accent_glass_border"
             app:trackCornerRadius="2dp"

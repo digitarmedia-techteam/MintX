@@ -50,7 +50,7 @@
                         android:id="@+id/tv_match_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#1affffff"
+                        android:background="@color/accent_glass"
                         android:padding="8dp"
                         android:text="@string/match_type"
                         android:textAlignment="center"
@@ -88,7 +88,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="@string/team_a_name"
-                            android:textColor="@color/white"
+                            android:textColor="@color/text_headline"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -134,7 +134,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="@string/team_b_name"
-                            android:textColor="@color/white"
+                            android:textColor="@color/text_headline"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -176,7 +176,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="@string/predict_win_prompt"
-                android:textColor="@color/white"
+                android:textColor="@color/text_headline"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -198,7 +198,7 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:text="@string/team_a_name"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_headline"
                     android:textSize="16sp" />
 
                 <TextView
@@ -210,7 +210,7 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:text="@string/draw"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_headline"
                     android:textSize="16sp" />
 
                 <TextView
@@ -222,7 +222,7 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:text="@string/team_b_name"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_headline"
                     android:textSize="16sp" />
 
             </LinearLayout>

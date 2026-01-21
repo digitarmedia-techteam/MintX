@@ -67,21 +67,142 @@ class QuizFragment : Fragment() {
 
     private fun showQuizCategorySelector() {
         val bottomSheet = QuizCategoryBottomSheet.newInstance()
+        bottomSheet.isCancelable = false
+        
         bottomSheet.onQuizStarted = { categories ->
             startQuizWithCategories(categories)
         }
+        
+        bottomSheet.onQuit = {
+            // Navigate to HomeFragment
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, HomeFragment())
+                .commit()
+        }
+        
         bottomSheet.show(childFragmentManager, QuizCategoryBottomSheet.TAG)
     }
 
     private fun startQuizWithCategories(categories: List<String>) {
-        // Update header to show category names
-        val categoryText = if (categories.size > 2) {
-            "${categories[0]} • ${categories[1]} +${categories.size - 2}"
-        } else {
-            categories.joinToString(" • ")
+        // Clear existing chips
+        binding.chipGroupSelectedCategories.removeAllViews()
+        
+        // Create a chip for each category
+        categories.forEach { categoryName ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = categoryName
+                isClickable = false
+                isCheckable = false
+                
+                //Premium chip styling
+                chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(requireContext(), R.color.mint_surface)
+                )
+                chipStrokeColor = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(requireContext(), R.color.mint_gold)
+                )
+                chipStrokeWidth = 3f  // Slightly thicker border
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_headline))
+                
+                // Shape and size
+                chipCornerRadius = 50f  // More rounded for premium look
+                chipMinHeight = 36f  // Slightly taller
+                
+                // Typography
+                textSize = 13f  // Slightly larger text
+                typeface = android.graphics.Typeface.DEFAULT_BOLD  // Bold text
+                
+                // Padding
+                setPadding(20, 8, 20, 8)  // More horizontal padding
+                
+                // Elevation for depth
+                elevation = 2f
+                stateListAnimator = null  // Remove default animation for custom look
+            }
+            binding.chipGroupSelectedCategories.addView(chip)
         }
-        binding.tvQuizRewardLabel.text = categoryText
+        
+        // Animate UI elements
+        animateQuizStart()
+        
         viewModel.fetchQuestions(categories = categories)
+    }
+
+    private fun animateQuizStart() {
+        // 1. Animate Header from top
+        val headerAnim = android.animation.ObjectAnimator.ofFloat(
+            binding.clQuizHeader, 
+            "translationY", 
+            -100f, 
+            0f
+        ).apply {
+            duration = 500
+            interpolator = android.view.animation.DecelerateInterpolator()
+        }
+
+        // 2. Animate Info Icon (pop in)
+        binding.btnCategoryInfo.alpha = 0f
+        binding.btnCategoryInfo.scaleX = 0f
+        binding.btnCategoryInfo.scaleY = 0f
+        
+        val iconAlpha = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "alpha", 0f, 1f)
+        val iconScaleX = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "scaleX", 0f, 1f)
+        val iconScaleY = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "scaleY", 0f, 1f)
+        
+        val iconAnimSet = android.animation.AnimatorSet().apply {
+            playTogether(iconAlpha, iconScaleX, iconScaleY)
+            duration = 500
+            startDelay = 200
+            interpolator = android.view.animation.OvershootInterpolator()
+        }
+
+        // Play all animations together
+        android.animation.AnimatorSet().apply {
+            playTogether(headerAnim, iconAnimSet)
+            start()
+        }
+        
+        // Setup tooltip toggle
+        binding.btnCategoryInfo.setOnClickListener { toggleTooltip() }
+        
+        // Hide tooltip when scrolling or clicking content
+        binding.root.setOnClickListener { hideTooltip() }
+    }
+    
+    private fun toggleTooltip() {
+        val tooltip = binding.cvCategoryTooltip
+        if (tooltip.visibility == View.VISIBLE) {
+            hideTooltip()
+        } else {
+            // Show
+            tooltip.visibility = View.VISIBLE
+            tooltip.alpha = 0f
+            tooltip.pivotX = 0f
+            tooltip.pivotY = 0f
+            tooltip.scaleX = 0.5f
+            tooltip.scaleY = 0.5f
+            
+            tooltip.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(300)
+                .setInterpolator(android.view.animation.OvershootInterpolator())
+                .start()
+        }
+    }
+    
+    private fun hideTooltip() {
+        val tooltip = binding.cvCategoryTooltip
+        if (tooltip.visibility == View.VISIBLE) {
+            tooltip.animate()
+                .alpha(0f)
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .setDuration(200)
+                .withEndAction { tooltip.visibility = View.GONE }
+                .start()
+        }
     }
 
     private fun setupClickListeners() {

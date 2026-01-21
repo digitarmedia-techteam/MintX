@@ -28,6 +28,7 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var adapter: MainCategoryAdapter
     var onQuizStarted: ((List<String>) -> Unit)? = null
+    var onQuit: (() -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +37,17 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetQuizCategoriesBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isCancelable = false
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,6 +66,7 @@ class QuizCategoryBottomSheet : BottomSheetDialogFragment() {
         }
 
         binding.btnClose.setOnClickListener {
+            onQuit?.invoke()
             dismiss()
         }
 

@@ -47,8 +47,8 @@
     <!-- Breadcrumb Skeleton -->
     <View
         android:id="@+id/sk_breadcrumb"
-        android:layout_width="180dp"
-        android:layout_height="24dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="24dp"
         android:background="@drawable/glass_card_bg"
         app:layout_constraintBottom_toBottomOf="@id/sk_timer"
