@@ -73,7 +73,6 @@
             android:id="@+id/ivAvatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="4dp"
             android:src="@drawable/user_gif" />
             <!-- Padding creates a white ring effect -->
     </androidx.cardview.widget.CardView>
@@ -222,8 +221,6 @@
                 android:layout_marginBottom="24dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/white"
-                app:strokeColor="@color/accent_glass_border"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -329,7 +326,6 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FEF2F2"
                 app:strokeColor="#FECACA"
                 app:strokeWidth="1dp">
                 

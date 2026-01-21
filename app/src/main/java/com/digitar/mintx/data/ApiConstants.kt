@@ -6,8 +6,8 @@ import com.digitar.mintx.data.model.SubCategory
 object ApiConstants {
     const val BASE_URL = "https://quizapi.io/api/v1/"
     // Note: User should replace this with their actual API key
-    const val API_KEY = "25w7Qg8oTSUSmf7UELPzjE0jUVnNpoEM2fDLmG9p"
-//    const val API_KEY = ""
+//    const val API_KEY = "25w7Qg8oTSUSmf7UELPzjE0jUVnNpoEM2fDLmG9p"
+    const val API_KEY = ""
 
     val QUIZ_CATEGORIES = listOf(
         QuizCategory(

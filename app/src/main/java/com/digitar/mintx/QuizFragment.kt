@@ -61,7 +61,8 @@ class QuizFragment : Fragment() {
 
         // Automatically show category selector if quiz hasn't started and no questions loaded
         if (viewModel.questions.value.isNullOrEmpty()) {
-            showQuizCategorySelector()
+             // Default to Linux if no selection to skip selector
+            startQuizWithCategories(listOf("Linux"))
         }
     }
 
@@ -84,44 +85,6 @@ class QuizFragment : Fragment() {
     }
 
     private fun startQuizWithCategories(categories: List<String>) {
-        // Clear existing chips
-        binding.chipGroupSelectedCategories.removeAllViews()
-        
-        // Create a chip for each category
-        categories.forEach { categoryName ->
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                text = categoryName
-                isClickable = false
-                isCheckable = false
-                
-                //Premium chip styling
-                chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), R.color.mint_surface)
-                )
-                chipStrokeColor = android.content.res.ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), R.color.mint_gold)
-                )
-                chipStrokeWidth = 3f  // Slightly thicker border
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.text_headline))
-                
-                // Shape and size
-                chipCornerRadius = 50f  // More rounded for premium look
-                chipMinHeight = 36f  // Slightly taller
-                
-                // Typography
-                textSize = 13f  // Slightly larger text
-                typeface = android.graphics.Typeface.DEFAULT_BOLD  // Bold text
-                
-                // Padding
-                setPadding(20, 8, 20, 8)  // More horizontal padding
-                
-                // Elevation for depth
-                elevation = 2f
-                stateListAnimator = null  // Remove default animation for custom look
-            }
-            binding.chipGroupSelectedCategories.addView(chip)
-        }
-        
         // Animate UI elements
         animateQuizStart()
         
@@ -140,83 +103,13 @@ class QuizFragment : Fragment() {
             interpolator = android.view.animation.DecelerateInterpolator()
         }
 
-        // 2. Animate Info Icon (pop in)
-        binding.btnCategoryInfo.alpha = 0f
-        binding.btnCategoryInfo.scaleX = 0f
-        binding.btnCategoryInfo.scaleY = 0f
-        
-        val iconAlpha = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "alpha", 0f, 1f)
-        val iconScaleX = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "scaleX", 0f, 1f)
-        val iconScaleY = android.animation.ObjectAnimator.ofFloat(binding.btnCategoryInfo, "scaleY", 0f, 1f)
-        
-        val iconAnimSet = android.animation.AnimatorSet().apply {
-            playTogether(iconAlpha, iconScaleX, iconScaleY)
-            duration = 500
-            startDelay = 200
-            interpolator = android.view.animation.OvershootInterpolator()
-        }
-
-        // Play all animations together
-        android.animation.AnimatorSet().apply {
-            playTogether(headerAnim, iconAnimSet)
-            start()
-        }
-        
-        // Setup tooltip toggle
-        binding.btnCategoryInfo.setOnClickListener { toggleTooltip() }
-        
-        // Hide tooltip when scrolling or clicking content
-        binding.root.setOnClickListener { hideTooltip() }
+        headerAnim.start()
     }
     
-    private fun toggleTooltip() {
-        val tooltip = binding.cvCategoryTooltip
-        if (tooltip.visibility == View.VISIBLE) {
-            hideTooltip()
-        } else {
-            // Show
-            tooltip.visibility = View.VISIBLE
-            tooltip.alpha = 0f
-            tooltip.pivotX = 0f
-            tooltip.pivotY = 0f
-            tooltip.scaleX = 0.5f
-            tooltip.scaleY = 0.5f
-            
-            tooltip.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(300)
-                .setInterpolator(android.view.animation.OvershootInterpolator())
-                .start()
-        }
-    }
-    
-    private fun hideTooltip() {
-        val tooltip = binding.cvCategoryTooltip
-        if (tooltip.visibility == View.VISIBLE) {
-            tooltip.animate()
-                .alpha(0f)
-                .scaleX(0.8f)
-                .scaleY(0.8f)
-                .setDuration(200)
-                .withEndAction { tooltip.visibility = View.GONE }
-                .start()
-        }
-    }
-
     private fun setupClickListeners() {
-        binding.btnNext.setOnClickListener {
+        binding.btnSkip.setOnClickListener {
+            // Act as skip/next
             viewModel.nextQuestion()
-        }
-
-        binding.btnPrev.setOnClickListener {
-            viewModel.prevQuestion()
-        }
-
-        binding.btnFinish.setOnClickListener {
-            // Navigate back or perform finish action
-            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -285,9 +178,12 @@ class QuizFragment : Fragment() {
         displayOptions(question, index)
 
         // Update Nav Buttons
-        binding.btnPrev.isEnabled = index > 0
-        binding.btnPrev.alpha = if (index > 0) 1.0f else 0.5f
-        binding.btnNext.text = if (index == questions.size - 1) "Finish" else "Next"
+        // binding.btnPrev.isEnabled = index > 0
+        // binding.btnPrev.alpha = if (index > 0) 1.0f else 0.5f
+        // binding.btnNext.text = if (index == questions.size - 1) "Finish" else "Next"
+        
+        // Update Skip Button Text (Optional: Change Skip to Finish on last question)
+        binding.btnSkip.text = if (index == questions.size - 1) "Finish" else "Skip"
     }
 
     private fun displayOptions(question: QuizQuestion, questionIndex: Int) {

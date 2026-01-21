@@ -47,7 +47,7 @@
     <!-- Breadcrumb Skeleton -->
     <View
         android:id="@+id/sk_breadcrumb"
-        android:layout_width="40dp"
+        android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginStart="24dp"
         android:background="@drawable/glass_card_bg"
