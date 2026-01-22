@@ -26,6 +26,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _timerText = MutableLiveData<String>()
     val timerText: LiveData<String> = _timerText
 
+    private val _timerSeconds = MutableLiveData<Long>()
+    val timerSeconds: LiveData<Long> = _timerSeconds
+
     private val _isResendEnabled = MutableLiveData<Boolean>()
     val isResendEnabled: LiveData<Boolean> = _isResendEnabled
 
@@ -175,13 +178,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(90000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                val minutes = millisUntilFinished / 1000 / 60
-                val seconds = millisUntilFinished / 1000 % 60
+                val secondsRemaining = millisUntilFinished / 1000
+                _timerSeconds.value = secondsRemaining
+                
+                val minutes = secondsRemaining / 60
+                val seconds = secondsRemaining % 60
                 _timerText.value = String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
-                _timerText.value = "00:00"
+                _timerText.value = "Resend OTP"
+                _timerSeconds.value = 0
                 _isResendEnabled.value = true
             }
         }.start()

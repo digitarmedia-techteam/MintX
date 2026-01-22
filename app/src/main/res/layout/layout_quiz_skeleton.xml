@@ -12,12 +12,13 @@
         android:layout_height="16dp"
         android:layout_margin="16dp"
         android:background="@drawable/glass_card_bg"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/sk_accuracy_text"
-        android:layout_width="80dp"
+        android:layout_width="60dp"
         android:layout_height="16dp"
         android:layout_margin="16dp"
         android:background="@drawable/glass_card_bg"
@@ -37,7 +38,7 @@
     <View
         android:id="@+id/sk_timer"
         android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_height="34dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:background="@drawable/glass_card_bg"

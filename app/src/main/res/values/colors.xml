@@ -3,7 +3,8 @@
     <!-- Brand Colors -->
     <color name="mint_primary">#2DD4BF</color>
     <color name="mint_secondary">#0EA5E9</color>
-    <color name="mint_gold">#D97706</color>
+    <color name="quiz_orange">#D97706</color>
+    <color name="mint_gold">#FF6B35</color>
     <color name="mint_green">#059669</color>
     <color name="accent_red">#DC2626</color>
 

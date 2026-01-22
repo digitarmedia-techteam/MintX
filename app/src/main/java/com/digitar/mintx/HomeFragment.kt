@@ -70,24 +70,16 @@ class HomeFragment : Fragment() {
     private fun showQuizCategorySelector() {
         val bottomSheet = QuizCategoryBottomSheet.newInstance()
         bottomSheet.onQuizStarted = { categories ->
-            // Pass categories via Fragment Result
-            parentFragmentManager.setFragmentResult("quiz_request", Bundle().apply {
-                putStringArrayList("categories", ArrayList(categories))
-            })
-            
-            // Navigate to Quiz tab
-            navigateToQuiz()
+            // Pass categories via Intent
+            val intent = Intent(requireContext(), QuizActivity::class.java)
+            intent.putStringArrayListExtra("categories", ArrayList(categories))
+            startActivity(intent)
         }
         bottomSheet.show(childFragmentManager, QuizCategoryBottomSheet.TAG)
     }
 
     private fun navigateToQuiz() {
-        val mainActivity = requireActivity() as MainActivity
-        mainActivity
-            .findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
-                R.id.bottom_navigation
-            )
-            .selectedItemId = R.id.navigation_quiz
+        startActivity(Intent(requireContext(), QuizActivity::class.java))
     }
 
     override fun onDestroyView() {

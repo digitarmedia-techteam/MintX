@@ -55,6 +55,12 @@ class MainActivity : AppCompatActivity() {
         // 4. Load default fragment
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
+
+            // 5. Check for Onboarding (Categories)
+            if (!sessionManager.isCategoriesSelected()) {
+                val onboardingFragment = com.digitar.mintx.ui.OnboardingBottomSheetFragment()
+                onboardingFragment.show(supportFragmentManager, "OnboardingBottomSheet")
+            }
         }
     }
     
@@ -75,8 +81,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_quiz -> {
-                    loadFragment(QuizFragment())
-                    true
+                    startActivity(android.content.Intent(this, QuizActivity::class.java))
+                    false
                 }
                 R.id.navigation_prediction -> {
                     loadFragment(PredictionFragment())

@@ -14,6 +14,7 @@ class SessionManager(context: Context) {
         private const val KEY_MOBILE_NUMBER = "mobileNumber"
         private const val KEY_USER_NAME = "userName"
         private const val KEY_USER_AGE = "userAge"
+        private const val KEY_IS_CATEGORIES_SELECTED = "isCategoriesSelected"
     }
 
     fun createLoginSession(mobileNumber: String) {
@@ -42,6 +43,12 @@ class SessionManager(context: Context) {
     fun getUserName(): String? = prefs.getString(KEY_USER_NAME, "User")
 
     fun getUserAge(): Int = prefs.getInt(KEY_USER_AGE, 0)
+
+    fun setCategoriesSelected(isSelected: Boolean) {
+        prefs.edit().putBoolean(KEY_IS_CATEGORIES_SELECTED, isSelected).apply()
+    }
+
+    fun isCategoriesSelected(): Boolean = prefs.getBoolean(KEY_IS_CATEGORIES_SELECTED, false)
     
     fun logout() {
         com.google.firebase.auth.FirebaseAuth.getInstance().signOut()

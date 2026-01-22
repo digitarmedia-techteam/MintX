@@ -51,11 +51,19 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
         setupOtpInputs()
         setupObservers()
         
-        binding.tvOtpSubtitle.text = "We've sent a code to $mobileNumber"
+        binding.tvPhoneNumber.text = mobileNumber
         
         binding.btnResend.setOnClickListener {
             viewModel.resendOtp(mobileNumber, requireActivity())
-            startSmsListener() // Restart listener on resend
+            startSmsListener()
+        }
+        
+        binding.btnBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+        
+        binding.tvGoBack.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 
@@ -81,14 +89,12 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
                             // Last box filled, verify
                             verifyOtp()
                         }
+                    } else if (s?.length == 0 && i > 0) {
+                         // Optional: Handle backspace to move focus back (needs OnKeyListener usually)
                     }
                 }
                 override fun afterTextChanged(s: Editable?) {}
             })
-            
-            // Backspace handling basic logic (optional but good for UX)
-            // For brevity, skipping specific backspace handling code 
-            // but standard Android behavior usually works ok-ish with number inputs.
         }
     }
 
@@ -101,12 +107,37 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
 
     private fun setupObservers() {
         viewModel.timerText.observe(viewLifecycleOwner) { 
-            binding.tvTimer.text = it 
+            // format: "Resend SMS in XXs" or "Resend SMS"
+            if (it == "Resend OTP") {
+                binding.tvResendTimer.text = "Resend SMS"
+                binding.tvResendTimer.setTextColor(resources.getColor(R.color.mint_primary, null))
+                binding.tvResendTimer.setOnClickListener { 
+                    viewModel.resendOtp(mobileNumber, requireActivity())
+                    startSmsListener()
+                }
+            } else {
+                binding.tvResendTimer.text = "Resend SMS in $it"
+                binding.tvResendTimer.setOnClickListener(null)
+            }
+        }
+        
+        viewModel.timerSeconds.observe(viewLifecycleOwner) { seconds ->
+             if (binding.tvResendTimer.text.toString() == "Resend SMS") return@observe
+             
+             val colorStart = resources.getColor(R.color.mint_green, null)
+             val colorMiddle = resources.getColor(R.color.mint_gold, null)
+             val colorEnd = resources.getColor(R.color.accent_red, null)
+             
+             val color = when {
+                 seconds > 60 -> colorStart
+                 seconds > 30 -> colorMiddle
+                 else -> colorEnd
+             }
+             binding.tvResendTimer.setTextColor(color)
         }
 
         viewModel.isResendEnabled.observe(viewLifecycleOwner) { enabled ->
-            binding.btnResend.isEnabled = enabled
-            // binding.btnResend.setTextColor(...) if needed
+             // Handled by text click above
         }
 
         viewModel.loginState.observe(viewLifecycleOwner) { state ->

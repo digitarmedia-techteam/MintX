@@ -1,34 +1,32 @@
 package com.digitar.mintx
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.LayoutInflater
-import java.util.ArrayList
 import android.view.View
-import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.digitar.mintx.data.model.QuizQuestion
 import com.digitar.mintx.data.repository.QuizRepository
-import com.digitar.mintx.databinding.FragmentQuizBinding
+import com.digitar.mintx.databinding.ActivityQuizBinding
 import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet
 import com.digitar.mintx.ui.quiz.QuizViewModel
 import java.util.Locale
 
-class QuizFragment : Fragment() {
+class QuizActivity : AppCompatActivity() {
 
-    private var _binding: FragmentQuizBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityQuizBinding
 
     private val viewModel: QuizViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return QuizViewModel(QuizRepository(requireContext())) as T
+                return QuizViewModel(QuizRepository(this@QuizActivity)) as T
             }
         }
     }
@@ -36,33 +34,24 @@ class QuizFragment : Fragment() {
     private var countDownTimer: CountDownTimer? = null
     private val TIMER_DURATION = 120000L // 2 minutes
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentQuizBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         
+        binding = ActivityQuizBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.mint_gold)
+
         setupClickListeners()
         observeViewModel()
-        
-        // Listen for category selection from Home or elsewhere
-        parentFragmentManager.setFragmentResultListener("quiz_request", viewLifecycleOwner) { _, bundle ->
-            val categories = bundle.getStringArrayList("categories")
-            if (!categories.isNullOrEmpty()) {
-                startQuizWithCategories(categories)
-            }
-        }
 
-        // Automatically show category selector if quiz hasn't started and no questions loaded
-        if (viewModel.questions.value.isNullOrEmpty()) {
-             // Default to Linux if no selection to skip selector
-            startQuizWithCategories(listOf("Linux"))
+        val categories = intent.getStringArrayListExtra("categories")
+        if (!categories.isNullOrEmpty()) {
+            startQuizWithCategories(categories)
+        } else {
+             if (viewModel.questions.value.isNullOrEmpty()) {
+                 // Default to Linux if no selection passed
+                 startQuizWithCategories(listOf("Linux"))
+             }
         }
     }
 
@@ -75,46 +64,50 @@ class QuizFragment : Fragment() {
         }
         
         bottomSheet.onQuit = {
-            // Navigate to HomeFragment
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment, HomeFragment())
-                .commit()
+            finish()
         }
         
-        bottomSheet.show(childFragmentManager, QuizCategoryBottomSheet.TAG)
+        bottomSheet.show(supportFragmentManager, QuizCategoryBottomSheet.TAG)
     }
 
     private fun startQuizWithCategories(categories: List<String>) {
-        // Animate UI elements
         animateQuizStart()
-        
         viewModel.fetchQuestions(categories = categories)
     }
 
     private fun animateQuizStart() {
-        // 1. Animate Header from top
-        val headerAnim = android.animation.ObjectAnimator.ofFloat(
-            binding.clQuizHeader, 
+        val headerAnim = ObjectAnimator.ofFloat(
+            binding.header.root, 
             "translationY", 
             -100f, 
             0f
         ).apply {
             duration = 500
-            interpolator = android.view.animation.DecelerateInterpolator()
+            interpolator = DecelerateInterpolator()
         }
 
         headerAnim.start()
     }
     
     private fun setupClickListeners() {
-        binding.btnSkip.setOnClickListener {
-            // Act as skip/next
-            viewModel.nextQuestion()
+        binding.header.btnBack.setOnClickListener {
+            finish()
+        }
+        
+
+
+        binding.btnFinish.setOnClickListener {
+            finish()
+        }
+
+        binding.btnPlayAgain.setOnClickListener {
+            binding.clSummary.visibility = View.GONE
+            viewModel.restartQuiz()
         }
     }
 
     private fun observeViewModel() {
-        viewModel.questions.observe(viewLifecycleOwner) { questions ->
+        viewModel.questions.observe(this) { questions ->
             if (questions.isNotEmpty()) {
                 if (binding.layoutSkeleton.root.visibility == View.VISIBLE) {
                     binding.layoutSkeleton.root.animate().alpha(0f).setDuration(300).withEndAction {
@@ -135,25 +128,66 @@ class QuizFragment : Fragment() {
             }
         }
 
-        viewModel.currentIndex.observe(viewLifecycleOwner) { index ->
+        viewModel.currentIndex.observe(this) { index ->
             updateUIForIndex(index)
         }
 
-        viewModel.quizFinished.observe(viewLifecycleOwner) { isFinished ->
+        viewModel.quizFinished.observe(this) { isFinished ->
             if (isFinished) {
                 showSummary()
             }
         }
 
-        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            // If loading but we already have questions, just show progress bar
-            // If loading and no questions, the skeleton is already visible
-            binding.pbQuizProgress.isIndeterminate = isLoading
+        viewModel.loading.observe(this) { isLoading ->
+            // Toggle Skeleton and Content visibility
+            if (isLoading) {
+                binding.layoutSkeleton.root.visibility = View.VISIBLE
+                binding.clQuizContent.visibility = View.GONE
+            } else {
+                binding.layoutSkeleton.root.visibility = View.GONE
+                binding.clQuizContent.visibility = View.VISIBLE
+            }
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { errorMsg ->
+        viewModel.currentScore.observe(this) { score ->
+            binding.header.tvCurrentScore.text = "Pts: $score"
+        }
+
+        viewModel.scoreUpdateEvent.observe(this) { delta ->
+            val animView = binding.header.tvScoreAnim
+            animView.text = if (delta > 0) "+$delta" else "$delta"
+            animView.setTextColor(
+                ContextCompat.getColor(
+                    this,
+                    if (delta > 0) R.color.mint_green else R.color.accent_red
+                )
+            )
+            
+            animView.visibility = View.VISIBLE
+            animView.alpha = 0f
+            animView.translationY = 20f
+
+            animView.animate()
+                .alpha(1f)
+                .translationY(-20f)
+                .setDuration(400)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    animView.animate()
+                        .alpha(0f)
+                        .setDuration(300)
+                        .setStartDelay(200)
+                        .withEndAction {
+                            animView.visibility = View.GONE
+                        }
+                        .start()
+                }
+                .start()
+        }
+
+        viewModel.error.observe(this) { errorMsg ->
             if (errorMsg != null) {
-                Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -164,33 +198,25 @@ class QuizFragment : Fragment() {
 
         val question = questions[index]
         
-        // Reset and start timer
         startTimer()
 
-        // Update Progress
-        binding.tvQuizProgress.text = "Question ${index + 1} of ${questions.size}"
-        binding.pbQuizProgress.progress = ((index + 1) * 100) / questions.size
+        binding.header.tvQuizProgressText.text = "Question ${index + 1} of ${questions.size}"
+        binding.header.tvQuestionLabel.text = "0${index + 1} Question"
+        binding.header.pbQuizProgress.progress = ((index + 1) * 100) / questions.size
         
-        // Question Text
-        binding.tvQuestionText.text = question.question
+        binding.question.tvQuestionText.text = "Q${index + 1}. ${question.question}"
+        
+        // Update Category Label
+        val categoryName = question.category
+        binding.question.tvCategoryLabel.text = categoryName.uppercase()
 
-        // Display Options
         displayOptions(question, index)
-
-        // Update Nav Buttons
-        // binding.btnPrev.isEnabled = index > 0
-        // binding.btnPrev.alpha = if (index > 0) 1.0f else 0.5f
-        // binding.btnNext.text = if (index == questions.size - 1) "Finish" else "Next"
-        
-        // Update Skip Button Text (Optional: Change Skip to Finish on last question)
-        binding.btnSkip.text = if (index == questions.size - 1) "Finish" else "Skip"
     }
 
     private fun displayOptions(question: QuizQuestion, questionIndex: Int) {
-        val options = listOf(binding.btnOption1, binding.btnOption2, binding.btnOption3, binding.btnOption4)
+        val options = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
         val selectedAnswer = viewModel.userAnswers.value?.get(questionIndex)
 
-        // Reset states
         options.forEach { 
             it.visibility = View.GONE
             it.isActivated = false
@@ -207,12 +233,17 @@ class QuizFragment : Fragment() {
             val answerText = validAnswers[key]
 
             view.visibility = View.VISIBLE
-            view.text = answerText
+            val label = when(i) {
+                0 -> "A"
+                1 -> "B"
+                2 -> "C"
+                3 -> "D"
+                else -> ""
+            }
+            view.text = "$label. $answerText"
 
-            // Restore selection if exists
             if (selectedAnswer == key) {
                 highlightSelection(view, key, question)
-                // If answered, disable buttons for this question
                 options.forEach { it.isEnabled = false }
             }
 
@@ -222,9 +253,8 @@ class QuizFragment : Fragment() {
                 highlightSelection(view, key, question)
                 options.forEach { it.isEnabled = false }
                 
-                // Optional: Auto move to next after delay
                 binding.root.postDelayed({
-                    if (isAdded && viewModel.currentIndex.value == questionIndex) {
+                    if (!isFinishing && viewModel.currentIndex.value == questionIndex) {
                         viewModel.nextQuestion()
                     }
                 }, 1000)
@@ -240,13 +270,12 @@ class QuizFragment : Fragment() {
             view.isActivated = true
         } else {
             view.isSelected = true
-            // Also show the correct one
             showCorrectAnswer(question)
         }
     }
 
     private fun showCorrectAnswer(question: QuizQuestion) {
-        val options = listOf(binding.btnOption1, binding.btnOption2, binding.btnOption3, binding.btnOption4)
+        val options = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
         val validAnswers = question.answers.filterValues { it != null }
         val answerKeys = validAnswers.keys.toList()
 
@@ -263,26 +292,40 @@ class QuizFragment : Fragment() {
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(TIMER_DURATION, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                val progress = ((millisUntilFinished.toFloat() / TIMER_DURATION.toFloat()) * 100).toInt()
-                binding.pbTimerRing.progress = progress
+                // Smooth Progress Calculation
+                val totalDuration = TIMER_DURATION.toFloat()
+                val currentMillis = millisUntilFinished.toFloat()
+                val progress = (currentMillis / totalDuration) * 100f
+                
+                // Color Transition Logic (Green -> Gold -> Red) based on %
+                val colorRes = when {
+                    progress > 60f -> R.color.mint_green
+                    progress > 30f -> R.color.mint_gold
+                    else -> R.color.accent_red
+                }
+                val color = ContextCompat.getColor(this@QuizActivity, colorRes)
 
+                // Update Premium Border Timer
+                binding.question.viewTimerBorder.setProgress(progress, color)
+                
+                // Update Analog Clock Timer (Floating)
                 val minutes = (millisUntilFinished / 1000) / 60
                 val seconds = (millisUntilFinished / 1000) % 60
-                binding.tvTimerText.text = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+                val timeStr = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
                 
-                // Visual warning color
-                if (millisUntilFinished < 15000) {
-                    binding.tvTimerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent_red))
-                    binding.pbTimerRing.setIndicatorColor(ContextCompat.getColor(requireContext(), R.color.accent_red))
-                } else {
-                    binding.tvTimerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                    binding.pbTimerRing.setIndicatorColor(ContextCompat.getColor(requireContext(), R.color.mint_gold))
-                }
+                binding.layoutFloating.viewFloatingTimer.setProgress(progress, color)
+                binding.layoutFloating.viewFloatingTimer.setText(timeStr)
+                
+                // Breathing Animation for Floating Timer
+                val scale = 1f + (0.05f * kotlin.math.sin(System.currentTimeMillis() / 200.0).toFloat())
+                binding.layoutFloating.cardFloatingTimer.scaleX = scale
+                binding.layoutFloating.cardFloatingTimer.scaleY = scale
             }
 
             override fun onFinish() {
-                binding.tvTimerText.text = "00:00"
-                Toast.makeText(requireContext(), "Time's up!", Toast.LENGTH_SHORT).show()
+                binding.question.viewTimerBorder.setProgress(0f, ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
+                // binding.timer.tvTimerText.text = "00:00"
+                Toast.makeText(this@QuizActivity, "Time's up!", Toast.LENGTH_SHORT).show()
                 viewModel.nextQuestion()
             }
         }.start()
@@ -297,8 +340,8 @@ class QuizFragment : Fragment() {
         val summary = viewModel.getQuizSummary()
         
         binding.clSummary.visibility = View.VISIBLE
+        binding.clQuizContent.visibility = View.GONE
         
-        // Fill Summary Data
         binding.rowTotal.apply {
             tvLabel.text = "Total Questions"
             tvValue.text = summary.totalQuestions.toString()
@@ -306,12 +349,22 @@ class QuizFragment : Fragment() {
         binding.rowCorrect.apply {
             tvLabel.text = "Correct Answers"
             tvValue.text = summary.correctCount.toString()
-            tvValue.setTextColor(ContextCompat.getColor(requireContext(), R.color.mint_green))
+            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
+        }
+        binding.rowCorrectPoints.apply {
+            tvLabel.text = "Points Earned"
+            tvValue.text = "+${summary.correctPoints}"
+            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
         }
         binding.rowWrong.apply {
             tvLabel.text = "Wrong Answers"
             tvValue.text = summary.wrongCount.toString()
-            tvValue.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent_red))
+            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
+        }
+        binding.rowNegativePoints.apply {
+            tvLabel.text = "Points Deducted"
+            tvValue.text = "-${summary.negativePoints}"
+            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
         }
         binding.rowSkipped.apply {
             tvLabel.text = "Skipped"
@@ -320,21 +373,19 @@ class QuizFragment : Fragment() {
         
         binding.tvTotalPoints.text = "Total Points: ${summary.totalPoints}"
 
-        // Summary Ring Logic
         val accuracy = if (summary.totalQuestions > 0) {
             ((summary.correctCount.toDouble() / summary.totalQuestions) * 100).toInt()
         } else 0
         
         binding.tvSummaryAccuracy.text = "$accuracy%"
         
-        // Determine Color based on highest count
         val indicatorColor = when {
-            summary.correctCount >= summary.wrongCount && summary.correctCount >= summary.skippedCount -> R.color.mint_green
-            summary.wrongCount > summary.correctCount && summary.wrongCount >= summary.skippedCount -> R.color.accent_red
-            else -> R.color.mint_gold
+            accuracy >= 70 -> R.color.mint_green
+            accuracy >= 40 -> R.color.mint_gold
+            else -> R.color.accent_red
         }
         
-        binding.pbSummaryRing.setIndicatorColor(ContextCompat.getColor(requireContext(), indicatorColor))
+        binding.pbSummaryRing.setIndicatorColor(ContextCompat.getColor(this@QuizActivity, indicatorColor))
         binding.pbSummaryRing.setProgressCompat(accuracy, true)
     }
 
@@ -345,19 +396,13 @@ class QuizFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Resume timer or handle accordingly if a quiz is in progress
         if (binding.clSummary.visibility != View.VISIBLE && viewModel.questions.value?.isNotEmpty() == true) {
             startTimer()
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         stopTimer()
-        _binding = null
-    }
-
-    companion object {
-        fun newInstance() = QuizFragment()
     }
 }

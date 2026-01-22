@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_options"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/btn_option_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/pill_choice_selector"
+        android:gravity="center_vertical|start"
+        android:lineSpacingExtra="4dp"
+        android:minHeight="60dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="A. grep -r"
+        android:textAlignment="viewStart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:drawablePadding="16dp"/>
+
+    <TextView
+        android:id="@+id/btn_option_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/pill_choice_selector"
+        android:gravity="center_vertical|start"
+        android:lineSpacingExtra="4dp"
+        android:minHeight="60dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="B. find -exec grep"
+        android:textAlignment="viewStart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:drawablePadding="16dp"/>
+
+    <TextView
+        android:id="@+id/btn_option_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/pill_choice_selector"
+        android:gravity="center_vertical|start"
+        android:lineSpacingExtra="4dp"
+        android:minHeight="60dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="C. awk"
+        android:textAlignment="viewStart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:drawablePadding="16dp"/>
+
+    <TextView
+        android:id="@+id/btn_option_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/pill_choice_selector"
+        android:gravity="center_vertical|start"
+        android:lineSpacingExtra="4dp"
+        android:minHeight="60dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="D. sed"
+        android:textAlignment="viewStart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
+        android:drawablePadding="16dp"/>
+
+</LinearLayout>

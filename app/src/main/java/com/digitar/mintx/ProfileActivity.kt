@@ -3,14 +3,21 @@ package com.digitar.mintx
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.digitar.mintx.auth.AuthActivity
 import com.digitar.mintx.databinding.ActivityProfileViewBinding
 import com.digitar.mintx.utils.SessionManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.digitar.mintx.ui.OnboardingBottomSheetFragment
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileViewBinding
     private lateinit var sessionManager: SessionManager
+
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +25,7 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sessionManager = SessionManager(this)
-
+        window.statusBarColor = ContextCompat.getColor(this, R.color.mint_gold)
         setupUI()
         setupListeners()
     }
@@ -33,8 +40,36 @@ class ProfileActivity : AppCompatActivity() {
         val age = sessionManager.getUserAge()
         binding.tvAge.text = "$age Years"
         
-        // Random stats for premium feel
         binding.tvPoints.text = "2.4k"
+        
+        fetchUserData()
+    }
+    
+    private fun fetchUserData() {
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val user = document.toObject(com.digitar.mintx.data.model.User::class.java)
+                    user?.let {
+                        binding.tvUserName.text = it.name
+                        binding.tvUserHandle.text = "@${it.name.replace(" ", "").lowercase()}"
+                        binding.tvAge.text = "${it.age} Years"
+                        
+                        // Update categories
+                        if (it.categories.isNotEmpty()) {
+                            binding.tvGameCategories.text = it.categories.joinToString(", ") { cat -> 
+                                cat.replaceFirstChar { char -> char.uppercase() } 
+                            }
+                        } else {
+                            binding.tvGameCategories.text = "None selected"
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                // Ignore errors or show toast
+            }
     }
 
     private fun setupListeners() {
@@ -45,6 +80,11 @@ class ProfileActivity : AppCompatActivity() {
         
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.cardGamePreferences.setOnClickListener {
+            val onboardingFragment = OnboardingBottomSheetFragment()
+            onboardingFragment.show(supportFragmentManager, "OnboardingBottomSheet")
         }
     }
 

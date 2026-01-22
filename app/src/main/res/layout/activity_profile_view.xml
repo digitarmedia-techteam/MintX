@@ -11,7 +11,7 @@
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:background="#2DD4BF"
+        android:background="@color/mint_gold"
         app:layout_constraintTop_toTopOf="parent" />
         <!-- Hardcoded teal just in case mint_primary behaves oddly, but will update if needed -->
 
@@ -307,6 +307,70 @@
                         </LinearLayout>
                     </LinearLayout>
 
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Game Preferences -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Game Preferences"
+                android:textColor="@color/text_headline"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardGamePreferences"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E8F0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_category_generic"
+                            app:tint="@color/mint_primary"
+                            android:padding="4dp"
+                            android:background="@drawable/pill_choice_selector"
+                            android:backgroundTint="#102DD4BF"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Favorite Categories"
+                                android:textColor="@color/text_subtext"
+                                android:textSize="12sp"/>
+                            <TextView
+                                android:id="@+id/tvGameCategories"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Action, Strategy"
+                                android:textColor="@color/text_headline"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

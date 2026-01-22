@@ -81,6 +81,8 @@
     <string name="msg_delay">This reward will be credited shortly.</string>
     <string name="msg_block">Please try again later.</string>
     <string name="redeem_now">Redeem Now</string>
-    <string name="ques">Aaj ke time me jab almost har service online ho chuki hai aur users apna personal data apps aur websites par share karte hain, tab data privacy aur security ek bahut important topic ban chuka hai. Companies user experience improve karne ke liye data collect karti hain, lekin agar data ka galat use ho jaaye to users ka trust toot sakta hai.
+    <string name="ques">Aaj ke time me jab almost har service online ho chuki hai aur users apna personal
+        data apps aur
 Is situation me, ek company ke liye sabse sahi approach kya honi chahiye?</string>
+    <string name="fun_with_quiz">Fun with Quiz</string>
 </resources>

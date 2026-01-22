@@ -35,6 +35,17 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
     // Quiz Result State
     private val _quizFinished = MutableLiveData<Boolean>(false)
     val quizFinished: LiveData<Boolean> = _quizFinished
+    
+    // Live Score
+    private val _currentScore = MutableLiveData(0)
+    val currentScore: LiveData<Int> = _currentScore
+    
+    // Event for score update animation (Delta)
+    private val _scoreUpdateEvent = com.digitar.mintx.utils.SingleLiveEvent<Int>()
+    val scoreUpdateEvent: LiveData<Int> = _scoreUpdateEvent
+
+    // Store current categories for restart
+    private var currentCategories: List<String> = emptyList()
 
     fun fetchCategories() {
         viewModelScope.launch {
@@ -52,6 +63,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
     }
 
     fun fetchQuestions(categories: List<String> = emptyList()) {
+        this.currentCategories = categories
         viewModelScope.launch {
             _loading.value = true
             _error.value = null
@@ -72,25 +84,66 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                     }
                 }.distinct()
 
-                val allQuestions = mutableListOf<QuizQuestion>()
+                // Mapping logic (unused but kept for reference)
+                // val apiCategories = ...
                 
-                if (apiCategories.isEmpty() || (apiCategories.size == 1 && apiCategories[0] == null)) {
-                    // Fetch random if nothing specific or only unknown categories selected
-                    val result = repository.getQuestions(null)
-                    if (result != null) allQuestions.addAll(result)
-                } else {
-                    // Fetch for each mapped category to ensure we get a mix
-                    apiCategories.forEach { cat ->
-                        val result = repository.getQuestions(cat)
-                        if (result != null) allQuestions.addAll(result)
+                val categoryQuestionsMap = mutableMapOf<String, MutableList<QuizQuestion>>()
+                
+                // Always fetch ALL questions (Repository is forced to return all)
+                val result = repository.getQuestions(null)
+                
+                if (result != null) {
+                    // Group questions by their defined category
+                    result.forEach { q ->
+                        val cat = q.category
+                        val key = cat.trim()
+                        if (!categoryQuestionsMap.containsKey(key)) {
+                            categoryQuestionsMap[key] = mutableListOf()
+                        }
+                        categoryQuestionsMap[key]?.add(q)
                     }
                 }
 
-                if (allQuestions.isNotEmpty()) {
-                    // Shuffle to mix if from multiple categories
-                    _questions.value = allQuestions.shuffled().take(10)
+                // Create rotated list: Strict 2 questions per category per rotation cycle
+                val rotatedList = mutableListOf<QuizQuestion>()
+                
+                // Get all available categories (e.g. Science, Tech, History...)
+                val availableCategories = categoryQuestionsMap.keys.toMutableList()
+                
+                // Shuffle categories to start with a random one each time
+                availableCategories.shuffle()
+                
+                // Shuffle questions WITHIN each category to vary content
+                categoryQuestionsMap.values.forEach { it.shuffle() }
+
+                while (rotatedList.size < 10 && availableCategories.isNotEmpty()) {
+                    val iterator = availableCategories.iterator()
+                    while (iterator.hasNext()) {
+                        val cat = iterator.next()
+                        val questions = categoryQuestionsMap[cat]
+                        
+                        if (questions.isNullOrEmpty()) {
+                            iterator.remove() // Exhausted this category
+                            continue
+                        }
+                        
+                        // Take 2 questions
+                        val batchSize = 2
+                        val batch = questions.take(batchSize)
+                        rotatedList.addAll(batch)
+                        
+                        // Remove used questions
+                        questions.removeAll(batch)
+                        
+                        if (rotatedList.size >= 10) break
+                    }
+                }
+
+                if (rotatedList.isNotEmpty()) {
+                    _questions.value = rotatedList.take(10) // Ensure max 10
                     _currentIndex.value = 0
                     _userAnswers.value = mutableMapOf()
+                    _currentScore.value = 0
                     _quizFinished.value = false
                 } else {
                     _error.value = "Failed to load questions. Please check your API key and connection."
@@ -102,11 +155,36 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             }
         }
     }
+    
+    fun restartQuiz() {
+        fetchQuestions(currentCategories)
+    }
 
     fun selectAnswer(questionIndex: Int, answerKey: String) {
+        val questions = _questions.value ?: return
+        if (questionIndex >= questions.size) return
+
         val currentAnswers = _userAnswers.value ?: mutableMapOf()
+        
+        // Check if already answered to prevent double scoring
+        if (currentAnswers.containsKey(questionIndex)) return
+
         currentAnswers[questionIndex] = answerKey
         _userAnswers.value = currentAnswers
+        
+        // Update Score
+        val question = questions[questionIndex]
+        val correctKey = "${answerKey}_correct"
+        val isCorrect = question.correctAnswers[correctKey] == "true"
+        
+        val currentScoreVal = _currentScore.value ?: 0
+        if (isCorrect) {
+            _currentScore.value = currentScoreVal + 2
+            _scoreUpdateEvent.value = 2
+        } else {
+            _currentScore.value = currentScoreVal - 1
+            _scoreUpdateEvent.value = -1
+        }
     }
 
     fun nextQuestion() {
@@ -148,12 +226,18 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             }
         }
         
+        val correctPoints = correctCount * 2
+        val negativePoints = wrongCount * 1 // 1 point deduction for wrong answer
+        val totalPoints = correctPoints - negativePoints
+        
         return QuizSummary(
             totalQuestions = questions.size,
             correctCount = correctCount,
             wrongCount = wrongCount,
             skippedCount = skippedCount,
-            totalPoints = correctCount * 2
+            correctPoints = correctPoints,
+            negativePoints = negativePoints,
+            totalPoints = totalPoints
         )
     }
 
@@ -162,6 +246,8 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val correctCount: Int,
         val wrongCount: Int,
         val skippedCount: Int,
+        val correctPoints: Int,
+        val negativePoints: Int,
         val totalPoints: Int
     )
 }

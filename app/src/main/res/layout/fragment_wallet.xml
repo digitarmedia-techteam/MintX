@@ -66,14 +66,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_redeem_bg"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="12dp"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
                 android:text="Redeem Now"
                 android:textColor="@color/mint_background"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_balance"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
