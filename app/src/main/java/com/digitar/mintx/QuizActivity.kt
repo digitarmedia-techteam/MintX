@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.digitar.mintx.data.model.QuizQuestion
@@ -39,10 +40,22 @@ class QuizActivity : AppCompatActivity() {
         
         binding = ActivityQuizBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.mint_gold)
+//        window.statusBarColor = ContextCompat.getColor(this, R.color.mint_gold)
 
         setupClickListeners()
+        setupBottomNavigation()
         observeViewModel()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.clSummary.visibility == View.VISIBLE) {
+                    finish()
+                } else {
+                    showExitConfirmation()
+                }
+            }
+        })
 
         val categories = intent.getStringArrayListExtra("categories")
         if (!categories.isNullOrEmpty()) {
@@ -91,7 +104,7 @@ class QuizActivity : AppCompatActivity() {
     
     private fun setupClickListeners() {
         binding.header.btnBack.setOnClickListener {
-            finish()
+            showExitConfirmation()
         }
         
 
@@ -103,6 +116,37 @@ class QuizActivity : AppCompatActivity() {
         binding.btnPlayAgain.setOnClickListener {
             binding.clSummary.visibility = View.GONE
             viewModel.restartQuiz()
+        }
+        
+        // Floating Controls Listeners
+        binding.layoutFloating.cardHint.setOnClickListener {
+            val isVisible = binding.layoutFloating.layoutHintOptions.visibility == View.VISIBLE
+            binding.layoutFloating.layoutHintOptions.visibility = if (isVisible) View.GONE else View.VISIBLE
+        }
+        
+        binding.layoutFloating.cardHintPoints.setOnClickListener {
+            if (viewModel.deductPoints(10)) {
+                binding.layoutFloating.layoutHintOptions.visibility = View.GONE
+                val index = viewModel.currentIndex.value ?: 0
+                val questions = viewModel.questions.value
+                if (questions != null && index < questions.size) {
+                    showCorrectAnswer(questions[index])
+                    Toast.makeText(this, "Answer Revealed!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Not enough points (Need 10)!", Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        binding.layoutFloating.cardHintAd.setOnClickListener {
+            binding.layoutFloating.layoutHintOptions.visibility = View.GONE
+            Toast.makeText(this, "Ad functionality not implemented yet", Toast.LENGTH_SHORT).show()
+            // Placeholder: Reveal answer anyway for testing
+            // val index = viewModel.currentIndex.value ?: 0
+            // val questions = viewModel.questions.value
+            // if (questions != null && index < questions.size) {
+            //     showCorrectAnswer(questions[index])
+            // }
         }
     }
 
@@ -206,6 +250,8 @@ class QuizActivity : AppCompatActivity() {
         
         binding.question.tvQuestionText.text = "Q${index + 1}. ${question.question}"
         
+        binding.layoutFloating.layoutHintOptions.visibility = View.GONE
+
         // Update Category Label
         val categoryName = question.category
         binding.question.tvCategoryLabel.text = categoryName.uppercase()
@@ -214,10 +260,11 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun displayOptions(question: QuizQuestion, questionIndex: Int) {
-        val options = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
+        val optionContainers = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
+        val optionTexts = listOf(binding.options.tvOptionText1, binding.options.tvOptionText2, binding.options.tvOptionText3, binding.options.tvOptionText4)
         val selectedAnswer = viewModel.userAnswers.value?.get(questionIndex)
 
-        options.forEach { 
+        optionContainers.forEach { 
             it.visibility = View.GONE
             it.isActivated = false
             it.isSelected = false
@@ -227,31 +274,26 @@ class QuizActivity : AppCompatActivity() {
         val validAnswers = question.answers.filterValues { it != null }
         val answerKeys = validAnswers.keys.toList()
 
-        for (i in 0 until minOf(options.size, answerKeys.size)) {
-            val view = options[i]
+        for (i in 0 until minOf(optionContainers.size, answerKeys.size)) {
+            val container = optionContainers[i]
+            val textView = optionTexts[i]
             val key = answerKeys[i]
             val answerText = validAnswers[key]
 
-            view.visibility = View.VISIBLE
-            val label = when(i) {
-                0 -> "A"
-                1 -> "B"
-                2 -> "C"
-                3 -> "D"
-                else -> ""
-            }
-            view.text = "$label. $answerText"
+            container.visibility = View.VISIBLE
+            // Text View set only text, labels (A,B..) are static in layout
+            textView.text = answerText
 
             if (selectedAnswer == key) {
-                highlightSelection(view, key, question)
-                options.forEach { it.isEnabled = false }
+                highlightSelection(container, key, question)
+                optionContainers.forEach { it.isEnabled = false }
             }
 
-            view.setOnClickListener {
+            container.setOnClickListener {
                 stopTimer()
                 viewModel.selectAnswer(questionIndex, key)
-                highlightSelection(view, key, question)
-                options.forEach { it.isEnabled = false }
+                highlightSelection(container, key, question)
+                optionContainers.forEach { it.isEnabled = false }
                 
                 binding.root.postDelayed({
                     if (!isFinishing && viewModel.currentIndex.value == questionIndex) {
@@ -262,7 +304,7 @@ class QuizActivity : AppCompatActivity() {
         }
     }
 
-    private fun highlightSelection(view: TextView, selectedKey: String, question: QuizQuestion) {
+    private fun highlightSelection(view: View, selectedKey: String, question: QuizQuestion) {
         val correctKey = "${selectedKey}_correct"
         val isCorrect = question.correctAnswers[correctKey] == "true"
 
@@ -275,15 +317,15 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun showCorrectAnswer(question: QuizQuestion) {
-        val options = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
+        val optionContainers = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
         val validAnswers = question.answers.filterValues { it != null }
         val answerKeys = validAnswers.keys.toList()
 
         val actualCorrectKey = question.correctAnswers.entries.find { it.value == "true" }?.key
         if (actualCorrectKey != null) {
             val baseKeyIdx = answerKeys.indexOf(actualCorrectKey.replace("_correct", ""))
-            if (baseKeyIdx != -1 && baseKeyIdx < options.size) {
-                options[baseKeyIdx].isActivated = true
+            if (baseKeyIdx != -1 && baseKeyIdx < optionContainers.size) {
+                optionContainers[baseKeyIdx].isActivated = true
             }
         }
     }
@@ -300,7 +342,7 @@ class QuizActivity : AppCompatActivity() {
                 // Color Transition Logic (Green -> Gold -> Red) based on %
                 val colorRes = when {
                     progress > 60f -> R.color.mint_green
-                    progress > 30f -> R.color.mint_gold
+                    progress > 30f -> R.color.yellow
                     else -> R.color.accent_red
                 }
                 val color = ContextCompat.getColor(this@QuizActivity, colorRes)
@@ -320,6 +362,13 @@ class QuizActivity : AppCompatActivity() {
                 val scale = 1f + (0.05f * kotlin.math.sin(System.currentTimeMillis() / 200.0).toFloat())
                 binding.layoutFloating.cardFloatingTimer.scaleX = scale
                 binding.layoutFloating.cardFloatingTimer.scaleY = scale
+
+                // Shake Hint Button if < 40 seconds
+                if (millisUntilFinished <= 40000) {
+                    val shake = ObjectAnimator.ofFloat(binding.layoutFloating.cardHint, "translationX", 0f, 10f, -10f, 10f, -10f, 0f)
+                    shake.duration = 500
+                    shake.start()
+                }
             }
 
             override fun onFinish() {
@@ -337,6 +386,7 @@ class QuizActivity : AppCompatActivity() {
 
     private fun showSummary() {
         stopTimer()
+        viewModel.saveQuizResults()
         val summary = viewModel.getQuizSummary()
         
         binding.clSummary.visibility = View.VISIBLE
@@ -404,5 +454,49 @@ class QuizActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopTimer()
+    }
+
+    private fun showExitConfirmation() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Quit Quiz?")
+            .setMessage("Are you sure you want to quit? You will lose your current progress.")
+            .setPositiveButton("Quit") { _, _ ->
+                finish()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun setupBottomNavigation() {
+        // Set 'Quiz' as active by default since we are in Quiz Screen
+        binding.bottomNavigation.selectedItemId = R.id.navigation_quiz
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // Explicitly navigate to Main Activity Home
+                    val intent = android.content.Intent(this, MainActivity::class.java)
+                    intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    intent.putExtra("NAV_ID", R.id.navigation_home)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                R.id.navigation_quiz -> {
+                    // Already on Quiz
+                    true
+                }
+                R.id.navigation_earn, R.id.navigation_wallet, R.id.navigation_prediction -> {
+                    // Navigate to Main Activity and Switch Tab
+                    val intent = android.content.Intent(this, MainActivity::class.java)
+                    intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    intent.putExtra("NAV_ID", item.itemId)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

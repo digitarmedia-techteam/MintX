@@ -1,82 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_options"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginTop="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:paddingBottom="4dp">
 
-    <TextView
+    <!-- Option 1 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_option_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:background="@drawable/pill_choice_selector"
-        android:gravity="center_vertical|start"
-        android:lineSpacingExtra="4dp"
+        android:elevation="4dp"
         android:minHeight="60dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp"
-        android:text="A. grep -r"
-        android:textAlignment="viewStart"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:drawablePadding="16dp"/>
+        android:padding="12dp">
 
-    <TextView
+        <TextView
+            android:id="@+id/tv_option_label_1"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_option_circle_gray"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_option_text_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="grep -r"
+            android:textColor="@color/selector_option_text"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_option_label_1"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Option 2 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_option_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:background="@drawable/pill_choice_selector"
-        android:gravity="center_vertical|start"
-        android:lineSpacingExtra="4dp"
+        android:elevation="4dp"
         android:minHeight="60dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp"
-        android:text="B. find -exec grep"
-        android:textAlignment="viewStart"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:drawablePadding="16dp"/>
+        android:padding="12dp">
 
-    <TextView
+        <TextView
+            android:id="@+id/tv_option_label_2"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_option_circle_gray"
+            android:gravity="center"
+            android:text="B"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_option_text_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="find"
+            android:textColor="@color/selector_option_text"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_option_label_2"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Option 3 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_option_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:background="@drawable/pill_choice_selector"
-        android:gravity="center_vertical|start"
-        android:lineSpacingExtra="4dp"
+        android:elevation="4dp"
         android:minHeight="60dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp"
-        android:text="C. awk"
-        android:textAlignment="viewStart"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:drawablePadding="16dp"/>
+        android:padding="12dp">
 
-    <TextView
+        <TextView
+            android:id="@+id/tv_option_label_3"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_option_circle_gray"
+            android:gravity="center"
+            android:text="C"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_option_text_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="awk"
+            android:textColor="@color/selector_option_text"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_option_label_3"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Option 4 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_option_4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:background="@drawable/pill_choice_selector"
-        android:gravity="center_vertical|start"
-        android:lineSpacingExtra="4dp"
+        android:elevation="4dp"
         android:minHeight="60dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp"
-        android:text="D. sed"
-        android:textAlignment="viewStart"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:drawablePadding="16dp"/>
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_option_label_4"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_option_circle_gray"
+            android:gravity="center"
+            android:text="D"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_option_text_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="sed"
+            android:textColor="@color/selector_option_text"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_option_label_4"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

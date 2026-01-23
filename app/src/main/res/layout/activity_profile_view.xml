@@ -51,7 +51,7 @@
         android:background="@drawable/pill_choice_selector"
         android:backgroundTint="#20000000"
         android:padding="8dp"
-        android:src="@drawable/ic_launcher_foreground"
+        android:src="@drawable/setings"
         app:tint="@color/fixed_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -238,7 +238,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_launcher_foreground"
+                            android:src="@drawable/mobile"
                             app:tint="@color/mint_secondary"
                             android:padding="4dp"
                             android:background="@drawable/pill_choice_selector"
@@ -280,7 +280,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_launcher_foreground"
+                            android:src="@drawable/age"
                             app:tint="@color/mint_gold"
                             android:padding="4dp"
                             android:background="@drawable/pill_choice_selector"
@@ -362,13 +362,10 @@
                                 android:text="Favorite Categories"
                                 android:textColor="@color/text_subtext"
                                 android:textSize="12sp"/>
-                            <TextView
-                                android:id="@+id/tvGameCategories"
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupCategories"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Action, Strategy"
-                                android:textColor="@color/text_headline"
-                                android:textSize="15sp"/>
+                                android:layout_height="wrap_content" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.tasks.await
 
 class QuizRepository(private val context: Context) {
 
@@ -56,5 +57,30 @@ class QuizRepository(private val context: Context) {
     }
     fun clearCache() {
         sharedPrefs.edit().remove("categories_cache").apply()
+    }
+
+    suspend fun getUserBalance(uid: String): Long = withContext(Dispatchers.IO) {
+        try {
+            val snapshot = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .await()
+            return@withContext snapshot.getLong("mintBalance") ?: 0L
+        } catch (e: Exception) {
+            return@withContext 0L
+        }
+    }
+
+    suspend fun updateUserBalance(uid: String, newBalance: Long) = withContext(Dispatchers.IO) {
+        try {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .update("mintBalance", newBalance)
+                .await()
+        } catch (e: Exception) {
+            // Log or handle error
+        }
     }
 }

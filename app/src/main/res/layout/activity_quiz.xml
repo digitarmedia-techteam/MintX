@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mint_surface_light"
+    android:background="@color/mint_background"
     tools:context=".QuizActivity">
 
     <!-- Quiz Content -->
@@ -63,7 +63,9 @@
                     android:id="@+id/options"
                     layout="@layout/layout_quiz_options"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"/>
 
             </LinearLayout>
         </ScrollView>
@@ -88,14 +90,21 @@
     <include
         android:id="@+id/layout_floating"
         layout="@layout/layout_floating_controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="16dp" 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:elevation="12dp" />
-
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/mint_surface"
+        app:itemIconTint="@color/mint_gold"
+        app:itemTextColor="@color/text_subtext"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
     <!-- Summary Screen (Overlaid) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_summary"

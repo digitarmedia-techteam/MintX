@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Correct Answer (Activated) -->
     <item android:state_activated="true">
         <shape android:shape="rectangle">
-            <solid android:color="#FFEDD5"/> <!-- Orange tint -->
-            <stroke android:color="@color/quiz_orange" android:width="2dp"/>
-            <corners android:radius="30dp"/>
+            <solid android:color="#E8F5E9"/>
+            <stroke android:color="@color/mint_green" android:width="2dp"/>
+            <corners android:radius="16dp"/> <!-- Less rounded as per "btn" style usually, or keep pill? User said "btn bodar". 16dp is good middle ground -->
         </shape>
     </item>
+
+    <!-- Wrong Answer (Selected) -->
     <item android:state_selected="true">
         <shape android:shape="rectangle">
-             <solid android:color="#FEE2E2"/> <!-- Red tint for wrong -->
+             <solid android:color="#FFEBEE"/>
              <stroke android:color="@color/accent_red" android:width="2dp"/>
-             <corners android:radius="30dp"/>
+             <corners android:radius="16dp"/>
         </shape>
     </item>
+
+    <!-- Default State -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@color/white"/>
-            <corners android:radius="30dp"/>
-            <!-- No stroke or very light stroke -->
+            <stroke android:color="#E0E0E0" android:width="1.5dp"/>
+            <corners android:radius="16dp"/>
         </shape>
     </item>
 </selector>

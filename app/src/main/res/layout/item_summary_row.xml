@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="8dp">
+    android:paddingVertical="2dp">
 
     <TextView
         android:id="@+id/tv_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Label"
-        android:textColor="@color/text_subtext"
-        android:textSize="14sp"
+        android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,7 +30,7 @@
             android:layout_gravity="center"
             android:progress="0"
             app:indicatorColor="@color/mint_primary"
-            app:indicatorSize="48dp"
+            app:indicatorSize="38dp"
             app:trackColor="@color/accent_glass_border"
             app:trackCornerRadius="2dp"
             app:trackThickness="4dp" />

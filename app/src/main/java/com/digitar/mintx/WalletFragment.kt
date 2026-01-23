@@ -24,7 +24,8 @@ class WalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // Initializing with sample data for UI demonstration
-        binding.tvBalance.text = "2,450"
+        val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
+        binding.tvBalance.text = "${sessionManager.getMintBalance()}"
 
         // Dummy Transaction 2
         binding.tx2.apply {

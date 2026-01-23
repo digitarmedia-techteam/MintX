@@ -23,14 +23,14 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
     private val selectedCategories = mutableSetOf<String>()
 
     private val categories = listOf(
-        Category("action", "Action", R.drawable.ic_category_generic),
-        Category("adventure", "Adventure", R.drawable.ic_category_generic),
-        Category("puzzle", "Puzzle", R.drawable.ic_category_generic),
-        Category("strategy", "Strategy", R.drawable.ic_category_generic),
-        Category("sports", "Sports", R.drawable.ic_category_generic),
-        Category("racing", "Racing", R.drawable.ic_category_generic),
-        Category("rpg", "RPG", R.drawable.ic_category_generic),
-        Category("simulation", "Simulation", R.drawable.ic_category_generic)
+        Category("action", "Action", R.drawable.action),
+        Category("adventure", "Adventure", R.drawable.adventure),
+        Category("puzzle", "Puzzle", R.drawable.puzzle),
+        Category("strategy", "Strategy", R.drawable.strategy),
+        Category("sports", "Sports", R.drawable.sports),
+        Category("racing", "Racing", R.drawable.racing),
+        Category("rpg", "RPG", R.drawable.rpg),
+        Category("simulation", "Simulation", R.drawable.simulation)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +55,7 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
 
         setupRecyclerView()
         setupListeners()
+        fetchUserCategories()
     }
 
     private fun setupRecyclerView() {
@@ -125,6 +126,25 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
             // Should not happen if logged in
             dismiss()
         }
+    }
+
+    private fun fetchUserCategories() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        FirebaseFirestore.getInstance().collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val loadedCategories = document.get("categories") as? List<String>
+                    if (loadedCategories != null) {
+                        selectedCategories.clear()
+                        selectedCategories.addAll(loadedCategories)
+                        binding.rvCategories.adapter?.notifyDataSetChanged()
+                        updateContinueButton()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                // Silently fail or log
+            }
     }
 
     override fun onDestroyView() {

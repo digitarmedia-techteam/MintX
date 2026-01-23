@@ -15,6 +15,7 @@ class SessionManager(context: Context) {
         private const val KEY_USER_NAME = "userName"
         private const val KEY_USER_AGE = "userAge"
         private const val KEY_IS_CATEGORIES_SELECTED = "isCategoriesSelected"
+        private const val KEY_MINT_BALANCE = "mintBalance"
     }
 
     fun createLoginSession(mobileNumber: String) {
@@ -50,6 +51,12 @@ class SessionManager(context: Context) {
 
     fun isCategoriesSelected(): Boolean = prefs.getBoolean(KEY_IS_CATEGORIES_SELECTED, false)
     
+    fun saveMintBalance(balance: Long) {
+        prefs.edit().putLong(KEY_MINT_BALANCE, balance).apply()
+    }
+
+    fun getMintBalance(): Long = prefs.getLong(KEY_MINT_BALANCE, 0L)
+
     fun logout() {
         com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
         prefs.edit().clear().apply()

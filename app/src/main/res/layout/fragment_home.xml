@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="80dp">
+        android:paddingBottom="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -28,6 +28,17 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/tv_greeting_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="👋"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/tv_greeting"
+                app:layout_constraintBottom_toBottomOf="@id/tv_greeting"
+                app:layout_constraintTop_toTopOf="@id/tv_greeting" />
+            
+            <TextView
                 android:id="@+id/tv_dashboard_title"
                 style="@style/MintX.Headline"
                 android:layout_width="wrap_content"
@@ -41,7 +52,7 @@
                 android:id="@+id/navHeaderAvatar"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:padding="2dp"
+                android:padding="12dp"
                 android:src="@drawable/user_gif"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -156,7 +167,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_green" />
+                    android:background="@color/quiz_orange" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -166,7 +177,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_green" />
+                    android:background="@color/quiz_orange" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -176,7 +187,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_surface_light" />
+                    android:background="@color/quiz_orange" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -186,7 +197,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_surface_light" />
+                    android:background="@color/gray_500" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -195,7 +206,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_surface_light" />
+                    android:background="@color/quiz_orange" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -204,7 +215,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="2dp"
-                    android:background="@color/mint_surface_light" />
+                    android:background="@color/gray_500" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -215,16 +226,27 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:text="4 / 7 days"
-                    android:textColor="@color/mint_green"
+                    android:textColor="@color/mint_gold"
                     android:textSize="12sp" />
 
             </LinearLayout>
 
-            <!-- Live Match / Quiz Card -->
+            <!-- Live Match / Quiz Card (3D Depth Layer) -->
+            <View
+                android:id="@+id/view_card_depth"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_card_3d_depth"
+                android:translationY="6dp"
+                app:layout_constraintBottom_toBottomOf="@id/card_featured"
+                app:layout_constraintEnd_toEndOf="@id/card_featured"
+                app:layout_constraintStart_toStartOf="@id/card_featured"
+                app:layout_constraintTop_toTopOf="@id/card_featured" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_featured"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="32dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
@@ -233,50 +255,105 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/gradient_card_bg"
-                    android:padding="20dp">
+                    android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/tv_featured_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/accent_red"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:text="@string/live_now"
-                        android:textColor="@color/white"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
+                    <!-- Background Image -->
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/stadium_background" />
+
+                    <!-- Gradient Overlay -->
+                    <View
+                        android:id="@+id/view_gradient_overlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_stadium_overlay" />
+
+                    <!-- Live Badge (GIF) -->
+                    <ImageView
+                        android:id="@+id/iv_live_badge"
+                        android:layout_width="60dp"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="24dp"
+                        android:src="@drawable/live"
+                        android:scaleType="fitCenter"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <!-- Title -->
                     <TextView
                         android:id="@+id/tv_featured_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="16dp"
                         android:text="Cricket World Cup: \nIND vs AUS Prediction"
                         android:textColor="@color/white"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
+                        android:lineSpacingExtra="2dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_featured_label" />
+                        app:layout_constraintStart_toStartOf="@id/iv_live_badge"
+                        app:layout_constraintTop_toBottomOf="@id/iv_live_badge" />
 
-                    <Button
+                    <!-- Flags -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="12dp"
-                        android:backgroundTint="@color/white"
-                        android:text="Predict &amp; Win"
-                        android:textColor="@color/fixed_black"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_featured_title" />
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="6dp"
+                        app:layout_constraintStart_toStartOf="@id/tv_featured_title"
+                        app:layout_constraintTop_toBottomOf="@id/tv_featured_title">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/flag_india" />
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/flag_australia" />
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Predict & Win Button (Floating 3D) -->
+            <LinearLayout
+                android:id="@+id/btn_predict_win"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/btn_predict_bg"
+                android:gravity="center"
+                android:paddingHorizontal="24dp"
+                android:orientation="horizontal"
+                android:elevation="12dp"
+                app:layout_constraintStart_toStartOf="@id/card_featured"
+                app:layout_constraintEnd_toEndOf="@id/card_featured"
+                app:layout_constraintTop_toBottomOf="@id/card_featured"
+                app:layout_constraintBottom_toBottomOf="@id/card_featured">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Predict &amp; Win"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/cricket_ball" />
+            </LinearLayout>
 
             <!-- Quick Actions Section -->
             <TextView
@@ -289,7 +366,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_featured" />
+                app:layout_constraintTop_toBottomOf="@id/btn_predict_win" />
 
             <LinearLayout
                 android:id="@+id/ll_actions"
@@ -316,7 +393,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:src="@android:drawable/ic_menu_help"
-                        app:tint="@color/mint_green" />
+                        app:tint="@color/mint_gold" />
 
                     <TextView
                         android:layout_width="wrap_content"

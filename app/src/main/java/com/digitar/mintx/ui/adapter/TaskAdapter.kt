@@ -51,8 +51,10 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallba
                 duration = 300
             }
             
-            // Apply animation to the parent view
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+            // Apply animation to the RecyclerView (parent) to push other items
+            (binding.root.parent as? ViewGroup)?.let { recyclerView ->
+                TransitionManager.beginDelayedTransition(recyclerView, transition)
+            }
 
             // Update UI
             binding.clInstructionDetails.visibility = if (task.isExpanded) View.VISIBLE else View.GONE

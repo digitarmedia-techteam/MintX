@@ -7,5 +7,6 @@ data class User(
     val age: Int = 0,
     val countryCode: String = "",
     val categories: List<String> = emptyList(),
+    val mintBalance: Long = 0,
     val createdAt: Long = System.currentTimeMillis()
 )

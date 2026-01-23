@@ -29,6 +29,16 @@ class MainActivity : AppCompatActivity() {
         
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.bottomNavigation.selectedItemId != R.id.navigation_home) {
+                    binding.bottomNavigation.selectedItemId = R.id.navigation_home
+                } else {
+                    showExitDialog()
+                }
+            }
+        })
 
         // 2. Set System Bar Icon Colors - Handled by Theme (values/themes.xml)
         // WindowInsetsControllerCompat(window, binding.root) // Not needed if XML handles it
@@ -52,9 +62,13 @@ class MainActivity : AppCompatActivity() {
 
         setupNavigation()
 
-        // 4. Load default fragment
+        // 4. Load default fragment or handle intent
         if (savedInstanceState == null) {
-            loadFragment(HomeFragment())
+            if (intent.hasExtra("NAV_ID")) {
+                 handleIntent(intent)
+            } else {
+                 loadFragment(HomeFragment())
+            }
 
             // 5. Check for Onboarding (Categories)
             if (!sessionManager.isCategoriesSelected()) {
@@ -105,5 +119,29 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.nav_host_fragment, fragment)
             .commit()
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: android.content.Intent) {
+        if (intent.hasExtra("NAV_ID")) {
+            val navId = intent.getIntExtra("NAV_ID", R.id.navigation_home)
+            binding.bottomNavigation.selectedItemId = navId
+        }
+    }
+
+    private fun showExitDialog() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Exit App")
+            .setMessage("Are you sure you want to exit?")
+            .setPositiveButton("Yes") { _, _ ->
+                finish()
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 }

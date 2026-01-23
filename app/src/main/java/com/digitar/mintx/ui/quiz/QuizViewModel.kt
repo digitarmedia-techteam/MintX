@@ -44,8 +44,24 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
     private val _scoreUpdateEvent = com.digitar.mintx.utils.SingleLiveEvent<Int>()
     val scoreUpdateEvent: LiveData<Int> = _scoreUpdateEvent
 
+    // Mint Balance
+    private val _mintBalance = MutableLiveData<Long>(0)
+    val mintBalance: LiveData<Long> = _mintBalance
+
     // Store current categories for restart
     private var currentCategories: List<String> = emptyList()
+
+    init {
+        fetchMintBalance()
+    }
+
+    private fun fetchMintBalance() {
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+        viewModelScope.launch {
+            val balance = repository.getUserBalance(uid)
+            _mintBalance.value = balance
+        }
+    }
 
     fun fetchCategories() {
         viewModelScope.launch {
@@ -61,6 +77,52 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             }
         }
     }
+
+    // ... (rest of fetchQuestions)
+
+    fun restartQuiz() {
+        fetchQuestions(currentCategories)
+        _currentScore.value = 0
+    }
+
+    fun deductPoints(amount: Int): Boolean {
+        val currentBalance = _mintBalance.value ?: 0
+        if (currentBalance >= amount) {
+            val newBalance = currentBalance - amount
+            _mintBalance.value = newBalance
+            
+            // Sync with Firestore
+            val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                viewModelScope.launch {
+                    repository.updateUserBalance(uid, newBalance)
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    fun saveQuizResults() {
+        val summary = getQuizSummary()
+        if (summary.totalPoints > 0) {
+            val currentBalance = _mintBalance.value ?: 0
+            val newBalance = currentBalance + summary.totalPoints
+            _mintBalance.value = newBalance
+            
+            // Sync with Firestore
+            val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                viewModelScope.launch {
+                    repository.updateUserBalance(uid, newBalance)
+                }
+            }
+        }
+    }
+
+
+
+
 
     fun fetchQuestions(categories: List<String> = emptyList()) {
         this.currentCategories = categories
@@ -156,9 +218,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         }
     }
     
-    fun restartQuiz() {
-        fetchQuestions(currentCategories)
-    }
+
 
     fun selectAnswer(questionIndex: Int, answerKey: String) {
         val questions = _questions.value ?: return

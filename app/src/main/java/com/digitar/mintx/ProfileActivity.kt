@@ -40,7 +40,7 @@ class ProfileActivity : AppCompatActivity() {
         val age = sessionManager.getUserAge()
         binding.tvAge.text = "$age Years"
         
-        binding.tvPoints.text = "2.4k"
+        binding.tvPoints.text = "${sessionManager.getMintBalance()}"
         
         fetchUserData()
     }
@@ -56,13 +56,25 @@ class ProfileActivity : AppCompatActivity() {
                         binding.tvUserHandle.text = "@${it.name.replace(" ", "").lowercase()}"
                         binding.tvAge.text = "${it.age} Years"
                         
+                        binding.tvPoints.text = "${it.mintBalance}"
+                        sessionManager.saveMintBalance(it.mintBalance)
+                        
                         // Update categories
+                        binding.chipGroupCategories.removeAllViews()
                         if (it.categories.isNotEmpty()) {
-                            binding.tvGameCategories.text = it.categories.joinToString(", ") { cat -> 
-                                cat.replaceFirstChar { char -> char.uppercase() } 
+                            it.categories.forEach { cat ->
+                                val chip = com.google.android.material.chip.Chip(this@ProfileActivity)
+                                chip.text = cat.replaceFirstChar { char -> char.uppercase() }
+                                chip.isCheckable = false
+                                chip.isClickable = false
+                                binding.chipGroupCategories.addView(chip)
                             }
                         } else {
-                            binding.tvGameCategories.text = "None selected"
+                            val chip = com.google.android.material.chip.Chip(this@ProfileActivity)
+                            chip.text = "None selected"
+                            chip.isCheckable = false
+                            chip.isClickable = false
+                            binding.chipGroupCategories.addView(chip)
                         }
                     }
                 }
