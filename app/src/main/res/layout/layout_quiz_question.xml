@@ -23,7 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        app:cardBackgroundColor="@color/white"
+        android:background="@drawable/glass_card_bg"
+        app:cardBackgroundColor="@color/mint_surface"
         app:cardCornerRadius="32dp"
         app:cardElevation="2dp"
         app:strokeWidth="0dp"
@@ -61,7 +62,7 @@
                 android:lineSpacingExtra="6dp"
                 android:text="Q1. You need to search for a specific text pattern recursively in all files within a directory on a Linux server. Which command should you use?"
                 android:textAlignment="viewStart"
-                android:textColor="@color/black"
+                android:textColor="@color/text_headline"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />

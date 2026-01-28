@@ -1,21 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors (Adjusted for Dark Mode brightness if needed, or kept same) -->
-    <color name="mint_gold">#F59E0B</color>
-    <color name="mint_green">#10B981</color>
-    <color name="accent_red">#EF4444</color>
+    <!-- ===================== -->
+    <!-- Brand Colors (Dark Mode) -->
+    <!-- Slightly brighter for visibility on dark bg -->
+    <!-- ===================== -->
+    <color name="mint_primary">#5EEAD4</color>
+    <color name="mint_secondary">#60A5FA</color>
+    <color name="quiz_orange">#FB923C</color>
+    <color name="mint_gold">#FBBF24</color>
+    <color name="mint_green">#34D399</color>
+    <color name="accent_red">#F87171</color>
+    <color name="yellow">#FDE047</color>
 
+    <!-- ===================== -->
     <!-- UI Colors (Dark Mode) -->
+    <!-- Softer dark backgrounds -->
+    <!-- ===================== -->
+    <!-- Deep blue-gray background -->
     <color name="mint_background">#0F172A</color>
+    <!-- Slightly lighter surface -->
     <color name="mint_surface">#1E293B</color>
+    <!-- Even lighter for elevated surfaces -->
     <color name="mint_surface_light">#334155</color>
-    
-    <!-- Text Colors (Dark Mode) -->
-    <color name="text_headline">#F8FAFC</color>
-    <color name="text_subtext">#94A3B8</color>
-    <color name="text_hint">#64748B</color>
 
+    <!-- ===================== -->
+    <!-- Text Colors (Dark Mode) -->
+    <!-- ===================== -->
+    <!-- Very light slate for primary text -->
+    <color name="text_headline">#F1F5F9</color>
+    <!-- Medium gray for secondary text -->
+    <color name="text_subtext">#94A3B8</color>
+    <!-- Darker gray for hints -->
+    <color name="text_hint">#64748B</color>
+    <!-- White for special cases -->
+    <color name="text_inverse">#0F172A</color>
+
+    <!-- ===================== -->
     <!-- Glass/Borders (Dark Mode) -->
-    <color name="accent_glass">#1AFFFFFF</color>
+    <!-- ===================== -->
+    <!-- Subtle white overlay for glass effect -->
+    <color name="accent_glass">#0DFFFFFF</color>
+    <!-- Soft border that's visible on dark -->
     <color name="accent_glass_border">#334155</color>
+
+    <!-- ===================== -->
+    <!-- Soft Palette Colors (Dark Mode) -->
+    <!-- Brighter variants for visibility -->
+    <!-- ===================== -->
+    <color name="red">#F87171</color>
+    <color name="green">#34D399</color>
+    <color name="blue">#60A5FA</color>
+    <color name="cyan">#22D3EE</color>
+    <color name="magenta">#E879F9</color>
+    <color name="orange">#FB923C</color>
+    <color name="pink">#F472B6</color>
+    <color name="purple">#A78BFA</color>
+    <color name="brown">#D97706</color>
+
+    <!-- ===================== -->
+    <!-- Status Colors (Dark Mode) -->
+    <!-- ===================== -->
+    <color name="success">#34D399</color>
+    <color name="warning">#FBBF24</color>
+    <color name="error">#F87171</color>
+    <color name="info">#60A5FA</color>
+
+    <!-- Status Background Colors (Darker for dark mode) -->
+    <color name="success_background">#064E3B</color>
+    <color name="error_background">#7F1D1D</color>
+    <color name="warning_background">#78350F</color>
+    <color name="info_background">#1E3A8A</color>
+
 </resources>

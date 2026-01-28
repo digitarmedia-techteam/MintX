@@ -2,71 +2,95 @@
 <resources>
 
     <!-- ===================== -->
-    <!-- Brand Colors -->
+    <!-- Brand Colors (Light Mode) -->
     <!-- ===================== -->
-    <color name="mint_primary">#2DD4BF</color>
-    <color name="mint_secondary">#0EA5E9</color>
-    <color name="quiz_orange">#D97706</color>
-    <color name="mint_gold">#FF6B35</color>
-    <color name="mint_green">#059669</color>
-    <color name="accent_red">#DC2626</color>
-    <color name="yellow">#FFFF00</color>
+    <!-- Soft, pleasant teal/mint as primary -->
+    <color name="mint_primary">#14B8A6</color>
+    <!-- Softer blue secondary -->
+    <color name="mint_secondary">#3B82F6</color>
+    <!-- Warm, soft orange for quiz -->
+    <color name="quiz_orange">#F97316</color>
+    <!-- Softer gold/amber -->
+    <color name="mint_gold">#F59E0B</color>
+    <!-- Pleasant emerald green -->
+    <color name="mint_green">#10B981</color>
+    <!-- Softer red for errors -->
+    <color name="accent_red">#EF4444</color>
+    <!-- Soft amber instead of harsh yellow -->
+    <color name="yellow">#FCD34D</color>
 
     <!-- ===================== -->
     <!-- UI Colors (Light Mode) -->
     <!-- ===================== -->
-    <color name="mint_background">#F8FAFC</color>
+    <!-- Very light gray-blue background (easy on eyes) -->
+    <color name="mint_background">#F1F5F9</color>
+    <!-- Pure white for cards -->
     <color name="mint_surface">#FFFFFF</color>
-    <color name="mint_surface_light">#F1F5F9</color>
+    <!-- Slightly darker for contrast -->
+    <color name="mint_surface_light">#E2E8F0</color>
 
     <!-- ===================== -->
-    <!-- Text Colors -->
+    <!-- Text Colors (Light Mode) -->
     <!-- ===================== -->
-    <color name="text_headline">#0F172A</color>
+    <!-- Dark slate instead of pure black -->
+    <color name="text_headline">#1E293B</color>
+    <!-- Medium gray for secondary text -->
     <color name="text_subtext">#64748B</color>
+    <!-- Lighter gray for hints -->
     <color name="text_hint">#94A3B8</color>
+    <!-- White for text on dark backgrounds -->
     <color name="text_inverse">#FFFFFF</color>
 
     <!-- ===================== -->
-    <!-- Glass / Border -->
+    <!-- Glass / Border (Light Mode) -->
     <!-- ===================== -->
-    <color name="accent_glass">#1A000000</color>
+    <!-- Subtle dark overlay -->
+    <color name="accent_glass">#0A000000</color>
+    <!-- Soft border color -->
     <color name="accent_glass_border">#E2E8F0</color>
 
     <!-- ===================== -->
-    <!-- Basic Colors -->
+    <!-- Soft Palette Colors -->
+    <!-- Replacing harsh RGB colors with pleasant alternatives -->
     <!-- ===================== -->
-    <color name="red">#FF0000</color>
-    <color name="green">#00FF00</color>
-    <color name="blue">#0000FF</color>
-    <color name="cyan">#00FFFF</color>
-    <color name="magenta">#FF00FF</color>
-    <color name="orange">#FFA500</color>
-    <color name="pink">#FFC0CB</color>
-    <color name="purple">#800080</color>
-    <color name="brown">#A52A2A</color>
+    <color name="red">#EF4444</color>
+    <color name="green">#10B981</color>
+    <color name="blue">#3B82F6</color>
+    <color name="cyan">#06B6D4</color>
+    <color name="magenta">#D946EF</color>
+    <color name="orange">#F97316</color>
+    <color name="pink">#EC4899</color>
+    <color name="purple">#8B5CF6</color>
+    <color name="brown">#A16207</color>
 
     <!-- ===================== -->
-    <!-- Gray Scale -->
+    <!-- Soothing Gray Scale -->
+    <!-- Using Tailwind's slate palette -->
     <!-- ===================== -->
-    <color name="gray_50">#F9FAFB</color>
-    <color name="gray_100">#F3F4F6</color>
-    <color name="gray_200">#E5E7EB</color>
-    <color name="gray_300">#D1D5DB</color>
-    <color name="gray_400">#9CA3AF</color>
-    <color name="gray_500">#6B7280</color>
-    <color name="gray_600">#4B5563</color>
-    <color name="gray_700">#374151</color>
-    <color name="gray_800">#1F2933</color>
-    <color name="gray_900">#111827</color>
+    <color name="gray_50">#F8FAFC</color>
+    <color name="gray_100">#F1F5F9</color>
+    <color name="gray_200">#E2E8F0</color>
+    <color name="gray_300">#CBD5E1</color>
+    <color name="gray_400">#94A3B8</color>
+    <color name="gray_500">#64748B</color>
+    <color name="gray_600">#475569</color>
+    <color name="gray_700">#334155</color>
+    <color name="gray_800">#1E293B</color>
+    <color name="gray_900">#0F172A</color>
 
     <!-- ===================== -->
-    <!-- Status Colors -->
+    <!-- Status Colors (Softer) -->
     <!-- ===================== -->
-    <color name="success">#16A34A</color>
+    <color name="success">#10B981</color>
     <color name="warning">#F59E0B</color>
-    <color name="error">#DC2626</color>
-    <color name="info">#2563EB</color>
+    <color name="error">#EF4444</color>
+    <color name="info">#3B82F6</color>
+
+    <!-- Status Background Colors -->
+    <color name="success_background">#D1FAE5</color>
+    <color name="error_background">#FEE2E2</color>
+    <color name="warning_background">#FEF3C7</color>
+    <color name="info_background">#DBEAFE</color>
 
     <!-- ===================== -->
     <!-- Fixed / Legacy -->

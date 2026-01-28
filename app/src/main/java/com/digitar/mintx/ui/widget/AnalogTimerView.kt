@@ -19,20 +19,20 @@ class AnalogTimerView @JvmOverloads constructor(
     private val bgPaint = Paint().apply {
         style = Paint.Style.STROKE
         strokeWidth = 10f
-        color = Color.parseColor("#E0E0E0")
+        color = ContextCompat.getColor(context, R.color.accent_glass_border)
         isAntiAlias = true
     }
 
     private val progressPaint = Paint().apply {
         style = Paint.Style.STROKE
         strokeWidth = 10f
-        color = Color.GREEN
+        color = ContextCompat.getColor(context, R.color.mint_green)
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
     }
 
     private val textPaint = Paint().apply {
-        color = Color.BLACK
+        color = ContextCompat.getColor(context, R.color.text_headline)
         textSize = 40f
         textAlign = Paint.Align.CENTER
         isAntiAlias = true

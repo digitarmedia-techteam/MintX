@@ -83,4 +83,17 @@ class QuizRepository(private val context: Context) {
             // Log or handle error
         }
     }
+
+    suspend fun saveTransaction(uid: String, transaction: com.digitar.mintx.data.model.Transaction) = withContext(Dispatchers.IO) {
+        try {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .collection("TransactionHistory")
+                .add(transaction)
+                .await()
+        } catch (e: Exception) {
+            android.util.Log.e("QuizRepository", "FIREBASE PERMISSION ERROR: Please checks rules for 'TransactionHistory'.", e)
+        }
+    }
 }

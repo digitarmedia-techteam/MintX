@@ -68,7 +68,7 @@
         <item name="android:inputType">number</item>
         <item name="android:maxLength">1</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/text_headline</item>
     </style>
 
     <style name="OtpBoxStyleRef">
@@ -79,7 +79,7 @@
         <item name="android:inputType">number</item>
         <item name="android:maxLength">1</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/text_headline</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

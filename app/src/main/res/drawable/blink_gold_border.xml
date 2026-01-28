@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    
+    <!-- Gold border visible -->
+    <item android:duration="500">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/mint_surface"/>
+            <stroke 
+                android:width="3dp" 
+                android:color="@color/mint_gold"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+    
+    <!-- Gold border semi-transparent -->
+    <item android:duration="500">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/mint_surface"/>
+            <stroke 
+                android:width="3dp" 
+                android:color="#80F59E0B"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+</animation-list>

@@ -81,8 +81,14 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
     // ... (rest of fetchQuestions)
 
     fun restartQuiz() {
-        fetchQuestions(currentCategories)
+        // Reset state immediately to prevent UI race conditions
+        _loading.value = true // Immediate visual feedback (Skeleton)
+        _currentIndex.value = 0
+        _quizFinished.value = false
         _currentScore.value = 0
+        _userAnswers.value = mutableMapOf()
+        
+        fetchQuestions(currentCategories)
     }
 
     fun deductPoints(amount: Int): Boolean {
@@ -95,7 +101,20 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
             if (uid != null) {
                 viewModelScope.launch {
+                    // Update Balance
                     repository.updateUserBalance(uid, newBalance)
+                    
+                    // Create Transaction for Debit (Hint Used)
+                    val transaction = com.digitar.mintx.data.model.Transaction(
+                        id = java.util.UUID.randomUUID().toString(),
+                        title = "Hint Used",
+                        description = "Points spent on in-game hint",
+                        amount = amount,
+                        timestamp = System.currentTimeMillis(),
+                        type = "debit",
+                        status = "completed"
+                    )
+                    repository.saveTransaction(uid, transaction)
                 }
             }
             return true
@@ -105,7 +124,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
 
     fun saveQuizResults() {
         val summary = getQuizSummary()
-        if (summary.totalPoints > 0) {
+        if (summary.totalPoints != 0) {
             val currentBalance = _mintBalance.value ?: 0
             val newBalance = currentBalance + summary.totalPoints
             _mintBalance.value = newBalance
@@ -114,7 +133,27 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
             if (uid != null) {
                 viewModelScope.launch {
+                    // Update Balance
                     repository.updateUserBalance(uid, newBalance)
+                    
+                    // Determine Transaction Details
+                    val isCredit = summary.totalPoints > 0
+                    val absAmount = kotlin.math.abs(summary.totalPoints)
+                    val type = if (isCredit) "credit" else "debit"
+                    val title = if (isCredit) "Quiz Earnings" else "Quiz Penalty"
+                    val description = if (isCredit) "Reward for completing daily quiz" else "Points deducted for low accuracy"
+                    
+                    // Create and Save Transaction Record
+                    val transaction = com.digitar.mintx.data.model.Transaction(
+                        id = java.util.UUID.randomUUID().toString(),
+                        title = title,
+                        description = description,
+                        amount = absAmount,
+                        timestamp = System.currentTimeMillis(),
+                        type = type,
+                        status = "completed"
+                    )
+                    repository.saveTransaction(uid, transaction)
                 }
             }
         }

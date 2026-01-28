@@ -10,14 +10,47 @@
         <item name="colorSecondaryVariant">@color/mint_secondary</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item> <!-- White icons for Dark Mode -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <!-- Backgrounds -->
         <item name="android:windowBackground">@color/mint_background</item>
         <item name="android:colorBackground">@color/mint_background</item>
         
         <!-- BottomSheet Theme -->
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogThemeDark</item>
+    </style>
+
+    <!-- Dark Mode Bottom Sheet Dialog Theme -->
+    <style name="BottomSheetDialogThemeDark" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/mint_background</item>
+    </style>
+
+    <!-- OTP Styles for Dark Mode -->
+    <style name="OtpBoxStyle">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/bg_otp_box</item>
+        <item name="android:gravity">center</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_headline</item>
+    </style>
+
+    <style name="OtpBoxStyleRef">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/bg_otp_box</item>
+        <item name="android:gravity">center</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/text_headline</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>
