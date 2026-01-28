@@ -56,7 +56,7 @@ class WalletFragment : Fragment() {
             binding.tvBalance.text = java.text.NumberFormat.getNumberInstance(java.util.Locale.US).format(balance)
             
             // Approximate value calculation: 200 Coins = 1 INR
-            val inrValue = balance / 200.0
+            val inrValue = balance / COIN_CONVERSION_RATE
             binding.tvApproxValueWallet.text = String.format("≈ ₹%.2f INR", inrValue)
         }
 
@@ -77,5 +77,8 @@ class WalletFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    companion object {
+        private const val COIN_CONVERSION_RATE = 200.0
     }
 }

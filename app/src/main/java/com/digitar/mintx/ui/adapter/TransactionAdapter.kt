@@ -61,12 +61,13 @@ class TransactionAdapter(private var transactions: List<Transaction> = emptyList
             if (transaction.type == "credit") {
                 tvAmount.text = "+${transaction.amount}"
                 tvAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.mint_green))
+                tvTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.mint_green))
                 ivIcon.setColorFilter(null) // Reset tint
             } else {
                 tvAmount.text = "-${transaction.amount}"
                 tvAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.accent_red))
                 // Can apply red tint to icon for debit
-                ivIcon.setColorFilter(ContextCompat.getColor(itemView.context, R.color.accent_red))
+                tvTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.accent_red))
             }
         }
     }

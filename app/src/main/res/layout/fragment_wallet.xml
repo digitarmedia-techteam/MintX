@@ -55,7 +55,7 @@
                 android:id="@+id/tv_approx_value_wallet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="≈ ₹12.50 INR"
+                android:text="≈ ₹0.00 INR"
                 android:textColor="@color/text_hint"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@id/tv_balance"

@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Rule (Allows Admin Panel to access everything)
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // 2. Specific User Rules
+    // (Note: These are currently redundant because the global rule above allows everything,
+    // but we keep them here for when you decide to secure the app later)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /TransactionHistory/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

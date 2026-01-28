@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MintX Admin Console</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo-icon"><i class="fa-solid fa-gamepad"></i></div>
+                <h2>MintX <span class="badge">ADMIN</span></h2>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="users">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="quizzes">
+                    <i class="fa-solid fa-clipboard-question"></i>
+                    <span>Quizzes</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="predictions">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Predictions</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="transactions">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Transactions</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="rewards">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>Redemptions</span>
+                    <span class="nav-badge">3</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item" data-tab="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <h4>Admin User</h4>
+                        <p>Super Admin</p>
+                    </div>
+                    <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search users, transactions...">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fa-solid fa-bell"></i><span
+                            class="notification-dot"></span></button>
+                    <button class="theme-toggle"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="page-header">
+                    <h1>Dashboard Overview</h1>
+                    <div class="date-filter">
+                        <span>Last 30 Days</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon mint"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Users</h3>
+                            <p class="stat-value">12,450</p>
+                            <span class="stat-change positive">+12% <i class="fa-solid fa-arrow-up"></i></span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon gold"><i class="fa-solid fa-coins"></i></div>
+                        <div class="stat-info">
+                            <h3>Coins Distributed</h3>
+                            <p class="stat-value">5.2M</p>
+                            <span class="stat-change positive">+8% <i class="fa-solid fa-arrow-up"></i></span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="stat-info">
+                            <h3>Quizzes Played</h3>
+                            <p class="stat-value">85.2K</p>
+                            <span class="stat-change positive">+24% <i class="fa-solid fa-arrow-up"></i></span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                        <div class="stat-info">
+                            <h3>Pending Payouts</h3>
+                            <p class="stat-value">₹4,200</p>
+                            <span class="stat-change negative">Action Needed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Signups & Live Activity -->
+                <div class="dashboard-grid">
+                    <div class="content-card large">
+                        <div class="card-header">
+                            <h3>Recent Signups</h3>
+                            <button class="btn-text">View All</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Coins</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="avatar-sm">JD</div>
+                                            <span>John Doe</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-pill active">Active</span></td>
+                                    <td>2 mins ago</td>
+                                    <td>500</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="avatar-sm">AS</div>
+                                            <span>Alice Smith</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-pill active">Active</span></td>
+                                    <td>15 mins ago</td>
+                                    <td>200</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="avatar-sm">RK</div>
+                                            <span>Rahul Kumar</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-pill pending">Unverified</span></td>
+                                    <td>1 hour ago</td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Pending Redemptions</h3>
+                        </div>
+                        <div class="list-items">
+                            <div class="list-item">
+                                <div class="item-icon amazon"><i class="fa-brands fa-amazon"></i></div>
+                                <div class="item-details">
+                                    <h4>Amazon Gift Card</h4>
+                                    <p>Requested by <strong>User #492</strong></p>
+                                </div>
+                                <div class="item-action">
+                                    <span class="amount">₹500</span>
+                                    <button class="btn-sm btn-primary">Approve</button>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-icon upi"><i class="fa-solid fa-mobile-screen"></i></div>
+                                <div class="item-details">
+                                    <h4>UPI Transfer</h4>
+                                    <p>Requested by <strong>User #881</strong></p>
+                                </div>
+                                <div class="item-action">
+                                    <span class="amount">₹100</span>
+                                    <button class="btn-sm btn-primary">Approve</button>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-icon google"><i class="fa-brands fa-google-play"></i></div>
+                                <div class="item-details">
+                                    <h4>Play Store Code</h4>
+                                    <p>Requested by <strong>User #102</strong></p>
+                                </div>
+                                <div class="item-action">
+                                    <span class="amount">₹50</span>
+                                    <button class="btn-sm btn-primary">Approve</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users View (Hidden by default) -->
+            <div id="view-users" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>User Management</h1>
+                    <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add User</button>
+                </div>
+                <div class="content-card full">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>UID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Coins</th>
+                                <th>Categories</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quizzes View -->
+            <div id="view-quizzes" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Quiz Management</h1>
+                    <div class="header-buttons">
+                        <button class="btn-primary" id="btn-add-category"><i class="fa-solid fa-folder-plus"></i> New
+                            Category</button>
+                    </div>
+                </div>
+
+                <div class="quiz-layout">
+                    <!-- Left: Categories -->
+                    <div class="categories-panel">
+                        <div class="categories-header">
+                            <h3>Categories</h3>
+                        </div>
+                        <div id="categories-list-full" class="categories-list">
+                            <!-- Populated JS -->
+                            <div style="padding:10px; color:var(--text-muted)">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Questions -->
+                    <div class="questions-panel">
+                        <div class="questions-header">
+                            <h3 id="selected-category-title">Select a Category</h3>
+                            <button class="btn-primary" id="btn-add-question" style="display:none;">
+                                <i class="fa-solid fa-plus"></i> Add Question
+                            </button>
+                        </div>
+                        <div id="questions-list-full" class="questions-list-container">
+                            <div style="text-align:center; padding: 2rem; color:var(--text-muted);">
+                                <i class="fa-solid fa-arrow-left" style="margin-right:8px;"></i> Select a category to
+                                manage questions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictions View (Hidden) -->
+            <div id="view-predictions" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Prediction Management</h1>
+                    <button class="btn-primary"><i class="fa-solid fa-plus"></i> Create Event</button>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Active Events</h3>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-icon blue"><i class="fa-solid fa-flag"></i></div>
+                        <div class="item-details">
+                            <h4>IND vs AUS - Cricket</h4>
+                            <p>Ends in <strong>2h 30m</strong></p>
+                        </div>
+                        <div class="item-action">
+                            <span class="amount">1,240 Bets</span>
+                            <button class="btn-sm btn-primary">Manage</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Category Modal -->
+    <div id="modal-add-category" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Category</h2>
+            <form id="form-add-category">
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="cat-name" required placeholder="e.g. Science">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="cat-desc" required placeholder="Short description...">
+                </div>
+                <button type="submit" class="btn-primary full-width">Create Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Question Modal -->
+    <div id="modal-add-question" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Question</h2>
+            <form id="form-add-question">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="q-category" required>
+                            <!-- Populated by JS -->
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        <select id="q-difficulty">
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Question Text</label>
+                    <textarea id="q-text" rows="3" required placeholder="Enter the question here..."></textarea>
+                </div>
+
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label>Option A</label>
+                        <input type="text" id="q-opt-a" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option B</label>
+                        <input type="text" id="q-opt-b" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option C</label>
+                        <input type="text" id="q-opt-c" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option D</label>
+                        <input type="text" id="q-opt-d" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Correct Answer</label>
+                    <select id="q-correct" required>
+                        <option value="answer_a">Option A</option>
+                        <option value="answer_b">Option B</option>
+                        <option value="answer_c">Option C</option>
+                        <option value="answer_d">Option D</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Save Question</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="modal-message" class="modal">
+        <div class="modal-content" style="width: 350px;">
+            <div class="msg-modal-body">
+                <i id="msg-icon" class="fa-solid fa-circle-check msg-icon success"></i>
+                <h2 id="msg-title" style="margin-bottom: 10px;">Success</h2>
+                <p id="msg-text" style="color: var(--text-muted); margin-bottom: 20px;">Operation completed.</p>
+                <button class="btn-primary full-width" onclick="closeMessageModal()">Okay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="modal-edit-category" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Category</h2>
+            <form id="form-edit-category">
+                <input type="hidden" id="edit-cat-id">
+                <input type="hidden" id="edit-cat-old-name">
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="edit-cat-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="edit-cat-desc" required>
+                </div>
+                <button type="submit" class="btn-primary full-width">Update Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
