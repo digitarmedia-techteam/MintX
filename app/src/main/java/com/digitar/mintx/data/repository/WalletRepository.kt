@@ -79,14 +79,17 @@ class WalletRepository {
             .document(uid)
             .collection("TransactionHistory")
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(20)
+            .limit(50)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
+                    android.util.Log.e("WalletRepo", "Tx Listener Error (Check Indices): ${error.message}", error)
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
                     val transactions = snapshot.toObjects(Transaction::class.java)
-                    trySend(transactions)
+                    // Client-side sort to ensure mixed Firestore Timestamp/Long types are ordered correctly
+                    val sortedTransactions = transactions.sortedByDescending { it.getTimestampLong() }
+                    trySend(sortedTransactions)
                 }
             }
         awaitClose { listener.remove() }

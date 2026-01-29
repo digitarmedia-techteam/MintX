@@ -1,0 +1,46 @@
+/* Code Editor with Line Numbers */
+.code-editor-container {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #1e1e1e;
+    height: 350px;
+    /* matched to previous rows=15 roughly */
+    overflow: hidden;
+}
+
+.line-numbers {
+    width: 45px;
+    background: #252526;
+    color: #858585;
+    text-align: right;
+    padding: 10px 8px 10px 5px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    /* Strict generic monospace */
+    font-size: 13px;
+    /* Exact pixel size */
+    line-height: 20px;
+    /* Exact pixel size */
+    overflow: hidden;
+    user-select: none;
+    border-right: 1px solid var(--border);
+}
+
+#bulk-json {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #d4d4d4;
+    padding: 10px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px !important;
+    line-height: 20px !important;
+    resize: none;
+    white-space: pre;
+    overflow: auto;
+    tab-size: 4;
+}
+
+#bulk-json:focus {
+    outline: none;
+}

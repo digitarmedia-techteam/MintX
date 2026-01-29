@@ -1,0 +1,97 @@
+/* Transaction History Timeline (Bank Style) */
+.tx-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.tx-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease;
+    cursor: default;
+}
+
+.tx-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tx-item:last-child {
+    border-bottom: none;
+}
+
+.tx-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    /* Modern Squircle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-right: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+}
+
+.tx-icon.credit {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--primary);
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.1);
+}
+
+.tx-icon.debit {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--red);
+}
+
+.tx-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    /* Text truncation fix */
+}
+
+.tx-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #F1F5F9;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tx-meta {
+    font-size: 0.8rem;
+    color: #94A3B8;
+    font-weight: 400;
+}
+
+.tx-amount {
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+    margin-left: 16px;
+}
+
+.tx-amount.credit {
+    color: var(--primary);
+}
+
+.tx-amount.debit {
+    color: var(--text-main);
+    opacity: 0.9;
+}
+.tx-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    font-style: italic;
+    opacity: 0.8;
+}
+

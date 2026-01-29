@@ -1,0 +1,33 @@
+/* Chips */
+.difficulty-chips {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.chip {
+    background: var(--card-surface);
+    color: var(--text-muted);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.chip.active {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.header-left-group {
+    display: flex;
+    align-items: center;
+}

@@ -109,7 +109,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                         id = java.util.UUID.randomUUID().toString(),
                         title = "Hint Used",
                         description = "Points spent on in-game hint",
-                        amount = amount,
+                        amount = amount.toDouble(),
                         timestamp = System.currentTimeMillis(),
                         type = "debit",
                         status = "completed"
@@ -126,7 +126,14 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val summary = getQuizSummary()
         if (summary.totalPoints != 0) {
             val currentBalance = _mintBalance.value ?: 0
-            val newBalance = currentBalance + summary.totalPoints
+            
+            // Logic for Low Accuracy Penalty: Fixed at -1 if score is negative
+            val finalPointsChange = if (summary.totalPoints < 0) -1 else summary.totalPoints
+            
+            // Prevent Negative Balance
+            var newBalance = currentBalance + finalPointsChange
+            if (newBalance < 0) newBalance = 0
+            
             _mintBalance.value = newBalance
             
             // Sync with Firestore
@@ -137,8 +144,8 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                     repository.updateUserBalance(uid, newBalance)
                     
                     // Determine Transaction Details
-                    val isCredit = summary.totalPoints > 0
-                    val absAmount = kotlin.math.abs(summary.totalPoints)
+                    val isCredit = finalPointsChange > 0
+                    val absAmount = kotlin.math.abs(finalPointsChange)
                     val type = if (isCredit) "credit" else "debit"
                     val title = if (isCredit) "Quiz Earnings" else "Quiz Penalty"
                     val description = if (isCredit) "Reward for completing daily quiz" else "Points deducted for low accuracy"
@@ -148,7 +155,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                         id = java.util.UUID.randomUUID().toString(),
                         title = title,
                         description = description,
-                        amount = absAmount,
+                        amount = absAmount.toDouble(),
                         timestamp = System.currentTimeMillis(),
                         type = type,
                         status = "completed"
@@ -170,84 +177,17 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             _error.value = null
             
             try {
-                // Mapping user sub-categories to valid quizapi.io categories/tags
-                // Valid categories: Linux, DevOps, Networking, Programming, Cloud, Docker, Kubernetes
-                val apiCategories = categories.map { name ->
-                    when (name.lowercase()) {
-                        "coding", "software", "programming" -> "Code"
-                        "linux & os", "linux", "operating systems" -> "Linux"
-                        "networking" -> "Networking"
-                        "devops" -> "DevOps"
-                        "cloud" -> "Cloud"
-                        "docker" -> "Docker"
-                        "kubernetes" -> "Kubernetes"
-                        else -> null // Will return random tech questions
-                    }
-                }.distinct()
-
-                // Mapping logic (unused but kept for reference)
-                // val apiCategories = ...
+                // Pass categories directly to repository (Firestore)
+                val result = repository.getQuestions(categories)
                 
-                val categoryQuestionsMap = mutableMapOf<String, MutableList<QuizQuestion>>()
-                
-                // Always fetch ALL questions (Repository is forced to return all)
-                val result = repository.getQuestions(null)
-                
-                if (result != null) {
-                    // Group questions by their defined category
-                    result.forEach { q ->
-                        val cat = q.category
-                        val key = cat.trim()
-                        if (!categoryQuestionsMap.containsKey(key)) {
-                            categoryQuestionsMap[key] = mutableListOf()
-                        }
-                        categoryQuestionsMap[key]?.add(q)
-                    }
-                }
-
-                // Create rotated list: Strict 2 questions per category per rotation cycle
-                val rotatedList = mutableListOf<QuizQuestion>()
-                
-                // Get all available categories (e.g. Science, Tech, History...)
-                val availableCategories = categoryQuestionsMap.keys.toMutableList()
-                
-                // Shuffle categories to start with a random one each time
-                availableCategories.shuffle()
-                
-                // Shuffle questions WITHIN each category to vary content
-                categoryQuestionsMap.values.forEach { it.shuffle() }
-
-                while (rotatedList.size < 10 && availableCategories.isNotEmpty()) {
-                    val iterator = availableCategories.iterator()
-                    while (iterator.hasNext()) {
-                        val cat = iterator.next()
-                        val questions = categoryQuestionsMap[cat]
-                        
-                        if (questions.isNullOrEmpty()) {
-                            iterator.remove() // Exhausted this category
-                            continue
-                        }
-                        
-                        // Take 2 questions
-                        val batchSize = 2
-                        val batch = questions.take(batchSize)
-                        rotatedList.addAll(batch)
-                        
-                        // Remove used questions
-                        questions.removeAll(batch)
-                        
-                        if (rotatedList.size >= 10) break
-                    }
-                }
-
-                if (rotatedList.isNotEmpty()) {
-                    _questions.value = rotatedList.take(10) // Ensure max 10
+                if (result.isNotEmpty()) {
+                    _questions.value = result.take(10) // Limit to 10 questions per session
                     _currentIndex.value = 0
                     _userAnswers.value = mutableMapOf()
                     _currentScore.value = 0
                     _quizFinished.value = false
                 } else {
-                    _error.value = "Failed to load questions. Please check your API key and connection."
+                    _error.value = "No questions found for the selected categories."
                 }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to fetch questions"
@@ -256,8 +196,6 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             }
         }
     }
-    
-
 
     fun selectAnswer(questionIndex: Int, answerKey: String) {
         val questions = _questions.value ?: return
@@ -275,6 +213,10 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val question = questions[questionIndex]
         val correctKey = "${answerKey}_correct"
         val isCorrect = question.correctAnswers[correctKey] == "true"
+        
+        android.util.Log.d("QuizDebug", "Selected: $answerKey, looking for: $correctKey")
+        android.util.Log.d("QuizDebug", "Available Correct Keys: ${question.correctAnswers.keys}")
+        android.util.Log.d("QuizDebug", "Is Correct? $isCorrect")
         
         val currentScoreVal = _currentScore.value ?: 0
         if (isCorrect) {

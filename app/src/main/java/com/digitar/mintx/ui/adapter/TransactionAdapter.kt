@@ -53,18 +53,26 @@ class TransactionAdapter(private var transactions: List<Transaction> = emptyList
             // Format time
             try {
                 val dateFormat = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
-                tvDate.text = dateFormat.format(Date(transaction.timestamp))
+                tvDate.text = dateFormat.format(Date(transaction.getTimestampLong()))
             } catch (e: Exception) {
                 tvDate.text = "Unknown Date"
             }
 
+            // Format Amount (Double to Int if whole number)
+            val amountVal = transaction.amount
+            val amountStr = if (amountVal % 1.0 == 0.0) {
+                amountVal.toLong().toString()
+            } else {
+                String.format("%.2f", amountVal)
+            }
+
             if (transaction.type == "credit") {
-                tvAmount.text = "+${transaction.amount}"
+                tvAmount.text = "+$amountStr"
                 tvAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.mint_green))
                 tvTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.mint_green))
                 ivIcon.setColorFilter(null) // Reset tint
             } else {
-                tvAmount.text = "-${transaction.amount}"
+                tvAmount.text = "-$amountStr"
                 tvAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.accent_red))
                 // Can apply red tint to icon for debit
                 tvTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.accent_red))

@@ -2,7 +2,7 @@ package com.digitar.mintx.data.repository
 
 import android.content.Context
 import com.digitar.mintx.data.ApiConstants
-import com.digitar.mintx.data.ManualQuestions
+
 import com.digitar.mintx.data.model.QuizCategory
 import com.digitar.mintx.data.model.QuizQuestion
 import com.digitar.mintx.data.network.ApiClient
@@ -18,42 +18,65 @@ class QuizRepository(private val context: Context) {
     private val gson = Gson()
 
     suspend fun getCategories(): List<QuizCategory> = withContext(Dispatchers.IO) {
-        val cachedJson = sharedPrefs.getString("categories_cache_v2", null)
-        if (cachedJson != null) {
-            val type = object : TypeToken<List<QuizCategory>>() {}.type
-            return@withContext gson.fromJson(cachedJson, type)
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        try {
+             // Collection name corrected to match Firestore screenshot: 'quiz_categories'
+             val result = db.collection("quiz_categories").get().await()
+             
+             if (result.isEmpty) {
+                 android.util.Log.w("QuizRepo", "No categories found in 'quiz_categories'")
+             }
+             
+             val categories = result.documents.map { doc ->
+                 QuizCategory(
+                     id = doc.id,
+                     name = doc.getString("name") ?: "Unknown",
+                     description = doc.getString("description")?.takeIf { it != "nan" } ?: "",
+                     icon = null, // TODO: Add dynamic icon support (URL)
+                     subCategories = emptyList() 
+                 )
+             }
+             return@withContext categories
+        } catch (e: Exception) {
+            android.util.Log.e("QuizRepo", "Error fetching categories", e)
+             return@withContext emptyList()
         }
-
-        val remoteCategories = ApiConstants.QUIZ_CATEGORIES
-        sharedPrefs.edit().putString("categories_cache_v2", gson.toJson(remoteCategories)).apply()
-        return@withContext remoteCategories
     }
 
-    suspend fun getQuestions(category: String?): List<QuizQuestion>? = withContext(Dispatchers.IO) {
-        // PER USER REQUEST: Force usage of ManualQuestions (Bypass API)
-        // try {
-        //     val response = com.digitar.mintx.data.network.ApiClient.getQuizApiService().getQuestions(
-        //         apiKey = ApiConstants.API_KEY,
-        //         category = category
-        //     )
-        //     if (response.isSuccessful) {
-        //         val body = response.body()
-        //         if (body != null && body.isNotEmpty()) {
-        //             return@withContext body
-        //         }
-        //     }
-        //     // Fallback for API error or empty body
-        //     android.util.Log.w("QuizRepository", "API failed or empty, using fallback. Code: ${response.code()}")
-        //     return@withContext ManualQuestions.getQuestions(category)
-        //     
-        // } catch (e: Exception) {
-        //     android.util.Log.e("QuizRepository", "Network Exception, using fallback", e)
-        //     return@withContext ManualQuestions.getQuestions(category)
-        // }
-        
-        // Direct return from ManualQuestions
-        // Force NULL to get ALL categories for rotation variety
-        return@withContext ManualQuestions.getQuestions(null)
+    suspend fun getQuestions(categories: List<String>?): List<QuizQuestion> = withContext(Dispatchers.IO) {
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        try {
+            var query: com.google.firebase.firestore.Query = db.collection("questions")
+            
+            // Handle multiple categories
+            if (!categories.isNullOrEmpty()) {
+                 // Convert to lowercase for matching if stored that way, or keep original. 
+                 // Admin panel saves them as is (often capitalized 'Linux', 'DevOps').
+                 query = query.whereIn("category", categories.take(10)) 
+            }
+            
+            // Randomize approach:
+            // Since we can't easily random sort in Firestore, we fetch a larger batch and shuffle locally.
+            var snapshot = query.limit(50).get().await()
+            
+            // FALLBACK: If specific category has no questions (e.g. data mismatch), fetch ANY questions
+            if (snapshot.isEmpty && !categories.isNullOrEmpty()) {
+                android.util.Log.w("QuizRepo", "No questions found for categories $categories. Fetching fallback.")
+                snapshot = db.collection("questions").limit(50).get().await()
+            }
+            val questions = snapshot.toObjects(QuizQuestion::class.java)
+            
+            // Ensure IDs are set
+            snapshot.documents.forEachIndexed { index, doc ->
+                 if (index < questions.size) questions[index].id = doc.id
+            }
+            
+            return@withContext questions.shuffled()
+            
+        } catch (e: Exception) {
+            android.util.Log.e("QuizRepo", "Error fetching questions from DB", e)
+            return@withContext emptyList()
+        }
     }
     fun clearCache() {
         sharedPrefs.edit().remove("categories_cache").apply()

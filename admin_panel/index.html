@@ -12,6 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/chips.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/tx_style.css">
 </head>
 
 <body>
@@ -100,8 +103,8 @@
                         <div class="stat-icon mint"><i class="fa-solid fa-users"></i></div>
                         <div class="stat-info">
                             <h3>Total Users</h3>
-                            <p class="stat-value">12,450</p>
-                            <span class="stat-change positive">+12% <i class="fa-solid fa-arrow-up"></i></span>
+                            <p class="stat-value" id="stat-total-users">...</p>
+                            <span class="stat-change positive">Live Count</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -113,11 +116,11 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon blue"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="stat-icon blue"><i class="fa-solid fa-layer-group"></i></div>
                         <div class="stat-info">
-                            <h3>Quizzes Played</h3>
-                            <p class="stat-value">85.2K</p>
-                            <span class="stat-change positive">+24% <i class="fa-solid fa-arrow-up"></i></span>
+                            <h3>Total Questions</h3>
+                            <p class="stat-value" id="stat-total-questions">...</p>
+                            <span class="stat-change positive">Live Count</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -278,9 +281,28 @@
                     <!-- Right: Questions -->
                     <div class="questions-panel">
                         <div class="questions-header">
-                            <h3 id="selected-category-title">Select a Category</h3>
+                            <div class="header-left-group">
+                                <h3 id="selected-category-title">Select a Category</h3>
+
+                                <div class="filter-group" style="display: flex; gap: 10px; align-items: center;">
+                                    <div id="difficulty-chips" class="difficulty-chips" style="display: none;">
+                                        <span class="chip active" onclick="selectDifficulty('All')">All</span>
+                                        <span class="chip" onclick="selectDifficulty('Easy')">Easy</span>
+                                        <span class="chip" onclick="selectDifficulty('Medium')">Medium</span>
+                                        <span class="chip" onclick="selectDifficulty('Hard')">Hard</span>
+                                    </div>
+
+                                    <select id="filter-level" onchange="filterQuestionsByLevel()"
+                                        style="display: none; padding: 6px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                                        <option value="All">All Levels</option>
+                                    </select>
+                                </div>
+                            </div>
                             <button class="btn-primary" id="btn-add-question" style="display:none;">
                                 <i class="fa-solid fa-plus"></i> Add Question
+                            </button>
+                            <button class="btn-secondary" id="btn-bulk-upload" style="display:none; margin-left: 10px;">
+                                <i class="fa-solid fa-upload"></i> Bulk Upload
                             </button>
                         </div>
                         <div id="questions-list-full" class="questions-list-container">
@@ -362,6 +384,13 @@
                             <option value="Hard">Hard</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Level</label>
+                        <input type="number" id="q-level" list="level-options" placeholder="e.g. 1" min="1">
+                        <datalist id="level-options">
+                            <!-- Populated JS -->
+                        </datalist>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -398,7 +427,157 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label>Explanation (Optional)</label>
+                    <textarea id="q-explanation" rows="2" placeholder="Explain the answer..."></textarea>
+                </div>
+
                 <button type="submit" class="btn-primary full-width">Save Question</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Question Modal -->
+    <div id="modal-edit-question" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Question</h2>
+            <form id="form-edit-question">
+                <input type="hidden" id="edit-q-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="edit-q-category" required>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        <select id="edit-q-difficulty">
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Level</label>
+                        <input type="number" id="edit-q-level" list="level-options-edit" placeholder="e.g. 1" min="1">
+                        <datalist id="level-options-edit">
+                            <!-- Populated JS -->
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Question Text</label>
+                    <textarea id="edit-q-text" rows="3" required></textarea>
+                </div>
+
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label>Option A</label>
+                        <input type="text" id="edit-q-opt-a" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option B</label>
+                        <input type="text" id="edit-q-opt-b" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option C</label>
+                        <input type="text" id="edit-q-opt-c" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option D</label>
+                        <input type="text" id="edit-q-opt-d" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Correct Answer</label>
+                    <select id="edit-q-correct" required>
+                        <option value="answer_a">Option A</option>
+                        <option value="answer_b">Option B</option>
+                        <option value="answer_c">Option C</option>
+                        <option value="answer_d">Option D</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Explanation (Optional)</label>
+                    <textarea id="edit-q-explanation" rows="2" placeholder="Explain the answer..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Update Question</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Modal -->
+    <div id="modal-bulk-upload" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal">&times;</span>
+            <h2>Bulk Upload Questions</h2>
+            <p style="color:var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Paste your JSON array of
+                questions here. The 'category' field in JSON is optional; if omitted, the currently selected category
+                will be used.</p>
+            <form id="form-bulk-upload">
+                <div class="form-group">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="margin-bottom: 0;">JSON Data</label>
+                            <i class="fa-solid fa-circle-info" id="btn-show-json-help"
+                                style="color: var(--primary); cursor: pointer;"
+                                title="Click to view JSON format example"></i>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="bulk-file-input" accept=".json" style="display: none;">
+                            <button type="button" class="btn-sm"
+                                style="background: var(--surface); border: 1px solid var(--border); cursor: pointer;"
+                                id="btn-import-file">
+                                <i class="fa-solid fa-file-import"></i> Import .json
+                            </button>
+                            <button type="button" class="btn-sm"
+                                style="background: var(--surface); border: 1px solid var(--border); cursor: pointer;"
+                                id="btn-format-json">
+                                <i class="fa-solid fa-code"></i> Format JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="json-format-help"
+                        style="display: none; background: #2a2a2a; padding: 15px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.85rem;">
+                        <p style="margin-bottom: 8px; color: var(--text-muted);"><strong>Required Format:</strong> Array
+                            of objects.</p>
+                        <pre
+                            style="color: #a5d6ff; margin: 0; background: #1e1e1e; padding: 10px; border-radius: 4px; overflow-x: auto;">[
+  {
+    "question": "Your Question Here?",
+    "category": "Science",
+    "difficulty": "Easy",
+    "answers": {
+      "answer_a": "Option 1",
+      "answer_b": "Option 2",
+      "answer_c": "Option 3",
+      "answer_d": "Option 4"
+    },
+    "correct_answers": {
+      "answer_a_correct": "true",
+      "answer_b_correct": "false",
+      "answer_c_correct": "false",
+      "answer_d_correct": "false"
+    },
+    "explanation": "Optional explanation text."
+  }
+]</pre>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers" id="bulk-line-numbers">1</div>
+                        <textarea id="bulk-json" placeholder='Paste your JSON content here...' spellcheck="false"
+                            required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary full-width">Upload Questions</button>
             </form>
         </div>
     </div>
@@ -436,7 +615,118 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Edit User Modal (Details Only) -->
+    <div id="modal-edit-user" class="modal">
+        <div class="modal-content"
+            style="width: 400px; padding: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--bg-dark);">
+            <div
+                style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5);">
+                <h2 style="margin:0; font-size: 1.25rem; color: var(--primary);">Edit User Details</h2>
+                <span class="close-modal" style="position: static;">&times;</span>
+            </div>
+
+            <form id="form-edit-user" style="padding: 24px;">
+                <input type="hidden" id="edit-user-id">
+
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div class="avatar"
+                        style="width: 80px; height: 80px; margin: 0 auto 16px; font-size: 2rem; border-radius: 50%; display: grid; place-items: center; background: var(--secondary); color: white;">
+                        AD</div>
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <input type="text" id="edit-user-name" class="editable-title" required
+                            style="text-align: center; font-weight: 600; font-size: 1.1rem; width: 100%;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <input type="text" id="edit-user-phone" readonly
+                            style="text-align: center; font-size: 0.9rem; color: var(--text-muted); background: transparent; border: none; width: 100%; cursor: default;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);">Wallet
+                        Balance</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="edit-user-balance" required
+                            style="font-weight: 700; color: var(--gold); font-size: 1.2rem;">
+                        <span style="color: var(--gold);">Mints</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                    <label style="font-size: 0.75rem; color: var(--primary); margin-bottom: 8px;"><i
+                            class="fa-solid fa-gift"></i> Quick Bonus</label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <button type="button" class="btn-xs-chip" onclick="addBonus(100)">+100</button>
+                        <button type="button" class="btn-xs-chip" onclick="addBonus(500)">+500</button>
+                        <button type="button" class="btn-xs-chip" onclick="addBonus(1000)">+1k</button>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="custom-bonus" placeholder="Custom"
+                            style="padding: 6px 10px; font-size: 0.8rem; background: var(--bg-dark); border: 1px solid var(--border); width: 100px;">
+                        <button type="button" class="btn-sm btn-primary" onclick="applyCustomBonus()">Add</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Account Status</label>
+                    <select id="edit-user-status">
+                        <option value="Active">Active</option>
+                        <option value="Blocked">Blocked</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+
+                <!-- Hidden elements -->
+                <div style="display: none;">
+                    <span id="edit-user-cats-count">0</span>
+                    <div id="edit-user-cats-list"></div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 25px;">
+                    <button type="button" class="btn-secondary full-width" onclick="openUserHistory()"
+                        style="background: var(--card-surface); color: white; border: 1px solid var(--border); padding: 12px; border-radius: 8px; cursor: pointer;">
+                        <i class="fa-solid fa-clock-rotate-left"></i> View Transaction History
+                    </button>
+                    <button type="submit" class="btn-primary full-width" style="padding: 12px; border-radius: 8px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                    <button type="button" class="full-width" onclick="resetUserAccount()"
+                        style="background: rgba(248, 113, 113, 0.1); color: var(--red); border: 1px solid var(--red); padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Reset Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transaction History Modal (Standalone) -->
+    <div id="modal-user-history" class="modal">
+        <div class="modal-content large"
+            style="height: 80vh; display: flex; flex-direction: column; padding: 0; background: var(--bg-dark); max-width: 600px;">
+            <div
+                style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5);">
+                <h2 style="margin:0; font-size: 1.25rem; color: white;">Transaction History</h2>
+                <span class="close-modal"
+                    onclick="document.getElementById('modal-user-history').classList.remove('active')"
+                    style="position: static;">&times;</span>
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding: 0;">
+                <div id="edit-user-transactions" style="min-height: 0;">
+                    <!-- Transactions List Populated Here (ID kept same for app.js compat) -->
+                </div>
+            </div>
+            <div
+                style="padding: 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" onclick="deleteAllUserTransactions()"
+                    style="background: transparent; color: var(--red); border: none; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-trash"></i> Clear All
+                </button>
+                <button class="btn-secondary"
+                    onclick="document.getElementById('modal-user-history').classList.remove('active')"
+                    style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 6px 16px; border-radius: 6px; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>

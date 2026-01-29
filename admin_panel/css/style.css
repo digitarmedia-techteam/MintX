@@ -682,12 +682,14 @@ textarea:focus {
     padding: 12px;
     margin-top: 1rem;
 }
+
 /* Quiz Management Layout */
 .quiz-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 1.5rem;
-    height: calc(100vh - 140px); /* Fill remaining height */
+    height: calc(100vh - 140px);
+    /* Fill remaining height */
     overflow: hidden;
 }
 
@@ -742,7 +744,8 @@ textarea:focus {
 .cat-actions {
     display: flex;
     gap: 8px;
-    opacity: 0; /* Show on hover */
+    opacity: 0;
+    /* Show on hover */
     transition: 0.2s;
 }
 
@@ -839,6 +842,27 @@ textarea:focus {
     margin-bottom: 1rem;
 }
 
-.msg-icon.success { color: var(--primary); }
-.msg-icon.error { color: var(--red); }
+.msg-icon.success {
+    color: var(--primary);
+}
 
+.msg-icon.error {
+    color: var(--red);
+}
+
+/* Chip style for bonus buttons */
+.btn-xs-chip {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-xs-chip:hover {
+    background: var(--primary);
+    color: #000;
+}
