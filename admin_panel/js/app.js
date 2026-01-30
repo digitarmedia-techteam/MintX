@@ -119,24 +119,30 @@ function setupModals() {
             }
         }
 
+        // Gather Options Dynamically
+        const answers = {};
+        const correct_answers = {};
+        const correctVal = document.getElementById('q-correct').value;
+
+        const optionsContainer = document.getElementById('add-options-container');
+        Array.from(optionsContainer.children).forEach((row, idx) => {
+            const char = getOptionChar(idx); // a, b, c...
+            const key = `answer_${char}`;
+            const val = row.querySelector('input').value;
+            answers[key] = val;
+
+            // Assume single correct answer logic (since dropdown is single select)
+            correct_answers[`${key}_correct`] = (key === correctVal) ? "true" : "false";
+        });
+
         const questionData = {
             category: document.getElementById('q-category').value,
             difficulty: document.getElementById('q-difficulty').value,
             level: document.getElementById('q-level').value ? parseInt(document.getElementById('q-level').value) : null,
             question: document.getElementById('q-text').value,
             explanation: document.getElementById('q-explanation').value,
-            answers: {
-                answer_a: document.getElementById('q-opt-a').value,
-                answer_b: document.getElementById('q-opt-b').value,
-                answer_c: document.getElementById('q-opt-c').value,
-                answer_d: document.getElementById('q-opt-d').value
-            },
-            correct_answers: {
-                answer_a_correct: document.getElementById('q-correct').value === 'answer_a' ? "true" : "false",
-                answer_b_correct: document.getElementById('q-correct').value === 'answer_b' ? "true" : "false",
-                answer_c_correct: document.getElementById('q-correct').value === 'answer_c' ? "true" : "false",
-                answer_d_correct: document.getElementById('q-correct').value === 'answer_d' ? "true" : "false",
-            },
+            answers: answers,
+            correct_answers: correct_answers,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -241,27 +247,52 @@ function setupModals() {
                     return;
                 }
 
-                // Question
+                // 1. Question (Required String)
                 if (!q.question || typeof q.question !== 'string' || !q.question.trim()) {
                     validationErrors.push(`${errContext}: Missing or invalid 'question'.`);
                 }
 
-                // Answers
+                // 2. Category (Optional in JSON, but required globally)
+                const cat = q.category || selectedCategory;
+                if (!cat) {
+                    validationErrors.push(`${errContext}: Missing 'category'. Please select a category or include it in JSON.`);
+                }
+
+                // 3. Level (Required Number)
+                if (q.level === undefined || q.level === null) {
+                    validationErrors.push(`${errContext}: Missing 'level'.`);
+                } else if (typeof q.level !== 'number') {
+                    validationErrors.push(`${errContext}: 'level' must be a number (e.g. 1).`);
+                }
+
+                // 4. Answers (Strict Map of Strings)
                 if (!q.answers || typeof q.answers !== 'object') {
                     validationErrors.push(`${errContext}: Missing or invalid 'answers' object.`);
                 } else {
                     ['answer_a', 'answer_b', 'answer_c', 'answer_d'].forEach(key => {
-                        if (!q.answers[key]) validationErrors.push(`${errContext}: Missing '${key}' in answers.`);
+                        const val = q.answers[key];
+                        if (val === undefined || val === null) {
+                            validationErrors.push(`${errContext}: Missing '${key}' in answers.`);
+                        } else if (typeof val !== 'string') {
+                            validationErrors.push(`${errContext}: '${key}' in answers must be a string.`);
+                        } else if (!val.trim()) {
+                            validationErrors.push(`${errContext}: '${key}' in answers cannot be empty.`);
+                        }
                     });
                 }
 
-                // Correct Answers
+                // 5. Correct Answers (Strict Map of "true"/"false" strings)
                 const ca = q.correct_answers || q.correctAnswers;
                 if (!ca || typeof ca !== 'object') {
                     validationErrors.push(`${errContext}: Missing 'correct_answers' object.`);
                 } else {
                     ['answer_a_correct', 'answer_b_correct', 'answer_c_correct', 'answer_d_correct'].forEach(key => {
-                        if (ca[key] === undefined) validationErrors.push(`${errContext}: Missing '${key}' in correct_answers.`);
+                        const val = ca[key];
+                        if (val === undefined || val === null) {
+                            validationErrors.push(`${errContext}: Missing '${key}' in correct_answers.`);
+                        } else if (val !== "true" && val !== "false") {
+                            validationErrors.push(`${errContext}: '${key}' must be explicitly "true" or "false" (string).`);
+                        }
                     });
                 }
             });
@@ -290,13 +321,27 @@ function setupModals() {
                 const batch = db.batch();
                 chunk.forEach(q => {
                     const docRef = db.collection('questions').doc();
+
+                    const ca = q.correct_answers || q.correctAnswers;
+
                     const qData = {
                         category: q.category || selectedCategory,
                         difficulty: q.difficulty || "Medium",
-                        question: q.question,
+                        level: Number(q.level),
+                        question: q.question.trim(),
                         explanation: q.explanation || "",
-                        answers: q.answers,
-                        correct_answers: q.correct_answers || q.correctAnswers,
+                        answers: {
+                            answer_a: q.answers.answer_a.toString(),
+                            answer_b: q.answers.answer_b.toString(),
+                            answer_c: q.answers.answer_c.toString(),
+                            answer_d: q.answers.answer_d.toString()
+                        },
+                        correct_answers: {
+                            answer_a_correct: ca.answer_a_correct,
+                            answer_b_correct: ca.answer_b_correct,
+                            answer_c_correct: ca.answer_c_correct,
+                            answer_d_correct: ca.answer_d_correct
+                        },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     batch.set(docRef, qData);
@@ -310,7 +355,7 @@ function setupModals() {
             document.getElementById('bulk-json').value = '';
 
             // Reload
-            loadQuestions(selectedCategory);
+            if (selectedCategory) loadQuestionsV2(selectedCategory);
 
         } catch (error) {
             console.error(error);
@@ -967,18 +1012,58 @@ window.openEditQuestion = function (id) {
     document.getElementById('edit-q-difficulty').value = q.difficulty;
     document.getElementById('edit-q-level').value = q.level || '';
     document.getElementById('edit-q-text').value = q.question;
-    document.getElementById('edit-q-opt-a').value = q.answers.answer_a;
-    document.getElementById('edit-q-opt-b').value = q.answers.answer_b;
-    document.getElementById('edit-q-opt-c').value = q.answers.answer_c;
-    document.getElementById('edit-q-opt-d').value = q.answers.answer_d;
     document.getElementById('edit-q-explanation').value = q.explanation || '';
 
+    // Clear and Populate Options
+    const container = document.getElementById('edit-options-container');
+    container.innerHTML = ''; // Start clean
+
+    // Filter and sort keys: answer_a, answer_b...
+    const keys = Object.keys(q.answers).filter(k => k.startsWith('answer_') && q.answers[k]);
+    keys.sort(); // Should give answer_a, answer_b...
+
+    keys.forEach((key, idx) => {
+        // Reuse addOption logic or manually create (simpler to manually create for control)
+        const char = getOptionChar(idx);
+        const val = q.answers[key];
+
+        const div = document.createElement('div');
+        div.className = 'form-row option-row';
+        div.dataset.index = idx;
+
+        div.innerHTML = `
+            <input type="text" value="${val}" placeholder="Option ${char.toUpperCase()}" required>
+            <button type="button" class="btn-sm" onclick="removeOption(this, 'edit')" style="background: var(--red); color: white; border: none;">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+
+    // Update Dropdown AFTER populating inputs
+    updateCorrectDropdown('edit');
+
     // Determine Correct Answer
-    let correctVal = 'answer_a';
-    if (q.correct_answers.answer_b_correct === "true") correctVal = 'answer_b';
-    if (q.correct_answers.answer_c_correct === "true") correctVal = 'answer_c';
-    if (q.correct_answers.answer_d_correct === "true") correctVal = 'answer_d';
-    document.getElementById('edit-q-correct').value = correctVal;
+    let correctVal = '';
+    // Check which one is marked true in correct_answers
+    for (const key of keys) {
+        if (q.correct_answers[`${key}_correct`] === "true") {
+            correctVal = key;
+            break;
+        }
+    }
+
+    // If we re-indexed (e.g. data had answer_a and answer_c but not b), 
+    // the keys loop above creates index 0, 1. The dropdown values are answer_a, answer_b.
+    // So we need to map the original key to the new key if we want to be strict, 
+    // BUT usually data is consistent. If specific key (answer_c) was correct, and it is now the 2nd item, it becomes answer_b in our new simplified logical list.
+    // For specific requirement "add as many options", simpler is:
+    // We generated inputs for index 0,1,2... corresponding to the SORTED keys found. 
+    // So if answer_c was correct and it is the 3rd key, we select 'answer_c'.
+
+    if (correctVal) {
+        document.getElementById('edit-q-correct').value = correctVal;
+    }
 
     document.getElementById('modal-edit-question').classList.add('active');
 }
@@ -1026,24 +1111,28 @@ document.getElementById('form-edit-question').addEventListener('submit', async (
 
     const correctVal = document.getElementById('edit-q-correct').value;
 
+    // Gather Options Dynamically
+    const answers = {};
+    const correct_answers = {};
+
+    const optionsContainer = document.getElementById('edit-options-container');
+    Array.from(optionsContainer.children).forEach((row, idx) => {
+        const char = getOptionChar(idx); // a, b, c...
+        const key = `answer_${char}`;
+        const val = row.querySelector('input').value;
+        answers[key] = val;
+
+        correct_answers[`${key}_correct`] = (key === correctVal) ? "true" : "false";
+    });
+
     const questionData = {
         category: category,
         difficulty: difficulty,
         level: level ? parseInt(level) : null,
         question: questionText,
         explanation: explanation,
-        answers: {
-            answer_a: document.getElementById('edit-q-opt-a').value,
-            answer_b: document.getElementById('edit-q-opt-b').value,
-            answer_c: document.getElementById('edit-q-opt-c').value,
-            answer_d: document.getElementById('edit-q-opt-d').value
-        },
-        correct_answers: {
-            answer_a_correct: correctVal === 'answer_a' ? "true" : "false",
-            answer_b_correct: correctVal === 'answer_b' ? "true" : "false",
-            answer_c_correct: correctVal === 'answer_c' ? "true" : "false",
-            answer_d_correct: correctVal === 'answer_d' ? "true" : "false",
-        }
+        answers: answers,
+        correct_answers: correct_answers
     };
 
     try {
@@ -1342,3 +1431,97 @@ function renderQuestions() {
     }
 }
 
+
+// --- Dynamic Options Logic ---
+
+window.addOption = function (mode) { // mode: 'add' or 'edit'
+    const containerId = mode === 'add' ? 'add-options-container' : 'edit-options-container';
+    const container = document.getElementById(containerId);
+
+    // Determine new index
+    const currentCount = container.children.length;
+    const char = getOptionChar(currentCount); // a, b, c...
+
+    const div = document.createElement('div');
+    div.className = 'form-row option-row';
+    div.dataset.index = currentCount;
+
+    div.innerHTML = `
+        <input type="text" placeholder="Option ${char.toUpperCase()}" required>
+        <button type="button" class="btn-sm" onclick="removeOption(this, '${mode}')" style="background: var(--red); color: white; border: none;">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    `;
+
+    container.appendChild(div);
+    updateCorrectDropdown(mode);
+}
+
+window.removeOption = function (btn, mode) {
+    const row = btn.parentElement;
+    const container = row.parentElement;
+    container.removeChild(row);
+
+    // Re-index remaining options (optional but good for clean A, B, C labels placeholder)
+    Array.from(container.children).forEach((child, idx) => {
+        child.dataset.index = idx;
+        const char = getOptionChar(idx).toUpperCase();
+        const input = child.querySelector('input');
+        input.placeholder = `Option ${char}`;
+    });
+
+    updateCorrectDropdown(mode);
+}
+
+function updateCorrectDropdown(mode) {
+    const containerId = mode === 'add' ? 'add-options-container' : 'edit-options-container';
+    const selectId = mode === 'add' ? 'q-correct' : 'edit-q-correct';
+
+    const container = document.getElementById(containerId);
+    const select = document.getElementById(selectId);
+
+    const currentVal = select.value;
+
+    // Clear
+    select.innerHTML = '';
+
+    Array.from(container.children).forEach((child, idx) => {
+        const char = getOptionChar(idx); // a, b, c
+        const val = `answer_${char}`;
+        const inputVal = child.querySelector('input').value;
+        const label = inputVal ? `${char.toUpperCase()}: ${inputVal.substring(0, 15)}${inputVal.length > 15 ? '...' : ''}` : `Option ${char.toUpperCase()}`;
+
+        const option = document.createElement('option');
+        option.value = val;
+        option.innerText = label;
+        select.appendChild(option);
+    });
+
+    // Restore selection if valid
+    if (currentVal) {
+        // Check if currentVal still exists in new options
+        let exists = false;
+        Array.from(select.options).forEach(opt => {
+            if (opt.value === currentVal) exists = true;
+        });
+        if (exists) select.value = currentVal;
+    }
+}
+
+// Hook up input comparison for realtime dropdown update (optional polish)
+function setupOptionInputListeners(mode) {
+    const containerId = mode === 'add' ? 'add-options-container' : 'edit-options-container';
+    document.getElementById(containerId).addEventListener('input', () => updateCorrectDropdown(mode));
+}
+
+// Helper: 0 -> a, 1 -> b...
+function getOptionChar(index) {
+    return String.fromCharCode(97 + index); // 97 is 'a'
+}
+
+// Init Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // ... existing setup ...
+    setupOptionInputListeners('add');
+    setupOptionInputListeners('edit');
+});

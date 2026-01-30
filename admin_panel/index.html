@@ -293,7 +293,7 @@
                                     </div>
 
                                     <select id="filter-level" onchange="filterQuestionsByLevel()"
-                                        style="display: none; padding: 6px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                                        style="display: none; padding: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main);">
                                         <option value="All">All Levels</option>
                                     </select>
                                 </div>
@@ -398,23 +398,27 @@
                     <textarea id="q-text" rows="3" required placeholder="Enter the question here..."></textarea>
                 </div>
 
-                <div class="options-grid">
-                    <div class="form-group">
-                        <label>Option A</label>
-                        <input type="text" id="q-opt-a" required>
+                <div class="form-group">
+                    <label>Options</label>
+                    <div id="add-options-container">
+                        <!-- Dynamic Options will be added here -->
+                        <div class="form-row option-row" data-index="0">
+                            <input type="text" placeholder="Option A" required>
+                            <button type="button" class="btn-sm" onclick="removeOption(this, 'add')"
+                                style="background: var(--red); color: white; border: none;"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="form-row option-row" data-index="1">
+                            <input type="text" placeholder="Option B" required>
+                            <button type="button" class="btn-sm" onclick="removeOption(this, 'add')"
+                                style="background: var(--red); color: white; border: none;"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Option B</label>
-                        <input type="text" id="q-opt-b" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option C</label>
-                        <input type="text" id="q-opt-c" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        <input type="text" id="q-opt-d" required>
-                    </div>
+                    <button type="button" class="btn-sm" onclick="addOption('add')"
+                        style="margin-top: 10px; background: var(--secondary); color: white; border: none;">
+                        <i class="fa-solid fa-plus"></i> Add Option
+                    </button>
                 </div>
 
                 <div class="form-group">
@@ -422,8 +426,6 @@
                     <select id="q-correct" required>
                         <option value="answer_a">Option A</option>
                         <option value="answer_b">Option B</option>
-                        <option value="answer_c">Option C</option>
-                        <option value="answer_d">Option D</option>
                     </select>
                 </div>
 
@@ -473,32 +475,21 @@
                     <textarea id="edit-q-text" rows="3" required></textarea>
                 </div>
 
-                <div class="options-grid">
-                    <div class="form-group">
-                        <label>Option A</label>
-                        <input type="text" id="edit-q-opt-a" required>
+                <div class="form-group">
+                    <label>Options</label>
+                    <div id="edit-options-container">
+                        <!-- Dynamic Options will be added here via JS -->
                     </div>
-                    <div class="form-group">
-                        <label>Option B</label>
-                        <input type="text" id="edit-q-opt-b" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option C</label>
-                        <input type="text" id="edit-q-opt-c" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        <input type="text" id="edit-q-opt-d" required>
-                    </div>
+                    <button type="button" class="btn-sm" onclick="addOption('edit')"
+                        style="margin-top: 10px; background: var(--secondary); color: white; border: none;">
+                        <i class="fa-solid fa-plus"></i> Add Option
+                    </button>
                 </div>
 
                 <div class="form-group">
                     <label>Correct Answer</label>
                     <select id="edit-q-correct" required>
-                        <option value="answer_a">Option A</option>
-                        <option value="answer_b">Option B</option>
-                        <option value="answer_c">Option C</option>
-                        <option value="answer_d">Option D</option>
+                        <!-- Populated by JS -->
                     </select>
                 </div>
 
@@ -555,6 +546,7 @@
     "question": "Your Question Here?",
     "category": "Science",
     "difficulty": "Easy",
+    "level": 1,
     "answers": {
       "answer_a": "Option 1",
       "answer_b": "Option 2",

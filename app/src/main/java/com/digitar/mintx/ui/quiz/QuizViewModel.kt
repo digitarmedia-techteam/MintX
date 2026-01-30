@@ -78,6 +78,28 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         }
     }
 
+    fun startQuizWithUserPreferences() {
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            viewModelScope.launch {
+                _loading.value = true
+                val categories = repository.getUserCategories(uid)
+                if (categories.isNotEmpty()) {
+                    fetchQuestions(categories)
+                } else {
+                    // Fallback if no categories selected: Use default or handle accordingly
+                    // For now, defaulting to 'Linux' as per previous logic, or maybe fetch questions from ANY category?
+                    // User request: "Only the questions from the categories selected by the user should be shown"
+                    // If none selected, we might want to guide them to selection or show random?
+                    // I will stick to the previous fallback logic for safety but ideally trigger onboarding.
+                     fetchQuestions(listOf("Linux")) 
+                }
+            }
+        } else {
+             fetchQuestions(listOf("Linux"))
+        }
+    }
+
     // ... (rest of fetchQuestions)
 
     fun restartQuiz() {

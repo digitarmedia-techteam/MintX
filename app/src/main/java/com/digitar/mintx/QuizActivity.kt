@@ -66,8 +66,8 @@ class QuizActivity : AppCompatActivity() {
             startQuizWithCategories(categories)
         } else {
              if (viewModel.questions.value.isNullOrEmpty()) {
-                 // Default to Linux if no selection passed
-                 startQuizWithCategories(listOf("Linux"))
+                 animateQuizStart()
+                 viewModel.startQuizWithUserPreferences()
              }
         }
     }
@@ -303,6 +303,12 @@ class QuizActivity : AppCompatActivity() {
         // Update Category Label
         val categoryName = question.category
         binding.question.tvCategoryLabel.text = categoryName.uppercase()
+
+        // Update Difficulty Chips
+        val difficulty = question.difficulty.lowercase()
+        binding.question.chipEasy.visibility = if (difficulty == "easy") View.VISIBLE else View.GONE
+        binding.question.chipMedium.visibility = if (difficulty == "medium") View.VISIBLE else View.GONE
+        binding.question.chipHard.visibility = if (difficulty == "hard") View.VISIBLE else View.GONE
 
         displayOptions(question, index)
     }

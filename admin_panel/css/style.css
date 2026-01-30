@@ -664,6 +664,11 @@ textarea {
     transition: 0.2s;
 }
 
+select option {
+    background: var(--bg-dark);
+    color: white;
+}
+
 input:focus,
 select:focus,
 textarea:focus {

@@ -1,15 +1,19 @@
 package com.digitar.mintx
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.digitar.mintx.auth.AuthActivity
 import com.digitar.mintx.databinding.ActivityProfileViewBinding
+import com.digitar.mintx.ui.OnboardingBottomSheetFragment
 import com.digitar.mintx.utils.SessionManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.digitar.mintx.ui.OnboardingBottomSheetFragment
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -18,6 +22,9 @@ class ProfileActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
+    // Cache for category images
+    private val categoryImageMap = mutableMapOf<String, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +49,28 @@ class ProfileActivity : AppCompatActivity() {
         
         binding.tvPoints.text = "${sessionManager.getMintBalance()}"
         
-        fetchUserData()
+        fetchAllData()
+    }
+    
+    private fun fetchAllData() {
+        // 1. Fetch Categories metadata first (to get images)
+        db.collection("quiz_categories").get()
+            .addOnSuccessListener { result ->
+                categoryImageMap.clear()
+                for (doc in result) {
+                    val name = doc.getString("name")
+                    val url = doc.getString("imageUrl") ?: doc.getString("image")
+                    if (name != null && url != null) {
+                        categoryImageMap[name] = url
+                    }
+                }
+                // 2. Then User Data
+                fetchUserData()
+            }
+            .addOnFailureListener {
+                // Return to fetching user data even if cats fail
+                fetchUserData()
+            }
     }
     
     private fun fetchUserData() {
@@ -62,11 +90,35 @@ class ProfileActivity : AppCompatActivity() {
                         // Update categories
                         binding.chipGroupCategories.removeAllViews()
                         if (it.categories.isNotEmpty()) {
-                            it.categories.forEach { cat ->
+                            it.categories.forEach { catName ->
                                 val chip = com.google.android.material.chip.Chip(this@ProfileActivity)
-                                chip.text = cat.replaceFirstChar { char -> char.uppercase() }
+                                chip.text = catName.replaceFirstChar { char -> char.uppercase() }
                                 chip.isCheckable = false
                                 chip.isClickable = false
+                                
+                                // Image Logic
+                                val imageUrl = categoryImageMap[catName]
+                                if (!imageUrl.isNullOrEmpty()) {
+                                    // Load with Glide
+                                    Glide.with(this@ProfileActivity)
+                                        .asDrawable()
+                                        .load(imageUrl)
+                                        .circleCrop()
+                                        .into(object : CustomTarget<Drawable>() {
+                                            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                                chip.chipIcon = resource
+                                                chip.isChipIconVisible = true
+                                            }
+                                            override fun onLoadCleared(placeholder: Drawable?) {
+                                                // Do nothing
+                                            }
+                                        })
+                                } else {
+                                    // "otherwise, don’t display the image"
+                                    chip.chipIcon = null
+                                    chip.isChipIconVisible = false
+                                }
+                                
                                 binding.chipGroupCategories.addView(chip)
                             }
                         } else {
@@ -74,6 +126,7 @@ class ProfileActivity : AppCompatActivity() {
                             chip.text = "None selected"
                             chip.isCheckable = false
                             chip.isClickable = false
+                            chip.isChipIconVisible = false
                             binding.chipGroupCategories.addView(chip)
                         }
                     }

@@ -7,10 +7,11 @@ data class SubCategory(
 )
 
 data class QuizCategory(
-    val id: String,
-    val name: String,
-    val description: String,
+    val id: String = "",
+    val name: String = "",
+    val description: String = "",
     val icon: Int? = null,
+    val imageUrl: String? = null,
     val subCategories: List<SubCategory> = emptyList(),
     var isExpanded: Boolean = false
 )

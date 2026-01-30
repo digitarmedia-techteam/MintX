@@ -66,6 +66,63 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="end"
+                android:gravity="center_vertical">
+                
+                <TextView
+                    android:id="@+id/chip_easy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Easy"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_category_label"
+                    android:backgroundTint="@color/mint_green"
+                    android:fontFamily="sans-serif-medium"
+                    android:elevation="1dp"/>
+
+                <TextView
+                    android:id="@+id/chip_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Medium"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_category_label"
+                    android:backgroundTint="@color/mint_gold"
+                    android:fontFamily="sans-serif-medium"
+                    android:elevation="1dp"/>
+
+                <TextView
+                    android:id="@+id/chip_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hard"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:background="@drawable/bg_category_label"
+                    android:backgroundTint="@color/accent_red"
+                    android:fontFamily="sans-serif-medium"
+                    android:elevation="1dp"/>
+
+            </LinearLayout>
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>

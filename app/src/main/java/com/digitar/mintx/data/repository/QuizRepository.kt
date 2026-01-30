@@ -14,8 +14,25 @@ import kotlinx.coroutines.tasks.await
 
 class QuizRepository(private val context: Context) {
 
+
     private val sharedPrefs = context.getSharedPreferences("quiz_cache", Context.MODE_PRIVATE)
     private val gson = Gson()
+
+    suspend fun getUserCategories(uid: String): List<String> = withContext(Dispatchers.IO) {
+        try {
+            val snapshot = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .await()
+            
+            @Suppress("UNCHECKED_CAST")
+            return@withContext (snapshot.get("categories") as? List<String>) ?: emptyList()
+        } catch (e: Exception) {
+            android.util.Log.e("QuizRepo", "Error fetching user categories", e)
+            return@withContext emptyList()
+        }
+    }
 
     suspend fun getCategories(): List<QuizCategory> = withContext(Dispatchers.IO) {
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
@@ -46,32 +63,46 @@ class QuizRepository(private val context: Context) {
     suspend fun getQuestions(categories: List<String>?): List<QuizQuestion> = withContext(Dispatchers.IO) {
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         try {
-            var query: com.google.firebase.firestore.Query = db.collection("questions")
-            
-            // Handle multiple categories
+            val allQuestions = mutableListOf<QuizQuestion>()
+
             if (!categories.isNullOrEmpty()) {
-                 // Convert to lowercase for matching if stored that way, or keep original. 
-                 // Admin panel saves them as is (often capitalized 'Linux', 'DevOps').
-                 query = query.whereIn("category", categories.take(10)) 
+                // Fetch questions for EACH category separately to ensure a mix
+                // Firestore 'whereIn' + 'limit' often returns results from just one category if data is clustered
+                for (category in categories.take(10)) {
+                    val snapshot = db.collection("questions")
+                        .whereEqualTo("category", category)
+                        .limit(5) // Fetch 5 questions per category
+                        .get()
+                        .await()
+
+                    val batch = snapshot.toObjects(QuizQuestion::class.java)
+                    snapshot.documents.forEachIndexed { index, doc ->
+                        if (index < batch.size) batch[index].id = doc.id
+                    }
+                    allQuestions.addAll(batch)
+                }
+            } else {
+                 // Fallback if no categories provided
+                 val snapshot = db.collection("questions").limit(20).get().await()
+                 val batch = snapshot.toObjects(QuizQuestion::class.java)
+                 snapshot.documents.forEachIndexed { index, doc ->
+                    if (index < batch.size) batch[index].id = doc.id
+                 }
+                 allQuestions.addAll(batch)
             }
             
-            // Randomize approach:
-            // Since we can't easily random sort in Firestore, we fetch a larger batch and shuffle locally.
-            var snapshot = query.limit(50).get().await()
-            
-            // FALLBACK: If specific category has no questions (e.g. data mismatch), fetch ANY questions
-            if (snapshot.isEmpty && !categories.isNullOrEmpty()) {
-                android.util.Log.w("QuizRepo", "No questions found for categories $categories. Fetching fallback.")
-                snapshot = db.collection("questions").limit(50).get().await()
-            }
-            val questions = snapshot.toObjects(QuizQuestion::class.java)
-            
-            // Ensure IDs are set
-            snapshot.documents.forEachIndexed { index, doc ->
-                 if (index < questions.size) questions[index].id = doc.id
+            // Failsafe: If specific fetch returned nothing (e.g. typos in category names), fetch generic
+            if (allQuestions.isEmpty() && !categories.isNullOrEmpty()) {
+                 android.util.Log.w("QuizRepo", "No questions found for specific categories. Fetching general fallback.")
+                 val snapshot = db.collection("questions").limit(20).get().await()
+                 val batch = snapshot.toObjects(QuizQuestion::class.java)
+                 snapshot.documents.forEachIndexed { index, doc ->
+                    if (index < batch.size) batch[index].id = doc.id
+                 }
+                 allQuestions.addAll(batch)
             }
             
-            return@withContext questions.shuffled()
+            return@withContext allQuestions.shuffled()
             
         } catch (e: Exception) {
             android.util.Log.e("QuizRepo", "Error fetching questions from DB", e)
