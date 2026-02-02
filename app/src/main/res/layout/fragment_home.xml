@@ -109,15 +109,7 @@
                         app:layout_constraintStart_toEndOf="@id/iv_coin_icon"
                         app:layout_constraintTop_toTopOf="@id/iv_coin_icon" />
 
-                    <TextView
-                        android:id="@+id/tv_approx_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="≈ ₹12.50 INR"
-                        android:textColor="@color/text_subtext"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="@id/tv_balance_amount"
-                        app:layout_constraintTop_toBottomOf="@id/tv_balance_amount" />
+
 
                     <TextView
                         android:id="@+id/btn_redeem_home"

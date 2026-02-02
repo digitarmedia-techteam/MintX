@@ -138,6 +138,31 @@ class QuizRepository(private val context: Context) {
         }
     }
 
+    suspend fun getUserXP(uid: String): Long = withContext(Dispatchers.IO) {
+        try {
+            val snapshot = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .await()
+            return@withContext snapshot.getLong("totalXP") ?: 0L
+        } catch (e: Exception) {
+            return@withContext 0L
+        }
+    }
+
+    suspend fun updateUserXP(uid: String, newXP: Long) = withContext(Dispatchers.IO) {
+        try {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .update("totalXP", newXP)
+                .await()
+        } catch (e: Exception) {
+            // Log or handle error
+        }
+    }
+
     suspend fun saveTransaction(uid: String, transaction: com.digitar.mintx.data.model.Transaction) = withContext(Dispatchers.IO) {
         try {
             com.google.firebase.firestore.FirebaseFirestore.getInstance()
@@ -148,6 +173,25 @@ class QuizRepository(private val context: Context) {
                 .await()
         } catch (e: Exception) {
             android.util.Log.e("QuizRepository", "FIREBASE PERMISSION ERROR: Please checks rules for 'TransactionHistory'.", e)
+        }
+    }
+
+    suspend fun updateUserSolvedStats(uid: String, easyDelta: Int, mediumDelta: Int, hardDelta: Int) = withContext(Dispatchers.IO) {
+        if (easyDelta == 0 && mediumDelta == 0 && hardDelta == 0) return@withContext
+        
+        try {
+            val updates = HashMap<String, Any>()
+            if (easyDelta > 0) updates["solvedEasy"] = com.google.firebase.firestore.FieldValue.increment(easyDelta.toLong())
+            if (mediumDelta > 0) updates["solvedMedium"] = com.google.firebase.firestore.FieldValue.increment(mediumDelta.toLong())
+            if (hardDelta > 0) updates["solvedHard"] = com.google.firebase.firestore.FieldValue.increment(hardDelta.toLong())
+            
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .update(updates)
+                .await()
+        } catch (e: Exception) {
+            android.util.Log.e("QuizRepository", "Error updating solved stats", e)
         }
     }
 }

@@ -48,18 +48,24 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
     private val _mintBalance = MutableLiveData<Long>(0)
     val mintBalance: LiveData<Long> = _mintBalance
 
+    // Total XP
+    private val _totalXP = MutableLiveData<Long>(0)
+    val totalXP: LiveData<Long> = _totalXP
+
     // Store current categories for restart
     private var currentCategories: List<String> = emptyList()
 
     init {
-        fetchMintBalance()
+        fetchUserData()
     }
 
-    private fun fetchMintBalance() {
+    private fun fetchUserData() {
         val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
         viewModelScope.launch {
             val balance = repository.getUserBalance(uid)
+            val xp = repository.getUserXP(uid)
             _mintBalance.value = balance
+            _totalXP.value = xp
         }
     }
 
@@ -148,6 +154,7 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val summary = getQuizSummary()
         if (summary.totalPoints != 0) {
             val currentBalance = _mintBalance.value ?: 0
+            val currentXP = _totalXP.value ?: 0
             
             // Logic for Low Accuracy Penalty: Fixed at -1 if score is negative
             val finalPointsChange = if (summary.totalPoints < 0) -1 else summary.totalPoints
@@ -156,7 +163,14 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             var newBalance = currentBalance + finalPointsChange
             if (newBalance < 0) newBalance = 0
             
+            // Update XP (Only add accumulated points, never decrease below 0? Or just partial add?)
+            // User Request: "Only the actual points earned should be added to the level progress (the same amount as Total Points Earned)."
+            // Interpreting this as adding the exact Total Points.
+            var newXP = currentXP + summary.totalPoints
+            if (newXP < 0) newXP = 0
+
             _mintBalance.value = newBalance
+            _totalXP.value = newXP
             
             // Sync with Firestore
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -164,6 +178,10 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                 viewModelScope.launch {
                     // Update Balance
                     repository.updateUserBalance(uid, newBalance)
+                    // Update XP
+                    repository.updateUserXP(uid, newXP)
+                    // Update Solved Stats
+                    repository.updateUserSolvedStats(uid, summary.correctEasy, summary.correctMedium, summary.correctHard)
                     
                     // Determine Transaction Details
                     val isCredit = finalPointsChange > 0
@@ -275,6 +293,10 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         var wrongCount = 0
         var skippedCount = 0
         
+        var correctEasy = 0
+        var correctMedium = 0
+        var correctHard = 0
+        
         questions.forEachIndexed { index, question ->
             val userChar = answers[index]?.replace("answer_", "") ?: ""
             if (userChar.isEmpty()) {
@@ -283,6 +305,12 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
                 val correctKey = "answer_${userChar}_correct"
                 if (question.correctAnswers[correctKey] == "true") {
                     correctCount++
+                    // Count Difficulty
+                    when (question.difficulty.lowercase()) {
+                        "easy" -> correctEasy++
+                        "medium" -> correctMedium++
+                        "hard" -> correctHard++
+                    }
                 } else {
                     wrongCount++
                 }
@@ -300,7 +328,10 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
             skippedCount = skippedCount,
             correctPoints = correctPoints,
             negativePoints = negativePoints,
-            totalPoints = totalPoints
+            totalPoints = totalPoints,
+            correctEasy = correctEasy,
+            correctMedium = correctMedium,
+            correctHard = correctHard
         )
     }
 
@@ -311,6 +342,10 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
         val skippedCount: Int,
         val correctPoints: Int,
         val negativePoints: Int,
-        val totalPoints: Int
+        val totalPoints: Int,
+        val correctEasy: Int = 0,
+        val correctMedium: Int = 0,
+        val correctHard: Int = 0
     )
 }
+

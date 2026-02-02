@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.digitar.mintx.databinding.FragmentWalletBinding
 import com.digitar.mintx.ui.adapter.TransactionAdapter
 import com.digitar.mintx.ui.wallet.WalletViewModel
@@ -39,33 +40,54 @@ class WalletFragment : Fragment() {
         binding.btnRedeemWallet.setOnClickListener {
              // Handle redeem click
             startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
-//            android.widget.Toast.makeText(context, "Redemption coming soon!", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun setupRecyclerView() {
+        val layoutManager = LinearLayoutManager(context)
         binding.rvTransactions.apply {
-            layoutManager = LinearLayoutManager(context)
+            this.layoutManager = layoutManager
             adapter = transactionAdapter
-            setHasFixedSize(true)
+            setHasFixedSize(false) // Allow dynamic sizing for pagination
+            
+            // Add scroll listener for pagination
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                    
+                    // Load more when user scrolls to bottom (last 3 items)
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 3
+                        && firstVisibleItemPosition >= 0) {
+                        transactionAdapter.loadNextPage()
+                    }
+                }
+            })
         }
     }
 
     private fun observeViewModel() {
         viewModel.balance.observe(viewLifecycleOwner) { balance ->
             binding.tvBalance.text = java.text.NumberFormat.getNumberInstance(java.util.Locale.US).format(balance)
-            
-            // Approximate value calculation: 200 Coins = 1 INR
-            val inrValue = balance / COIN_CONVERSION_RATE
-            binding.tvApproxValueWallet.text = String.format("≈ ₹%.2f INR", inrValue)
         }
 
         viewModel.transactions.observe(viewLifecycleOwner) { transactions ->
-            transactionAdapter.updateData(transactions)
+            if (transactions.isEmpty()) {
+                // Show empty state if needed
+            } else {
+                transactionAdapter.updateData(transactions)
+            }
         }
         
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
-            // Could add ProgressBar logic here if UI supported it
+            if (isLoading) {
+                transactionAdapter.showShimmer()
+            } else {
+                transactionAdapter.hideShimmer()
+            }
         }
     }
 
@@ -78,6 +100,7 @@ class WalletFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    
     companion object {
         private const val COIN_CONVERSION_RATE = 200.0
     }

@@ -109,4 +109,9 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
+    <!-- ===================== -->
+    <!-- Shimmer Colors -->
+    <!-- ===================== -->
+    <color name="shimmer_placeholder">#E2E8F0</color>
+
 </resources>

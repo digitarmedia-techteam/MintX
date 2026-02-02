@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/overlay_blur_warning"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CC000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:elevation="@dimen/_20sdp"
+    android:visibility="gone">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_32sdp"
+        app:cardBackgroundColor="@color/mint_surface"
+        app:cardCornerRadius="@dimen/_24sdp"
+        app:cardElevation="@dimen/_8sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/_32sdp"
+            android:gravity="center">
+
+            <!-- Warning Icon -->
+            <ImageView
+                android:id="@+id/iv_warning_icon"
+                android:layout_width="@dimen/_64sdp"
+                android:layout_height="@dimen/_64sdp"
+                android:src="@drawable/ic_warning"
+                app:tint="@color/warning"
+                android:layout_marginBottom="@dimen/_16sdp"/>
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/tv_warning_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quiz Paused"
+                android:textSize="@dimen/_24ssp"
+                android:textStyle="bold"
+                android:textColor="@color/text_headline"
+                android:layout_marginBottom="@dimen/_12sdp"/>
+
+            <!-- Message -->
+            <TextView
+                android:id="@+id/tv_warning_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Please don't minimize the app during the quiz. Your timer is still running!"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/text_subtext"
+                android:textAlignment="center"
+                android:layout_marginBottom="@dimen/_24sdp"/>
+
+            <!-- Buttons Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingTop="@dimen/_8sdp">
+
+                <!-- Quit/Leave Button (Initially Gone) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_quit_quiz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Leave"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/_16ssp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:visibility="gone"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/error"
+                    app:cornerRadius="@dimen/_12sdp"/>
+
+                <!-- Resume/Stay Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_resume_quiz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resume Quiz"
+                    android:textSize="@dimen/_15ssp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:cornerRadius="@dimen/_12sdp"
+                    app:backgroundTint="@color/mint_primary"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

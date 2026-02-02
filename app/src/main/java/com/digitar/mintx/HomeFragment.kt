@@ -188,8 +188,6 @@ class HomeFragment : Fragment() {
                     if (serverBalance != localBalance) {
                         sessionManager.saveMintBalance(serverBalance)
                         // Animate from old local to new server
-                        val currencyValue = serverBalance * 0.05
-                        binding.tvApproxValue.text = "≈ ₹${String.format("%.2f", currencyValue)}"
                         animateBalance(localBalance, serverBalance)
                     }
                 }
@@ -203,10 +201,6 @@ class HomeFragment : Fragment() {
         val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
         val newBalance = sessionManager.getMintBalance()
         
-        // Convert to 0.05 currency
-        val currencyValue = newBalance * 0.05
-        binding.tvApproxValue.text = "≈ ₹${String.format("%.2f", currencyValue)}"
-
         // Animate Balance
         // We assume starting from 0 if it's the first load, or we could track previous. 
         // For "spinning loader" effect, staring from 0 or a low number is good visuals on valid screens.

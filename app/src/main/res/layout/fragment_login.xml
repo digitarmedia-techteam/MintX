@@ -10,7 +10,7 @@
         android:layout_marginHorizontal="24dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/white"
+        app:cardBackgroundColor="@color/mint_surface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Login"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_headline"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -51,8 +51,8 @@
                     app:ccp_showFlag="true"
                     app:ccp_showNameCode="false"
                     app:ccp_textSize="16sp"
-                    app:ccp_arrowColor="@android:color/black"
-                    app:ccp_contentColor="@android:color/black"
+                    app:ccp_arrowColor="@color/text_headline"
+                    app:ccp_contentColor="@color/text_headline"
                     android:layout_gravity="center_vertical" />
 
                 <View
@@ -68,8 +68,9 @@
                     android:background="@null"
                     android:hint="Mobile number"
                     android:inputType="phone"
+                    android:maxLength="11"
                     android:paddingEnd="12dp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_headline"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -117,7 +118,7 @@
                     android:layout_height="40dp"
                     android:layout_marginStart="16dp"
                     android:src="@drawable/apple"
-                    app:tint="@android:color/darker_gray" />
+                    app:tint="@color/text_headline" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

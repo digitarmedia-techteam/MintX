@@ -188,7 +188,7 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.cardCategory.strokeColor = if (isSelected) 
                     binding.root.context.getColor(R.color.mint_gold) 
                 else 
-                    android.graphics.Color.parseColor("#444444")
+                    binding.root.context.getColor(R.color.accent_glass_border)
                 
                 binding.root.setOnClickListener {
                     val newState = !selectedCategories.contains(category.id)

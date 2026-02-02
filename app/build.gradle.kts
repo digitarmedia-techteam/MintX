@@ -67,9 +67,11 @@ dependencies {
     implementation(libs.firebase.appcheck.playintegrity)
     implementation(libs.firebase.appcheck.debug)
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
+    implementation("com.intuit.sdp:sdp-android:1.1.1")
+    implementation("com.intuit.ssp:ssp-android:1.1.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
 }

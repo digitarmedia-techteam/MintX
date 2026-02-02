@@ -79,6 +79,7 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
         )
 
         for (i in otpBoxes.indices) {
+            // Forward Navigation
             otpBoxes[i].addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -86,15 +87,27 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
                         if (i < otpBoxes.size - 1) {
                             otpBoxes[i + 1].requestFocus()
                         } else {
-                            // Last box filled, verify
                             verifyOtp()
                         }
-                    } else if (s?.length == 0 && i > 0) {
-                         // Optional: Handle backspace to move focus back (needs OnKeyListener usually)
                     }
                 }
                 override fun afterTextChanged(s: Editable?) {}
             })
+
+            // Backward Navigation (Backspace)
+            otpBoxes[i].setOnKeyListener { _, keyCode, event ->
+                if (keyCode == android.view.KeyEvent.KEYCODE_DEL && event.action == android.view.KeyEvent.ACTION_DOWN) {
+                    // If current box is empty and we are not in the first box
+                    if (otpBoxes[i].text.isEmpty() && i > 0) {
+                        otpBoxes[i - 1].requestFocus()
+                        otpBoxes[i - 1].text.clear() // Clear the previous box content
+                        return@setOnKeyListener true // Consume event
+                    }
+                    // If current box is NOT empty, let default behavior happen (delete character)
+                    // If it becomes empty after this, the NEXT backspace will trigger the above block.
+                }
+                false
+            }
         }
     }
 
@@ -198,7 +211,11 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
-        requireActivity().registerReceiver(smsBroadcastReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireActivity().registerReceiver(smsBroadcastReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null, android.content.Context.RECEIVER_EXPORTED)
+        } else {
+            requireActivity().registerReceiver(smsBroadcastReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null)
+        }
     }
 
     override fun onPause() {

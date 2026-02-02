@@ -17,5 +17,8 @@ class MintXApplication : Application() {
         appCheck.installAppCheckProviderFactory(
             DebugAppCheckProviderFactory.getInstance()
         )
+        
+        // Initialize AdMob
+        com.digitar.mintx.utils.AdManager.initialize(this)
     }
 }

@@ -8,8 +8,10 @@
     android:layout_margin="8dp"
     android:clickable="true"
     android:focusable="true"
+    app:cardBackgroundColor="@color/mint_surface"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
+    app:strokeColor="@color/accent_glass_border"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +35,7 @@
             android:layout_marginTop="12dp"
             android:fontFamily="sans-serif-medium"
             android:text="Action"
+            android:textColor="@color/text_headline"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

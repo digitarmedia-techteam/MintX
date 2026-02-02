@@ -19,9 +19,11 @@ import com.digitar.mintx.data.repository.QuizRepository
 import com.digitar.mintx.databinding.ActivityQuizBinding
 import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet
 import com.digitar.mintx.ui.quiz.QuizViewModel
+import com.digitar.mintx.utils.AdManager.showRewardedAd
 import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.sqrt
+import com.digitar.mintx.utils.LevelUtils
 
 class QuizActivity : AppCompatActivity() {
 
@@ -37,6 +39,12 @@ class QuizActivity : AppCompatActivity() {
 
     private var countDownTimer: CountDownTimer? = null
     private val TIMER_DURATION = 120000L // 2 minutes
+    private var isShowingAd = false // Track if ad is currently being shown
+    private var isShowingHint = false // Track if hint is currently being revealed
+    private var isShowingInterstitial = false // Track if interstitial ad is being shown
+    private var isTogglingHint = false // Prevent multiple rapid clicks on hint button
+    private var hintTapCount = 0 // Track triple-tap progress
+    private var hasShownHintInstruction = false // Track if we've shown the hint instruction
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +55,12 @@ class QuizActivity : AppCompatActivity() {
 
         setupClickListeners()
         setupBottomNavigation()
-        setupDraggableHint()
         observeViewModel()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.clSummary.visibility == View.VISIBLE) {
+                if (binding.clSummary.root.visibility == View.VISIBLE) {
                     finish()
                 } else {
                     showExitConfirmation()
@@ -70,6 +77,12 @@ class QuizActivity : AppCompatActivity() {
                  viewModel.startQuizWithUserPreferences()
              }
         }
+        
+        // Preload Rewarded Ad
+        com.digitar.mintx.utils.AdManager.loadRewardedAd(this)
+        
+        // Preload Interstitial Ad
+        com.digitar.mintx.utils.AdManager.loadInterstitialAd(this)
     }
 
     private fun showQuizCategorySelector() {
@@ -94,7 +107,7 @@ class QuizActivity : AppCompatActivity() {
 
     private fun animateQuizStart() {
         val headerAnim = ObjectAnimator.ofFloat(
-            binding.header.root, 
+            binding.clQuizContent.header.root, 
             "translationY", 
             -100f, 
             0f
@@ -107,26 +120,118 @@ class QuizActivity : AppCompatActivity() {
     }
     
     private fun setupClickListeners() {
-        binding.header.btnBack.setOnClickListener {
+        binding.clQuizContent.header.btnBack.setOnClickListener {
             showExitConfirmation()
         }
         
 
-
-        binding.btnFinish.setOnClickListener {
+        binding.clSummary.btnFinish.setOnClickListener {
             finish()
         }
 
-        binding.btnPlayAgain.setOnClickListener {
-            binding.clSummary.visibility = View.GONE
+        binding.clSummary.btnPlayAgain.setOnClickListener {
+            binding.clSummary.root.visibility = View.GONE
             viewModel.restartQuiz()
         }
         
         
-        // Floating Controls Listeners
-        binding.layoutFloating.cardHint.setOnClickListener {
-            toggleHintOptions()
+        
+        // Floating Controls Listeners - Hint button with drag and click
+        var dX = 0f
+        var dY = 0f
+        var initialX = 0f
+        var initialY = 0f
+        var hasMoved = false
+        
+        binding.layoutFloating.cardHint.setOnTouchListener { view, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    initialX = view.x
+                    initialY = view.y
+                    hasMoved = false
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + dX
+                    val newY = event.rawY + dY
+                    
+                    // Check if moved significantly (more than 10px)
+                    if (kotlin.math.abs(newX - initialX) > 10 || kotlin.math.abs(newY - initialY) > 10) {
+                        hasMoved = true
+                        view.animate()
+                            .x(newX)
+                            .y(newY)
+                            .setDuration(0)
+                            .start()
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (!hasMoved) {
+                        // It was a click, not a drag - implement triple-tap
+                        view.performClick()
+                        
+                        hintTapCount++
+                        
+                        // Pulse animation on each tap with increasing intensity
+                        val scale = 1f - (hintTapCount * 0.05f) // Gets smaller with each tap
+                        view.animate()
+                            .scaleX(scale)
+                            .scaleY(scale)
+                            .setDuration(80)
+                            .withEndAction {
+                                view.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(80)
+                                    .start()
+                            }
+                            .start()
+                        
+                        when (hintTapCount) {
+                            1 -> {
+                                // First tap - show instruction only once per session
+                                if (!hasShownHintInstruction) {
+                                    Toast.makeText(this, "💡 Tap 3 times to open hints", Toast.LENGTH_SHORT).show()
+                                    hasShownHintInstruction = true
+                                }
+                            }
+                            2 -> {
+                                // Second tap - just visual feedback (no toast)
+                                // Shimmer effect to indicate progress
+                                (view as? com.facebook.shimmer.ShimmerFrameLayout)?.startShimmer()
+                            }
+                            3 -> {
+                                // Third tap - open hint options!
+                                hintTapCount = 0 // Reset counter
+                                (view as? com.facebook.shimmer.ShimmerFrameLayout)?.stopShimmer()
+                                toggleHintOptions()
+                                
+                                // Success feedback - celebratory spin
+                                view.animate()
+                                    .rotationBy(360f)
+                                    .setDuration(300)
+                                    .start()
+                            }
+                        }
+                        
+                        // Reset counter after 1.5 seconds of inactivity
+                        view.removeCallbacks(null)
+                        view.postDelayed({
+                            if (hintTapCount < 3) {
+                                hintTapCount = 0
+                                (view as? com.facebook.shimmer.ShimmerFrameLayout)?.stopShimmer()
+                            }
+                        }, 1500)
+                    }
+                    true
+                }
+                else -> false
+            }
         }
+
         
         binding.layoutFloating.cardHintPoints.setOnClickListener {
             if (viewModel.deductPoints(10)) {
@@ -139,8 +244,31 @@ class QuizActivity : AppCompatActivity() {
         
         binding.layoutFloating.cardHintAd.setOnClickListener {
             closeHintOptions()
-            Toast.makeText(this, "Answer Revealed! (Ad simulation)", Toast.LENGTH_SHORT).show()
-            handleHintUsed() 
+            
+            // Set flag to prevent quiz termination
+            isShowingAd = true
+            
+            // Show Rewarded Ad
+            showRewardedAd(
+                this,
+                onRewardEarned = {
+                    // User watched the ad, reveal the answer
+                    // Ad is already fully dismissed at this point
+                    isShowingAd = false
+                    
+                    // Small delay for smooth transition
+                    binding.root.postDelayed({
+                        if (!isFinishing) {
+                            handleHintUsed()
+                        }
+                    }, 300)
+                },
+                onAdClosed = {
+                    // Ad closed (whether completed or not)
+                    isShowingAd = false
+                    // If user didn't complete, they don't get the hint
+                }
+            )
         }
     }
 
@@ -149,6 +277,7 @@ class QuizActivity : AppCompatActivity() {
         val questions = viewModel.questions.value
         
         if (questions != null && index < questions.size) {
+            isShowingHint = true // Set flag to prevent timer restart
             stopTimer()
             disableOptions()
             
@@ -156,34 +285,36 @@ class QuizActivity : AppCompatActivity() {
             showCorrectAnswer(questions[index], isHintReveal = true)
             Toast.makeText(this, "Answer Revealed!", Toast.LENGTH_SHORT).show()
             
-            // Auto-advance after 2 seconds
+            // Auto-advance after 3 seconds
             binding.root.postDelayed({
                 if (!isFinishing && viewModel.currentIndex.value == index) {
+                    isShowingHint = false // Reset flag before moving to next question
                     viewModel.nextQuestion()
                 }
-            }, 1000)
+            }, 3000)
         }
     }
 
     private fun observeViewModel() {
         viewModel.questions.observe(this) { questions ->
             if (questions.isNotEmpty()) {
-                if (binding.layoutSkeleton.root.visibility == View.VISIBLE) {
-                    binding.layoutSkeleton.root.animate().alpha(0f).setDuration(300).withEndAction {
-                        binding.layoutSkeleton.root.visibility = View.GONE
+                // If skeleton is currently visible, it means this is a fresh load (or restart)
+                if (binding.layoutSkeleton.root.visibility == View.VISIBLE && binding.layoutSkeleton.root.alpha > 0f) {
+                    // First time loading - show interstitial ad before quiz starts
+                    isShowingInterstitial = true
+                    com.digitar.mintx.utils.AdManager.showInterstitialAd(this) {
+                        // After ad closes, smoothly show quiz content
+                        isShowingInterstitial = false
+                        transitionToContent()
+                        updateUIForIndex(viewModel.currentIndex.value ?: 0)
                     }
-                    binding.clQuizContent.alpha = 0f
-                    binding.clQuizContent.visibility = View.VISIBLE
-                    binding.clQuizContent.animate().alpha(1f).setDuration(300).start()
                 } else {
-                    binding.clQuizContent.visibility = View.VISIBLE
-                    binding.layoutSkeleton.root.visibility = View.GONE
+                    // Subsequent updates or already visible - just transition smoothly
+                    transitionToContent()
+                    updateUIForIndex(viewModel.currentIndex.value ?: 0)
                 }
-                updateUIForIndex(viewModel.currentIndex.value ?: 0)
             } else {
-                binding.layoutSkeleton.root.visibility = View.VISIBLE
-                binding.layoutSkeleton.root.alpha = 1f
-                binding.clQuizContent.visibility = View.GONE
+                transitionToSkeleton()
             }
         }
 
@@ -198,22 +329,20 @@ class QuizActivity : AppCompatActivity() {
         }
 
         viewModel.loading.observe(this) { isLoading ->
-            // Toggle Skeleton and Content visibility
+            // Only handle SHOWING the skeleton here.
+            // We delegate HIDING (transition to content) to the questions observer
+            // to ensure accurate timing with Ad display and data binding.
             if (isLoading) {
-                binding.layoutSkeleton.root.visibility = View.VISIBLE
-                binding.clQuizContent.visibility = View.GONE
-            } else {
-                binding.layoutSkeleton.root.visibility = View.GONE
-                binding.clQuizContent.visibility = View.VISIBLE
+                transitionToSkeleton()
             }
         }
 
         viewModel.currentScore.observe(this) { score ->
-            binding.header.tvCurrentScore.text = "Pts: $score"
+            binding.clQuizContent.header.tvCurrentScore.text = "Pts: $score"
         }
 
         viewModel.scoreUpdateEvent.observe(this) { delta ->
-            val animView = binding.header.tvScoreAnim
+            val animView = binding.clQuizContent.header.tvScoreAnim
             animView.text = if (delta > 0) "+$delta" else "$delta"
             animView.setTextColor(
                 ContextCompat.getColor(
@@ -257,7 +386,7 @@ class QuizActivity : AppCompatActivity() {
 
         if (index > 0) {
             // Animate transition for next questions - ONLY question and options
-            val viewsToAnimate = listOf(binding.question.root, binding.options.root)
+            val viewsToAnimate = listOf(binding.clQuizContent.question.root, binding.clQuizContent.options.root)
             
             viewsToAnimate.forEach { view ->
                 view.animate()
@@ -292,30 +421,30 @@ class QuizActivity : AppCompatActivity() {
         
         startTimer()
 
-        binding.header.tvQuizProgressText.text = "Question ${index + 1} of ${questions.size}"
-        binding.header.tvQuestionLabel.text = "0${index + 1} Question"
-        binding.header.pbQuizProgress.progress = ((index + 1) * 100) / questions.size
+        binding.clQuizContent.header.tvQuizProgressText.text = "Question ${index + 1} of ${questions.size}"
+
+        binding.clQuizContent.header.pbQuizProgress.progress = ((index + 1) * 100) / questions.size
         
-        binding.question.tvQuestionText.text = "Q${index + 1}. ${question.question}"
+        binding.clQuizContent.question.tvQuestionText.text = "Q${index + 1}. ${question.question}"
         
         binding.layoutFloating.layoutHintOptions.visibility = View.GONE
 
         // Update Category Label
         val categoryName = question.category
-        binding.question.tvCategoryLabel.text = categoryName.uppercase()
+        binding.clQuizContent.question.tvCategoryLabel.text = categoryName.uppercase()
 
         // Update Difficulty Chips
         val difficulty = question.difficulty.lowercase()
-        binding.question.chipEasy.visibility = if (difficulty == "easy") View.VISIBLE else View.GONE
-        binding.question.chipMedium.visibility = if (difficulty == "medium") View.VISIBLE else View.GONE
-        binding.question.chipHard.visibility = if (difficulty == "hard") View.VISIBLE else View.GONE
+        binding.clQuizContent.question.chipEasy.visibility = if (difficulty == "easy") View.VISIBLE else View.GONE
+        binding.clQuizContent.question.chipMedium.visibility = if (difficulty == "medium") View.VISIBLE else View.GONE
+        binding.clQuizContent.question.chipHard.visibility = if (difficulty == "hard") View.VISIBLE else View.GONE
 
         displayOptions(question, index)
     }
 
     private fun displayOptions(question: QuizQuestion, questionIndex: Int) {
-        val optionContainers = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
-        val optionTexts = listOf(binding.options.tvOptionText1, binding.options.tvOptionText2, binding.options.tvOptionText3, binding.options.tvOptionText4)
+        val optionContainers = listOf(binding.clQuizContent.options.btnOption1, binding.clQuizContent.options.btnOption2, binding.clQuizContent.options.btnOption3, binding.clQuizContent.options.btnOption4)
+        val optionTexts = listOf(binding.clQuizContent.options.tvOptionText1, binding.clQuizContent.options.tvOptionText2, binding.clQuizContent.options.tvOptionText3, binding.clQuizContent.options.tvOptionText4)
         val selectedAnswer = viewModel.userAnswers.value?.get(questionIndex)
 
         optionContainers.forEach { container ->
@@ -380,7 +509,7 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun showCorrectAnswer(question: QuizQuestion, isHintReveal: Boolean = false) {
-        val optionContainers = listOf(binding.options.btnOption1, binding.options.btnOption2, binding.options.btnOption3, binding.options.btnOption4)
+        val optionContainers = listOf(binding.clQuizContent.options.btnOption1, binding.clQuizContent.options.btnOption2, binding.clQuizContent.options.btnOption3, binding.clQuizContent.options.btnOption4)
         val validAnswers = question.answers.filterValues { it != null }
         val answerKeys = validAnswers.keys.toList()
 
@@ -417,10 +546,10 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun disableOptions() {
-        binding.options.btnOption1.isEnabled = false
-        binding.options.btnOption2.isEnabled = false
-        binding.options.btnOption3.isEnabled = false
-        binding.options.btnOption4.isEnabled = false
+        binding.clQuizContent.options.btnOption1.isEnabled = false
+        binding.clQuizContent.options.btnOption2.isEnabled = false
+        binding.clQuizContent.options.btnOption3.isEnabled = false
+        binding.clQuizContent.options.btnOption4.isEnabled = false
     }
 
     private fun startTimer() {
@@ -441,7 +570,7 @@ class QuizActivity : AppCompatActivity() {
                 val color = ContextCompat.getColor(this@QuizActivity, colorRes)
 
                 // Update Premium Border Timer
-                binding.question.viewTimerBorder.setProgress(progress, color)
+                binding.clQuizContent.question.viewTimerBorder.setProgress(progress, color)
                 
                 // Update Analog Clock Timer (Floating)
                 val minutes = (millisUntilFinished / 1000) / 60
@@ -450,6 +579,16 @@ class QuizActivity : AppCompatActivity() {
                 
                 binding.layoutFloating.viewFloatingTimer.setProgress(progress, color)
                 binding.layoutFloating.viewFloatingTimer.setText(timeStr)
+                
+                // Stop Shimmer if it's running
+                if (binding.layoutFloating.cardFloatingTimer.isShimmerStarted) {
+                    binding.layoutFloating.cardFloatingTimer.stopShimmer()
+                    binding.layoutFloating.cardFloatingTimer.setShimmer(null) // Remove shimmer fully
+                }
+                if (binding.layoutFloating.cardHint.isShimmerStarted) {
+                    binding.layoutFloating.cardHint.stopShimmer()
+                    binding.layoutFloating.cardHint.setShimmer(null) // Remove shimmer fully
+                }
                 
                 // Breathing Animation for Floating Timer
                 val scale = 1f + (0.05f * kotlin.math.sin(System.currentTimeMillis() / 200.0).toFloat())
@@ -465,7 +604,7 @@ class QuizActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                binding.question.viewTimerBorder.setProgress(0f, ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
+                binding.clQuizContent.question.viewTimerBorder.setProgress(0f, ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
                 // binding.timer.tvTimerText.text = "00:00"
                 Toast.makeText(this@QuizActivity, "Time's up!", Toast.LENGTH_SHORT).show()
                 viewModel.nextQuestion()
@@ -482,54 +621,64 @@ class QuizActivity : AppCompatActivity() {
         viewModel.saveQuizResults()
         val summary = viewModel.getQuizSummary()
         
-        binding.clSummary.visibility = View.VISIBLE
-        binding.clQuizContent.visibility = View.GONE
-        
-        binding.rowTotal.apply {
-            tvLabel.text = "Total Questions"
-            tvValue.text = summary.totalQuestions.toString()
-        }
-        binding.rowCorrect.apply {
-            tvLabel.text = "Correct Answers"
-            tvValue.text = summary.correctCount.toString()
-            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
-        }
-        binding.rowCorrectPoints.apply {
-            tvLabel.text = "Points Earned"
-            tvValue.text = "+${summary.correctPoints}"
-            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
-        }
-        binding.rowWrong.apply {
-            tvLabel.text = "Wrong Answers"
-            tvValue.text = summary.wrongCount.toString()
-            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
-        }
-        binding.rowNegativePoints.apply {
-            tvLabel.text = "Points Deducted"
-            tvValue.text = "-${summary.negativePoints}"
-            tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
-        }
-        binding.rowSkipped.apply {
-            tvLabel.text = "Skipped"
-            tvValue.text = summary.skippedCount.toString()
-        }
-        
-        binding.tvTotalPoints.text = "Total Points: ${summary.totalPoints}"
+        // Show interstitial ad before summary
+        isShowingInterstitial = true
+        com.digitar.mintx.utils.AdManager.showInterstitialAd(this) {
+            isShowingInterstitial = false
+            // After ad closes, show summary
+            binding.clSummary.root.visibility = View.VISIBLE
+            binding.clQuizContent.root.visibility = View.GONE
+            
+            binding.clSummary.rowTotal.apply {
+                tvLabel.text = "Total Questions"
+                tvValue.text = summary.totalQuestions.toString()
+            }
+            binding.clSummary.rowCorrect.apply {
+                tvLabel.text = "Correct Answers"
+                tvValue.text = summary.correctCount.toString()
+                tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
+            }
+            binding.clSummary.rowCorrectPoints.apply {
+                tvLabel.text = "Points Earned"
+                tvValue.text = "+${summary.correctPoints}"
+                tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green))
+            }
+            binding.clSummary.rowWrong.apply {
+                tvLabel.text = "Wrong Answers"
+                tvValue.text = summary.wrongCount.toString()
+                tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
+            }
+            binding.clSummary.rowNegativePoints.apply {
+                tvLabel.text = "Points Deducted"
+                tvValue.text = "-${summary.negativePoints}"
+                tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.accent_red))
+            }
+            binding.clSummary.rowSkipped.apply {
+                tvLabel.text = "Skipped"
+                tvValue.text = summary.skippedCount.toString()
+            }
+            
+            binding.clSummary.tvTotalPoints.text = "Total Points: ${summary.totalPoints}"
 
-        val accuracy = if (summary.totalQuestions > 0) {
-            ((summary.correctCount.toDouble() / summary.totalQuestions) * 100).toInt()
-        } else 0
-        
-        binding.tvSummaryAccuracy.text = "$accuracy%"
-        
-        val indicatorColor = when {
-            accuracy >= 70 -> R.color.mint_green
-            accuracy >= 40 -> R.color.mint_gold
-            else -> R.color.accent_red
+            val accuracy = if (summary.totalQuestions > 0) {
+                ((summary.correctCount.toDouble() / summary.totalQuestions) * 100).toInt()
+            } else 0
+            
+            binding.clSummary.tvSummaryAccuracy.text = "$accuracy%"
+            
+            val indicatorColor = when {
+                accuracy >= 70 -> R.color.mint_green
+                accuracy >= 40 -> R.color.mint_gold
+                else -> R.color.accent_red
+            }
+            
+            binding.clSummary.pbSummaryRing.setIndicatorColor(ContextCompat.getColor(this@QuizActivity, indicatorColor))
+            binding.clSummary.pbSummaryRing.setProgressCompat(accuracy, true)
+            
+            // Update Level UI
+            val currentXP = viewModel.totalXP.value ?: 0
+            updateLevelUI(currentXP)
         }
-        
-        binding.pbSummaryRing.setIndicatorColor(ContextCompat.getColor(this@QuizActivity, indicatorColor))
-        binding.pbSummaryRing.setProgressCompat(accuracy, true)
     }
 
     override fun onPause() {
@@ -537,7 +686,9 @@ class QuizActivity : AppCompatActivity() {
         stopTimer()
         
         // Show blur overlay when app is minimized during an active quiz
-        if (binding.clSummary.visibility != View.VISIBLE && 
+        // BUT NOT when showing an ad or interstitial
+        if (!isShowingAd && !isShowingInterstitial &&
+            binding.clSummary.root.visibility != View.VISIBLE && 
             viewModel.questions.value?.isNotEmpty() == true) {
             showBlurOverlay()
         }
@@ -547,12 +698,13 @@ class QuizActivity : AppCompatActivity() {
         super.onResume()
         
         // Strict Mode Check: If overlay is visible, it means user minimized the app.
-        if (binding.overlayBlurWarning.visibility == View.VISIBLE) {
+        // BUT if ad or interstitial was showing, this is expected behavior - don't terminate
+        if (binding.overlayBlurWarning.root.visibility == View.VISIBLE && !isShowingAd && !isShowingInterstitial) {
             // Update UI to show termination message
-            binding.tvWarningTitle.text = "Quiz Terminated"
-            binding.tvWarningMessage.text = "Minimizing the app is not allowed during the quiz."
-            binding.btnResumeQuiz.visibility = View.GONE
-            binding.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.error))
+            binding.overlayBlurWarning.tvWarningTitle.text = "Quiz Terminated"
+            binding.overlayBlurWarning.tvWarningMessage.text = "Minimizing the app is not allowed during the quiz."
+            binding.overlayBlurWarning.btnResumeQuiz.visibility = View.GONE
+            binding.overlayBlurWarning.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.error))
             
             // Keep warning visible for 2 seconds before quitting
             binding.root.postDelayed({
@@ -565,8 +717,10 @@ class QuizActivity : AppCompatActivity() {
         // Hide blur overlay when app returns (failsafe)
         hideBlurOverlay()
         
-        // Restart timer if quiz is active
-        if (binding.clSummary.visibility != View.VISIBLE && viewModel.questions.value?.isNotEmpty() == true) {
+        // Restart timer if quiz is active AND not showing hint
+        if (!isShowingHint && 
+            binding.clSummary.root.visibility != View.VISIBLE && 
+            viewModel.questions.value?.isNotEmpty() == true) {
             startTimer()
         }
     }
@@ -587,37 +741,51 @@ class QuizActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun updateLevelUI(totalPoints: Long) {
+        val levelInfo = LevelUtils.calculateLevelInfo(totalPoints)
+        
+        binding.clSummary.tvLevelCurrent.text = "Level ${levelInfo.level}"
+        
+        val pointsInLevel = levelInfo.currentPoints - levelInfo.minPoints
+        val totalPointsForLevel = levelInfo.maxPoints - levelInfo.minPoints
+        
+        binding.clSummary.tvLevelPoints.text = "$pointsInLevel / $totalPointsForLevel XP"
+        binding.clSummary.pbLevelProgress.progress = levelInfo.progressPercent
+        
+        binding.clSummary.tvLevelNextInfo.text = "${levelInfo.pointsToNextLevel} XP to Level ${levelInfo.level + 1}"
+    }
+
     private fun showBlurOverlay() {
         // Reset to Pause state
-        binding.tvWarningTitle.text = "Quiz Paused"
-        binding.tvWarningMessage.text = "Please don't minimize the app during the quiz. Your timer is still running!"
-        binding.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.warning))
-        binding.btnResumeQuiz.text = "Resume Quiz"
-        binding.btnResumeQuiz.visibility = View.VISIBLE
-        binding.btnQuitQuiz.visibility = View.GONE
+        binding.overlayBlurWarning.tvWarningTitle.text = "Quiz Paused"
+        binding.overlayBlurWarning.tvWarningMessage.text = "Please don't minimize the app during the quiz. Your timer is still running!"
+        binding.overlayBlurWarning.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.warning))
+        binding.overlayBlurWarning.btnResumeQuiz.text = "Resume Quiz"
+        binding.overlayBlurWarning.btnResumeQuiz.visibility = View.VISIBLE
+        binding.overlayBlurWarning.btnQuitQuiz.visibility = View.GONE
         
         // Reset Resume button listener to simple hide
-        binding.btnResumeQuiz.setOnClickListener { 
+        binding.overlayBlurWarning.btnResumeQuiz.setOnClickListener { 
             hideBlurOverlay() 
         }
         
-        binding.overlayBlurWarning.visibility = View.VISIBLE
+        binding.overlayBlurWarning.root.visibility = View.VISIBLE
     }
 
     private fun hideBlurOverlay() {
-        binding.overlayBlurWarning.visibility = View.GONE
+        binding.overlayBlurWarning.root.visibility = View.GONE
     }
 
     private fun setupBottomNavigation() {
         // Set 'Quiz' as active by default since we are in Quiz Screen
-        binding.bottomNavigation.selectedItemId = R.id.navigation_quiz
+        binding.bottomNavigation.bottomNavigation.selectedItemId = R.id.navigation_quiz
 
         // Setup resume button click (Default)
-        binding.btnResumeQuiz.setOnClickListener {
+        binding.overlayBlurWarning.btnResumeQuiz.setOnClickListener {
             hideBlurOverlay()
         }
         
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
+        binding.bottomNavigation.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
                     showLeaveQuizConfirmation {
@@ -648,31 +816,31 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun showLeaveQuizConfirmation(onConfirm: () -> Unit) {
-        if (binding.clSummary.visibility == View.VISIBLE) {
+        if (binding.clSummary.root.visibility == View.VISIBLE) {
             onConfirm()
             return
         }
 
         // Use Blur Overlay for Confirmation
-        binding.tvWarningTitle.text = "Leave Quiz?"
-        binding.tvWarningMessage.text = "Are you sure you want to leave? Your progress will be lost."
-        binding.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.mint_gold))
+        binding.overlayBlurWarning.tvWarningTitle.text = "Leave Quiz?"
+        binding.overlayBlurWarning.tvWarningMessage.text = "Are you sure you want to leave? Your progress will be lost."
+        binding.overlayBlurWarning.ivWarningIcon.setColorFilter(ContextCompat.getColor(this, R.color.mint_gold))
         
-        binding.btnResumeQuiz.text = "Stay"
-        binding.btnResumeQuiz.visibility = View.VISIBLE
-        binding.btnQuitQuiz.visibility = View.VISIBLE
+        binding.overlayBlurWarning.btnResumeQuiz.text = "Stay"
+        binding.overlayBlurWarning.btnResumeQuiz.visibility = View.VISIBLE
+        binding.overlayBlurWarning.btnQuitQuiz.visibility = View.VISIBLE
         
         // Setup Button Actions
-        binding.btnQuitQuiz.setOnClickListener {
+        binding.overlayBlurWarning.btnQuitQuiz.setOnClickListener {
             hideBlurOverlay()
             onConfirm()
         }
         
-        binding.btnResumeQuiz.setOnClickListener {
+        binding.overlayBlurWarning.btnResumeQuiz.setOnClickListener {
             hideBlurOverlay()
         }
         
-        binding.overlayBlurWarning.visibility = View.VISIBLE
+        binding.overlayBlurWarning.root.visibility = View.VISIBLE
     }
 
     private fun closeHintOptions() {
@@ -691,6 +859,10 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun toggleHintOptions() {
+        // Prevent multiple rapid clicks
+        if (isTogglingHint) return
+        isTogglingHint = true
+        
         val isVisible = binding.layoutFloating.layoutHintOptions.visibility == View.VISIBLE
         
         if (isVisible) {
@@ -703,6 +875,7 @@ class QuizActivity : AppCompatActivity() {
                 .setInterpolator(DecelerateInterpolator())
                 .withEndAction {
                     binding.layoutFloating.layoutHintOptions.visibility = View.GONE
+                    isTogglingHint = false
                 }
                 .start()
         } else {
@@ -720,121 +893,97 @@ class QuizActivity : AppCompatActivity() {
                 .scaleY(1f)
                 .setDuration(250)
                 .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    isTogglingHint = false
+                }
                 .start()
         }
     }
 
     private fun positionHintOptionsBasedOnLocation() {
-        // Measure the view first since it might be GONE
-        binding.layoutFloating.layoutHintOptions.measure(
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        )
-        
-        val optionsWidth = binding.layoutFloating.layoutHintOptions.measuredWidth
-        val optionsHeight = binding.layoutFloating.layoutHintOptions.measuredHeight
-        
-        val parent = binding.layoutFloating.cardHint.parent as View
-        val screenWidth = parent.width
-        val hintCenterX = binding.layoutFloating.cardHint.x + binding.layoutFloating.cardHint.width / 2
-        
-        // Determine if hint is on the left or right side of screen
-        val isOnLeftSide = hintCenterX < screenWidth / 2
-        
-        // Position hint options vertically aligned with card_hint
-        // Since both are 48dp usually, this centers them vertically relative to each other
-        val hintY = binding.layoutFloating.cardHint.y
-        binding.layoutFloating.layoutHintOptions.y = hintY + (binding.layoutFloating.cardHint.height - optionsHeight) / 2
-        
-        if (isOnLeftSide) {
-            // Hint is on left side, show options to the right
-            binding.layoutFloating.layoutHintOptions.x = binding.layoutFloating.cardHint.x + binding.layoutFloating.cardHint.width + 12
-        } else {
-            // Hint is on right side, show options to the left
-            binding.layoutFloating.layoutHintOptions.x = binding.layoutFloating.cardHint.x - optionsWidth - 12
+        // Use post to ensure parent layout is complete
+        binding.layoutFloating.cardHint.post {
+            // Measure the view first since it might be GONE
+            binding.layoutFloating.layoutHintOptions.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            
+            val optionsWidth = binding.layoutFloating.layoutHintOptions.measuredWidth
+            val optionsHeight = binding.layoutFloating.layoutHintOptions.measuredHeight
+            
+            val parent = binding.layoutFloating.cardHint.parent as View
+            val screenWidth = parent.width
+            
+            // Ensure parent has valid dimensions
+            if (screenWidth == 0) {
+                // Fallback positioning if parent not ready
+                binding.layoutFloating.layoutHintOptions.x = 16f
+                binding.layoutFloating.layoutHintOptions.y = binding.layoutFloating.cardHint.y
+                return@post
+            }
+            
+            val hintCenterX = binding.layoutFloating.cardHint.x + binding.layoutFloating.cardHint.width / 2
+            
+            // Determine if hint is on the left or right side of screen
+            val isOnLeftSide = hintCenterX < screenWidth / 2
+            
+            // Position hint options vertically aligned with card_hint
+            // Since both are 48dp usually, this centers them vertically relative to each other
+            val hintY = binding.layoutFloating.cardHint.y
+            binding.layoutFloating.layoutHintOptions.y = hintY + (binding.layoutFloating.cardHint.height - optionsHeight) / 2
+            
+            if (isOnLeftSide) {
+                // Hint is on left side, show options to the right
+                binding.layoutFloating.layoutHintOptions.x = binding.layoutFloating.cardHint.x + binding.layoutFloating.cardHint.width + 12
+            } else {
+                // Hint is on right side, show options to the left
+                binding.layoutFloating.layoutHintOptions.x = binding.layoutFloating.cardHint.x - optionsWidth - 12
+            }
         }
     }
 
-    private fun setupDraggableHint() {
-        // Set default position to bottom-right corner
-        binding.layoutFloating.cardHint.post {
-            val parent = binding.layoutFloating.cardHint.parent as View
-            val marginBottom = 110 // Same as original bottom margin in dp * density
-            val marginEnd = 12 // Right margin in dp * density
-            
-            val density = resources.displayMetrics.density
-            val bottomMarginPx = (marginBottom * density).toInt()
-            val endMarginPx = (marginEnd * density).toInt()
-            
-            binding.layoutFloating.cardHint.x = parent.width - binding.layoutFloating.cardHint.width - endMarginPx.toFloat()
-            binding.layoutFloating.cardHint.y = parent.height - binding.layoutFloating.cardHint.height - bottomMarginPx.toFloat()
-        }
-        
-        var dX = 0f
-        var dY = 0f
-        var initialX = 0f
-        var initialY = 0f
-        var isDragging = false
 
-        binding.layoutFloating.cardHint.setOnTouchListener { view, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    dX = view.x - event.rawX
-                    dY = view.y - event.rawY
-                    initialX = event.rawX
-                    initialY = event.rawY
-                    isDragging = false
-                    false // Allow click listener to also receive this event
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val distanceMoved = sqrt(
-                        (event.rawX - initialX).toDouble().pow(2.0) +
-                        (event.rawY - initialY).toDouble().pow(2.0)
-                    )
-                    
-                    // Only consider it dragging if moved more than 15 pixels (increased threshold)
-                    if (distanceMoved > 15) {
-                        if (!isDragging) {
-                            isDragging = true
-                            // Close hint options when starting to drag
-                            if (binding.layoutFloating.layoutHintOptions.visibility == View.VISIBLE) {
-                                binding.layoutFloating.layoutHintOptions.visibility = View.GONE
-                            }
-                        }
-                        
-                        val newX = event.rawX + dX
-                        val newY = event.rawY + dY
-                        
-                        // Get parent bounds
-                        val parent = view.parent as View
-                        val maxX = parent.width - view.width.toFloat()
-                        val maxY = parent.height - view.height.toFloat()
-                        
-                        // Constrain to screen bounds
-                        view.x = newX.coerceIn(0f, maxX)
-                        view.y = newY.coerceIn(0f, maxY)
-                        
-                        true // Consume the event when dragging
-                    } else {
-                        false // Not dragging yet, allow click listener
-                    }
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (isDragging) {
-                        // Was dragging, consume the event to prevent click
-                        isDragging = false
-                        true
-                    } else {
-                        // Was a click, let the click listener handle it
-                        false
-                    }
-                }
-                MotionEvent.ACTION_CANCEL -> {
-                    isDragging = false
-                    false
-                }
-                else -> false
+
+    private fun transitionToContent() {
+        if (binding.clQuizContent.root.visibility == View.VISIBLE && binding.clQuizContent.root.alpha == 1f) return
+        
+        binding.layoutSkeleton.root.animate()
+            .alpha(0f)
+            .setDuration(500)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                binding.layoutSkeleton.root.visibility = View.GONE
             }
-        }
+            .start()
+            
+        binding.clQuizContent.root.visibility = View.VISIBLE
+        binding.clQuizContent.root.alpha = 0f
+        binding.clQuizContent.root.translationY = 50f
+        binding.clQuizContent.root.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(500)
+            .setInterpolator(DecelerateInterpolator())
+            .start()
+    }
+
+    private fun transitionToSkeleton() {
+        if (binding.layoutSkeleton.root.visibility == View.VISIBLE && binding.layoutSkeleton.root.alpha == 1f) return
+
+        binding.clQuizContent.root.animate()
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction {
+                binding.clQuizContent.root.visibility = View.GONE
+            }
+            .start()
+
+        binding.layoutSkeleton.root.visibility = View.VISIBLE
+        binding.layoutSkeleton.root.alpha = 0f
+        binding.layoutSkeleton.root.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
     }
 }

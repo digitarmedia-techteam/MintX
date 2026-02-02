@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/mint_background"
    android:paddingTop="24dp">
 
     <!-- Top Bar -->
@@ -22,14 +22,14 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_back_black"
-            app:tint="@android:color/black" />
+            app:tint="@color/text_headline" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="OTP Verification"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_headline"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:text="We have sent a verification code to"
-        android:textColor="@android:color/black"
+        android:textColor="@color/text_subtext"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="+91-9198885722"
-        android:textColor="@android:color/black"
+        android:textColor="@color/text_headline"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Didn't get the OTP? "
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_headline"
             android:textStyle="bold"
             android:textSize="14sp" />
 
@@ -108,7 +108,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Resend SMS in 11s"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/text_subtext"
             android:textSize="14sp" />
         
         <!-- Hidden button for actual click action if needed separate from text, 
@@ -132,7 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:text="Go back to login methods"
-        android:textColor="#E23744"
+        android:textColor="@color/accent_red"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

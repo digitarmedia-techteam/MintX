@@ -84,8 +84,37 @@ class ProfileActivity : AppCompatActivity() {
                         binding.tvUserHandle.text = "@${it.name.replace(" ", "").lowercase()}"
                         binding.tvAge.text = "${it.age} Years"
                         
+                        // Points/Mint Balance (Coins)
                         binding.tvPoints.text = "${it.mintBalance}"
                         sessionManager.saveMintBalance(it.mintBalance)
+                        
+                        // Solved Stats
+                        // Fetch Total Questions Count asynchronously
+                        db.collection("questions").get().addOnSuccessListener { questionsSnapshot ->
+                             val totalQuestions = questionsSnapshot.size()
+                             binding.viewSolvedStats.setData(it.solvedEasy, it.solvedMedium, it.solvedHard, totalQuestions)
+                        }.addOnFailureListener { _ ->
+                             // Fallback if fails
+                             binding.viewSolvedStats.setData(it.solvedEasy, it.solvedMedium, it.solvedHard, 0)
+                        }
+                        
+                        binding.tvServedEasy.text = "${it.solvedEasy}"
+                        binding.pbEasy.max = 50 // Placeholder Max
+                        binding.pbEasy.progress = it.solvedEasy
+                        
+                        binding.tvServedMedium.text = "${it.solvedMedium}"
+                        binding.pbMedium.max = 30 // Placeholder Max
+                        binding.pbMedium.progress = it.solvedMedium
+                        
+                        binding.tvServedHard.text = "${it.solvedHard}"
+                        binding.pbHard.max = 20 // Placeholder Max
+                        binding.pbHard.progress = it.solvedHard
+                        
+                        // Level and XP
+                        binding.tvXP.text = "${it.totalXP}"
+                        
+                        val levelInfo = com.digitar.mintx.utils.LevelUtils.calculateLevelInfo(it.totalXP)
+                        binding.tvLevel.text = "${levelInfo.level}"
                         
                         // Update categories
                         binding.chipGroupCategories.removeAllViews()
