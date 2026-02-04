@@ -85,8 +85,8 @@
         <!-- Big Floating Coin -->
         <ImageView
             android:id="@+id/iv_big_coin"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/mint_coin"
             android:layout_marginEnd="-20dp"
             android:layout_marginBottom="20dp"
