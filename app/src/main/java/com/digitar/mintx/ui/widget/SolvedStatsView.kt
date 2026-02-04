@@ -21,6 +21,11 @@ class SolvedStatsView @JvmOverloads constructor(
     private var hardCount = 0
     private var totalSolved = 0
     private var totalQuestions = 0
+    
+    // Loading state
+    private var isLoading = true
+    private var animationProgress = 0f
+    private var shimmerOffset = 0f
 
     // Paints
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -59,6 +64,12 @@ class SolvedStatsView @JvmOverloads constructor(
         textSize = 30f // Will be scaled
     }
 
+    private val shimmerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        color = Color.parseColor("#E8E8E8")
+    }
+    
     private val rect = RectF()
     private var strokeWidth = 20f
 
@@ -74,6 +85,7 @@ class SolvedStatsView @JvmOverloads constructor(
         
         textPaint.textSize = 24 * density
         labelPaint.textSize = 12 * density
+        shimmerPaint.strokeWidth = strokeWidth
     }
 
     fun setData(easy: Int, medium: Int, hard: Int, totalAll: Int) {
@@ -82,7 +94,41 @@ class SolvedStatsView @JvmOverloads constructor(
         this.hardCount = hard
         this.totalSolved = easy + medium + hard
         this.totalQuestions = totalAll
+        isLoading = false
+        animationProgress = 0f
+        animateToFull()
+    }
+    
+    fun startLoading() {
+        isLoading = true
+        animationProgress = 0f
+        shimmerOffset = 0f
         invalidate()
+        startShimmerAnimation()
+    }
+    
+    fun stopLoading() {
+        isLoading = false
+        invalidate()
+    }
+    
+    private fun startShimmerAnimation() {
+        if (!isLoading) return
+        shimmerOffset += 10f
+        if (shimmerOffset > 360f) shimmerOffset = 0f
+        invalidate()
+        postDelayed({ startShimmerAnimation() }, 16)
+    }
+    
+    private fun animateToFull() {
+        if (animationProgress >= 1f) {
+            animationProgress = 1f
+            invalidate()
+            return
+        }
+        animationProgress += 0.05f
+        invalidate()
+        postDelayed({ animateToFull() }, 16)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -97,13 +143,26 @@ class SolvedStatsView @JvmOverloads constructor(
         val padding = strokeWidth / 2
         rect.set(padding, padding, width - padding, height - padding)
 
+        val cx = width / 2f
+        val cy = height / 2f
+        
+        if (isLoading) {
+            // Draw shimmer loading state
+            canvas.drawArc(rect, 0f, 360f, false, trackPaint)
+            
+            // Draw animated shimmer arc
+            val shimmerLength = 90f
+            canvas.drawArc(rect, shimmerOffset, shimmerLength, false, shimmerPaint)
+            
+            // Draw loading text
+            canvas.drawText("Loading...", cx, cy + (textPaint.textSize / 3), labelPaint)
+            return
+        }
+
         // Draw Track
         canvas.drawArc(rect, 0f, 360f, false, trackPaint)
 
         // Draw Center Text
-        val cx = width / 2f
-        val cy = height / 2f
-        
         if (totalQuestions > 0) {
             canvas.drawText("$totalSolved / $totalQuestions", cx, cy + (textPaint.textSize / 3), textPaint)
         } else {
@@ -113,28 +172,10 @@ class SolvedStatsView @JvmOverloads constructor(
 
         if (totalSolved == 0) return
         
-        // Calculate Angles
-        // We generally use "Total Questions" as 100% or "Total Solved" as 100%?
-        // LeetCode uses "Total Solved" / "Total Questions" ratio?
-        // Actually LeetCode's ring shows breakdown of SOLVED.
-        // So 100% of the ring = Total Solved (if all adjacent) OR 100% ring = Total Questions?
-        // LeetCode: The ring represents the *Solved* questions.
-        // Wait, LeetCode's ring is often incomplete if you haven't solved all.
-        // No, LeetCode's profile ring fills up based on Total Solved / Total Questions.
-        // But for this simplified version, let's make the ring represent the breakdown of the solved ones (100% filled if we only care about proportions) OR
-        // better: Represent Solved / Total Available.
-        
-        // FOR NOW: Let's assume we want to show PROPORTION of Solved vs Total Available.
-        // But I don't have "Total Available" easily.
-        // So let's make the ring strictly "Breakdown of Solved". i.e. Full circle = 100% of solved.
-        // Wait, if I have solved 1 easy, 1 medium, 1 hard. 3 total. Each 33%.
-        // The circle will be full.
-        // This looks good.
-        
         val total = totalSolved.toFloat()
-        val easyAngle = (easyCount / total) * 360f
-        val mediumAngle = (mediumCount / total) * 360f
-        val hardAngle = (hardCount / total) * 360f
+        val easyAngle = (easyCount / total) * 360f * animationProgress
+        val mediumAngle = (mediumCount / total) * 360f * animationProgress
+        val hardAngle = (hardCount / total) * 360f * animationProgress
 
         var startAngle = -90f // Start from top
 
@@ -154,7 +195,5 @@ class SolvedStatsView @JvmOverloads constructor(
         if (hardCount > 0) {
             canvas.drawArc(rect, startAngle, hardAngle, false, hardPaint)
         }
-        
-
     }
 }

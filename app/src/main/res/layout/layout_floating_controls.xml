@@ -7,34 +7,29 @@
     android:clipToPadding="false">
 
     <!-- Hint Button (Draggable - Default: Bottom Right) -->
-    <!-- Hint Button (Draggable - Default: Bottom Right) -->
-    <com.facebook.shimmer.ShimmerFrameLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="@dimen/_50sdp"
         android:layout_marginBottom="@dimen/_86sdp"
         android:layout_marginEnd="@dimen/_16sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:shimmer_auto_start="true">
+        app:cardBackgroundColor="@color/mint_floating_card_bg"
+        app:cardCornerRadius="@dimen/_25sdp"
+        app:cardElevation="@dimen/_8sdp"
+        app:strokeColor="@color/accent_glass_border"
+        app:strokeWidth="@dimen/_1sdp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_50sdp"
-            android:layout_height="@dimen/_50sdp"
-            app:cardBackgroundColor="@color/mint_surface"
-            app:cardCornerRadius="@dimen/_25sdp"
-            app:cardElevation="@dimen/_6sdp">
+        <ImageView
+            android:id="@+id/iv_hint_icon"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_hint_bulb"
+            app:tint="@color/mint_gold" />
 
-            <ImageView
-                android:id="@+id/iv_hint_icon"
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_hint_bulb"
-                app:tint="@color/mint_gold" />
-
-        </com.google.android.material.card.MaterialCardView>
-    </com.facebook.shimmer.ShimmerFrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Hint Options (Initially Hidden) -->
     <LinearLayout
@@ -54,9 +49,9 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/_40sdp"
             android:layout_marginEnd="@dimen/_8sdp"
-            app:cardBackgroundColor="@color/mint_surface"
+            app:cardBackgroundColor="@color/mint_floating_card_bg"
             app:cardCornerRadius="@dimen/_20sdp"
-            app:cardElevation="@dimen/_4sdp"
+            app:cardElevation="@dimen/_6sdp"
             app:strokeColor="@color/accent_glass_border"
             app:strokeWidth="@dimen/_1sdp">
 
@@ -64,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:paddingHorizontal="12dp">
+                android:paddingHorizontal="16dp">
 
                 <ImageView
                     android:layout_width="16dp"
@@ -74,11 +69,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_4sdp"
+                    android:layout_marginStart="@dimen/_6sdp"
                     android:text="-10"
                     android:textColor="@color/text_headline"
                     android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -87,9 +83,9 @@
             android:id="@+id/card_hint_ad"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/_40sdp"
-            app:cardBackgroundColor="@color/mint_surface"
+            app:cardBackgroundColor="@color/mint_floating_card_bg"
             app:cardCornerRadius="@dimen/_20sdp"
-            app:cardElevation="@dimen/_4sdp"
+            app:cardElevation="@dimen/_6sdp"
             app:strokeColor="@color/accent_glass_border"
             app:strokeWidth="@dimen/_1sdp">
 
@@ -97,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:paddingHorizontal="12dp">
+                android:paddingHorizontal="16dp">
 
                 <ImageView
                     android:layout_width="16dp"
@@ -108,40 +104,37 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_4sdp"
+                    android:layout_marginStart="@dimen/_6sdp"
                     android:text="Watch Ad"
                     android:textColor="@color/text_headline"
                     android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <!-- Floating Timer Container (Top Right) -->
-    <com.facebook.shimmer.ShimmerFrameLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_floating_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_56sdp"
+        android:layout_height="@dimen/_56sdp"
         android:layout_marginTop="@dimen/_130sdp"
         android:layout_marginEnd="@dimen/_16sdp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:shimmer_auto_start="true">
+        app:cardBackgroundColor="@color/mint_floating_card_bg"
+        app:cardCornerRadius="@dimen/_28sdp"
+        app:cardElevation="@dimen/_8sdp"
+        app:strokeColor="@color/accent_glass_border"
+        app:strokeWidth="@dimen/_1sdp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_56sdp"
-            android:layout_height="@dimen/_56sdp"
-            app:cardBackgroundColor="@color/mint_surface"
-            app:cardCornerRadius="@dimen/_28sdp"
-            app:cardElevation="@dimen/_6sdp">
+        <com.digitar.mintx.ui.widget.AnalogTimerView
+            android:id="@+id/view_floating_timer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/_4sdp" />
 
-            <com.digitar.mintx.ui.widget.AnalogTimerView
-                android:id="@+id/view_floating_timer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/_3sdp" />
-
-        </com.google.android.material.card.MaterialCardView>
-    </com.facebook.shimmer.ShimmerFrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

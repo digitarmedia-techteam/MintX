@@ -31,7 +31,7 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
     private val smsBroadcastReceiver by lazy { SmsBroadcastReceiver() }
     
     // OTP Box list
-    private lateinit var otpBoxes: List<EditText>
+    private lateinit var otpBoxes: List<com.digitar.mintx.utils.OtpEditText>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,8 +74,12 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
 
     private fun setupOtpInputs() {
         otpBoxes = listOf(
-            binding.otp1, binding.otp2, binding.otp3, 
-            binding.otp4, binding.otp5, binding.otp6
+            binding.otp1 as com.digitar.mintx.utils.OtpEditText,
+            binding.otp2 as com.digitar.mintx.utils.OtpEditText,
+            binding.otp3 as com.digitar.mintx.utils.OtpEditText,
+            binding.otp4 as com.digitar.mintx.utils.OtpEditText,
+            binding.otp5 as com.digitar.mintx.utils.OtpEditText,
+            binding.otp6 as com.digitar.mintx.utils.OtpEditText
         )
 
         for (i in otpBoxes.indices) {
@@ -94,19 +98,15 @@ class OtpFragment : Fragment(), SmsBroadcastReceiver.OtpReceiveListener {
                 override fun afterTextChanged(s: Editable?) {}
             })
 
-            // Backward Navigation (Backspace)
-            otpBoxes[i].setOnKeyListener { _, keyCode, event ->
-                if (keyCode == android.view.KeyEvent.KEYCODE_DEL && event.action == android.view.KeyEvent.ACTION_DOWN) {
-                    // If current box is empty and we are not in the first box
-                    if (otpBoxes[i].text.isEmpty() && i > 0) {
-                        otpBoxes[i - 1].requestFocus()
-                        otpBoxes[i - 1].text.clear() // Clear the previous box content
-                        return@setOnKeyListener true // Consume event
-                    }
-                    // If current box is NOT empty, let default behavior happen (delete character)
-                    // If it becomes empty after this, the NEXT backspace will trigger the above block.
+            // Backward Navigation (Backspace on empty)
+            otpBoxes[i].setOnBackspacePressedListener {
+                if (i > 0) {
+                    otpBoxes[i - 1].requestFocus()
+                    // Optional: Move cursor to end if needed, but for 1 char box it's fine.
+                    // If we want to CLEAR the previous box as well (super aggressive delete):
+                    // otpBoxes[i - 1].text?.clear()
+                    // But standard behavior is just navigate back so user can decide.
                 }
-                false
             }
         }
     }

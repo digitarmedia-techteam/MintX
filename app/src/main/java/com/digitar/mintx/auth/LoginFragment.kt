@@ -50,6 +50,17 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            viewModel.handleGoogleSignInResult(task)
+        }
+    }
+
+    private lateinit var googleSignInClient: com.google.android.gms.auth.api.signin.GoogleSignInClient
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,8 +73,76 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupInput()
+        setupGoogleLogin()
         setupObservers()
         requestPhoneHint()
+        
+        // Post to ensure view is measured/laid out (though for drawable resource it's available immediately usually)
+        binding.ivHeroBanner.post {
+            updateStatusBarColor()
+        }
+    }
+    
+    private fun updateStatusBarColor() {
+        try {
+            val drawable = binding.ivHeroBanner.drawable
+            if (drawable != null) {
+                // Convert to bitmap to get pixel
+                val bitmap = if (drawable is android.graphics.drawable.BitmapDrawable) {
+                    drawable.bitmap
+                } else {
+                    val bmp = android.graphics.Bitmap.createBitmap(
+                        drawable.intrinsicWidth.takeIf { it > 0 } ?: 1,
+                        drawable.intrinsicHeight.takeIf { it > 0 } ?: 1,
+                        android.graphics.Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = android.graphics.Canvas(bmp)
+                    drawable.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable.draw(canvas)
+                    bmp
+                }
+
+                if (bitmap != null) {
+                    // Get top-left pixel
+                    // We pick (0,0) or (width/2, 0) for center top.
+                    // Let's pick center top to be safe for gradients
+                    val pixel = bitmap.getPixel(bitmap.width / 2, 0)
+                    
+                    val window = requireActivity().window
+                    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    window.statusBarColor = pixel
+                    
+                    // Set icons light/dark based on luminance
+                    // Luminance formula: 0.299*R + 0.587*G + 0.114*B
+                    val r = android.graphics.Color.red(pixel)
+                    val g = android.graphics.Color.green(pixel)
+                    val b = android.graphics.Color.blue(pixel)
+                    val luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+                    
+                    val controller = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+                    controller.isAppearanceLightStatusBars = luminance > 0.5 // If bright background, use dark icons
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    private fun setupGoogleLogin() {
+        // Configure Google Sign In
+        val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(
+            com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
+        )
+            .requestIdToken(getString(R.string.default_web_client_id)) 
+            .requestEmail()
+            .build()
+
+        googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(requireActivity(), gso)
+        
+        binding.google.setOnClickListener {
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
     }
 
     private fun setupInput() {
@@ -105,11 +184,27 @@ class LoginFragment : Fragment() {
                         putString("mobileNumber", number)
                     }
                     findNavController().navigate(R.id.action_loginFragment_to_otpFragment, bundle)
+                    viewModel.resetLoginState()
                     // Reset state to Idle to avoid re-navigating if we come back
                     // Actually ViewModel is shared? No, generic `by viewModels()` is scoped to Fragment. 
                     // Good, so LoginFragment has its own VM instance separate from Otp if I don't scope to Activity.
                     // But wait, if I want to share data easily I should scope to Activity or pass args.
                     // I am passing args. So separate VMs is fine.
+                }
+                is LoginUiState.LoginSuccess -> {
+                    // Navigate to Home/Dashboard
+                    // Assuming we have a navigation action or start Main
+                    val intent = android.content.Intent(requireContext(), com.digitar.mintx.MainActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
+                is LoginUiState.NavigateToProfile -> {
+                    // For Google Auth this might happen if some data is missing or we want to force check
+                    // But our ViewModel logic tries to auto-create.
+                    // If we land here, maybe just go to ProfileActivity?
+                    val intent = android.content.Intent(requireContext(), com.digitar.mintx.ProfileActivity::class.java) // Check class name
+                    startActivity(intent)
+                    requireActivity().finish()
                 }
                 is LoginUiState.Error -> {
                     binding.btnContinue.text = "Continue"

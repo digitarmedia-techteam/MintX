@@ -26,14 +26,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/_32sdp"
+            android:padding="@dimen/_24sdp"
             android:gravity="center">
 
             <!-- Warning Icon -->
             <ImageView
                 android:id="@+id/iv_warning_icon"
-                android:layout_width="@dimen/_64sdp"
-                android:layout_height="@dimen/_64sdp"
+                android:layout_width="@dimen/_56sdp"
+                android:layout_height="@dimen/_56sdp"
                 android:src="@drawable/ic_warning"
                 app:tint="@color/warning"
                 android:layout_marginBottom="@dimen/_16sdp"/>
@@ -44,10 +44,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Quiz Paused"
-                android:textSize="@dimen/_24ssp"
+                android:textSize="@dimen/_20ssp"
                 android:textStyle="bold"
                 android:textColor="@color/text_headline"
-                android:layout_marginBottom="@dimen/_12sdp"/>
+                android:layout_marginBottom="@dimen/_8sdp"/>
 
             <!-- Message -->
             <TextView
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Please don't minimize the app during the quiz. Your timer is still running!"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_14ssp"
                 android:textColor="@color/text_subtext"
                 android:textAlignment="center"
                 android:layout_marginBottom="@dimen/_24sdp"/>
@@ -65,35 +65,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingTop="@dimen/_8sdp">
+                android:gravity="center">
 
-                <!-- Quit/Leave Button (Initially Gone) -->
+                <!-- Quit/Leave Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_quit_quiz"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Leave"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_42sdp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:text="Quit"
                     android:textColor="@color/error"
-                    android:textSize="@dimen/_16ssp"
+                    android:textSize="@dimen/_13ssp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="@dimen/_16sdp"
                     android:visibility="gone"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:strokeColor="@color/error"
-                    app:cornerRadius="@dimen/_12sdp"/>
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="@dimen/_21sdp"/>
 
                 <!-- Resume/Stay Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_resume_quiz"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Resume Quiz"
-                    android:textSize="@dimen/_15ssp"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_42sdp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:text="Resume"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_13ssp"
                     android:textStyle="bold"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:paddingVertical="@dimen/_10sdp"
-                    app:cornerRadius="@dimen/_12sdp"
+                    app:cornerRadius="@dimen/_21sdp"
                     app:backgroundTint="@color/mint_primary"/>
             </LinearLayout>
         </LinearLayout>

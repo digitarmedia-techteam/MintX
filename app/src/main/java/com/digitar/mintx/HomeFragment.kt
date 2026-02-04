@@ -6,16 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.digitar.mintx.databinding.FragmentHomeBinding
-
 import com.digitar.mintx.ui.quiz.QuizCategoryBottomSheet
-
 import android.content.Intent
 import java.util.ArrayList
+import androidx.core.content.ContextCompat
+import com.digitar.mintx.utils.StreakUtils
+import com.digitar.mintx.RewardsStoreActivity
+import com.digitar.mintx.ProfileActivity
+import com.digitar.mintx.QuizActivity
+import com.digitar.mintx.R
 
 class HomeFragment : Fragment() {
     private var balanceAnimator: android.animation.ValueAnimator? = null
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private var isStreakLoading = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,12 +43,7 @@ class HomeFragment : Fragment() {
         }
         
         binding.btnQuickQuiz.setOnClickListener {
-//            showQuizCategorySelector()
             navigateToQuiz()
-        }
-
-        binding.btnRedeemHome.setOnClickListener {
-            startActivity(Intent(requireContext(), RewardsStoreActivity::class.java))
         }
 
         binding.btnRedeemHome.setOnClickListener {
@@ -67,6 +67,17 @@ class HomeFragment : Fragment() {
             binding.tvGreeting.text = "Hello, $name"
             animateGreetingEmoji()
         }
+
+        // Avatar Logic
+        val photoUrl = sessionManager.getUserPhoto()
+        if (!photoUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(this)
+                .load(photoUrl)
+                .circleCrop()
+                .placeholder(R.drawable.user_gif)
+                .error(R.drawable.user_gif)
+                .into(binding.navHeaderAvatar)
+        }
         // Load Live GIF
         try {
             com.bumptech.glide.Glide.with(this)
@@ -76,6 +87,9 @@ class HomeFragment : Fragment() {
             // Fallback
         }
         setupFeaturedCard("")
+        
+        // Start streak dots loading animation
+        animateStreakDotsLoader()
     }
 
     private fun setupFeaturedCard(countryCode: String) {
@@ -180,6 +194,22 @@ class HomeFragment : Fragment() {
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val serverBalance = document.getLong("mintBalance") ?: 0L
+                    var activityDates = document.get("activityDates") as? List<Long> ?: emptyList()
+                    
+                    // MARK DAILY ATTENDANCE
+                    val today = System.currentTimeMillis()
+                    val isTodayRecorded = activityDates.any { StreakUtils.isToday(it) }
+                    
+                    if (!isTodayRecorded) {
+                        val newDates = activityDates.toMutableList()
+                        newDates.add(today)
+                        activityDates = newDates
+                        
+                        db.collection("users").document(uid).update("activityDates", newDates)
+                            .addOnSuccessListener {
+                                // Updated successfully
+                            }
+                    }
                     
                     // Check if different from local
                     val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
@@ -190,6 +220,8 @@ class HomeFragment : Fragment() {
                         // Animate from old local to new server
                         animateBalance(localBalance, serverBalance)
                     }
+                    
+                    updateStreakUI(activityDates)
                 }
             }
             .addOnFailureListener {
@@ -197,14 +229,63 @@ class HomeFragment : Fragment() {
             }
     }
 
+    private fun updateStreakUI(activityDates: List<Long>) {
+        // Stop loading animation
+        isStreakLoading = false
+        
+        val currentWeekActivity = StreakUtils.getCurrentWeekActivity(activityDates)
+        val currentStreak = StreakUtils.getCurrentStreak(activityDates)
+        val streakContainer = binding.llStreakDots
+        val childCount = streakContainer.childCount
+        
+        // 7 dots representing Mon-Sun of current week
+        for (i in 0 until 7) {
+            val viewIndex = i * 2 // 0, 2, 4, ...
+            if (viewIndex >= childCount) break
+            
+            val dotView = streakContainer.getChildAt(viewIndex) as? android.widget.ImageView
+            val isActive = currentWeekActivity[i]
+            
+            // Reset animation state to normal
+            dotView?.apply {
+                scaleX = 1f
+                scaleY = 1f
+                alpha = 1f
+            }
+            
+            dotView?.setImageResource(if (isActive) R.drawable.streak_dot_active else R.drawable.streak_dot_inactive)
+            
+            // Connecting Lines
+            if (i < 6) {
+                val lineIndex = viewIndex + 1
+                if (lineIndex < childCount) {
+                    val lineView = streakContainer.getChildAt(lineIndex)
+                    
+                    // Connect active days
+                    val nextActive = currentWeekActivity[i+1]
+                    val isLineActive = isActive && nextActive
+                    
+                    lineView.setBackgroundColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            if (isLineActive) R.color.quiz_orange else R.color.gray_500
+                        )
+                    )
+                }
+            }
+        }
+        
+        // Update label
+        val labelView = streakContainer.getChildAt(childCount - 1) as? android.widget.TextView
+        val weekNum = if (currentStreak > 0) ((currentStreak - 1) / 7) + 1 else 1
+        labelView?.text = "Week $weekNum ($currentStreak Days)"
+    }
+
     private fun updateBalance() {
         val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
         val newBalance = sessionManager.getMintBalance()
         
         // Animate Balance
-        // We assume starting from 0 if it's the first load, or we could track previous. 
-        // For "spinning loader" effect, staring from 0 or a low number is good visuals on valid screens.
-        // Or we just animate from 0 every time onResume for the "effect".
         animateBalance(0, newBalance)
     }
 
@@ -234,6 +315,59 @@ class HomeFragment : Fragment() {
 
     private fun navigateToQuiz() {
         startActivity(Intent(requireContext(), QuizActivity::class.java))
+    }
+    
+    fun animateStreakDotsLoader() {
+        // Stop if data is loaded
+        if (!isStreakLoading) return
+        
+        val dotIds = listOf(
+            R.id.streak_dot_0,
+            R.id.streak_dot_1,
+            R.id.streak_dot_2,
+            R.id.streak_dot_3,
+            R.id.streak_dot_4,
+            R.id.streak_dot_5,
+            R.id.streak_dot_6
+        )
+        
+        // Animate each dot sequentially
+        dotIds.forEachIndexed { index, dotId ->
+            val dot = binding.root.findViewById<android.widget.ImageView>(dotId)
+            dot?.let {
+                // Reset initial state
+                it.scaleX = 1f
+                it.scaleY = 1f
+                it.alpha = 0.3f
+                
+                // Create sequential animation
+                it.postDelayed({
+                    // Scale up and fade in
+                    it.animate()
+                        .scaleX(1.4f)
+                        .scaleY(1.4f)
+                        .alpha(1f)
+                        .setDuration(300)
+                        .withEndAction {
+                            // Scale back down
+                            it.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .alpha(0.3f)
+                                .setDuration(300)
+                                .start()
+                        }
+                        .start()
+                }, (index * 200).toLong()) // 200ms delay between each dot
+            }
+        }
+        
+        // Loop the animation only if still loading
+        binding.root.postDelayed({
+            if (_binding != null && isStreakLoading) {
+                animateStreakDotsLoader()
+            }
+        }, (dotIds.size * 200 + 600).toLong()) // Restart after all dots finish
     }
 
     override fun onDestroyView() {

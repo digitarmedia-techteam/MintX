@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.digitar.mintx.auth.AuthActivity
 import com.digitar.mintx.databinding.ActivityProfileViewBinding
 import com.digitar.mintx.ui.OnboardingBottomSheetFragment
 import com.digitar.mintx.utils.SessionManager
@@ -18,97 +17,127 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileViewBinding
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
     private lateinit var sessionManager: SessionManager
 
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-
-    // Cache for category images
-    private val categoryImageMap = mutableMapOf<String, String>()
+    private val categoryImageMap = mapOf(
+        "science" to "https://cdn-icons-png.flaticon.com/512/3655/3655580.png",
+        "history" to "https://cdn-icons-png.flaticon.com/512/3976/3976625.png"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        sessionManager = SessionManager(this)
+        // Set status bar color to match header
         window.statusBarColor = ContextCompat.getColor(this, R.color.mint_gold)
+
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+        sessionManager = SessionManager(this)
+
         setupUI()
         setupListeners()
+        fetchAllData()
     }
 
     private fun setupUI() {
-        val userName = sessionManager.getUserName() ?: "User"
-        binding.tvUserName.text = userName
-        binding.tvUserHandle.text = "@${userName.replace(" ", "").lowercase()}"
+        // Set default values
+        binding.tvUserName.text = "Loading..."
+        binding.tvUserHandle.text = "@username"
+        binding.tvAge.text = "00 Years"
+        binding.tvPoints.text = "0"
+        binding.tvXP.text = "0"
+        binding.tvLevel.text = "1"
+        binding.tvMobileNumber.text = auth.currentUser?.phoneNumber ?: "+91 0000 00000"
         
-        binding.tvMobileNumber.text = "${sessionManager.getUserMobile()}"
+        // Set default progress
+        binding.pbEasy.progress = 0
+        binding.pbMedium.progress = 0
+        binding.pbHard.progress = 0
         
-        val age = sessionManager.getUserAge()
-        binding.tvAge.text = "$age Years"
+        binding.tvServedEasy.text = "0"
+        binding.tvServedMedium.text = "0"
+        binding.tvServedHard.text = "0"
         
-        binding.tvPoints.text = "${sessionManager.getMintBalance()}"
-        
-        fetchAllData()
+        // Set button colors
+        binding.btnBack.setColorFilter(ContextCompat.getColor(this, R.color.fixed_white))
+        binding.btnSettings.setColorFilter(ContextCompat.getColor(this, R.color.fixed_white))
     }
-    
+
     private fun fetchAllData() {
-        // 1. Fetch Categories metadata first (to get images)
-        db.collection("quiz_categories").get()
-            .addOnSuccessListener { result ->
-                categoryImageMap.clear()
-                for (doc in result) {
-                    val name = doc.getString("name")
-                    val url = doc.getString("imageUrl") ?: doc.getString("image")
-                    if (name != null && url != null) {
-                        categoryImageMap[name] = url
-                    }
-                }
-                // 2. Then User Data
-                fetchUserData()
-            }
-            .addOnFailureListener {
-                // Return to fetching user data even if cats fail
-                fetchUserData()
-            }
+        fetchUserData()
     }
-    
+
     private fun fetchUserData() {
         val uid = auth.currentUser?.uid ?: return
+        
+        // Start loading state
+        binding.viewSolvedStats.startLoading()
+        
         db.collection("users").document(uid).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(com.digitar.mintx.data.model.User::class.java)
                     user?.let {
                         binding.tvUserName.text = it.name
-                        binding.tvUserHandle.text = "@${it.name.replace(" ", "").lowercase()}"
+                        
+                        // Email Logic from DB
+                        if (it.email.isNotEmpty()) {
+                             binding.tvUserHandle.text = it.email
+                        } else {
+                             binding.tvUserHandle.text = "@${it.name.replace(" ", "").lowercase()}"
+                        }
+                        
+                        // Photo Logic from DB
+                        if (it.photoUrl.isNotEmpty()) {
+                             Glide.with(this@ProfileActivity)
+                                .load(it.photoUrl)
+                                .circleCrop()
+                                .placeholder(R.drawable.user_gif)
+                                .error(R.drawable.user_gif)
+                                .into(binding.ivAvatar)
+                        }
+
                         binding.tvAge.text = "${it.age} Years"
                         
                         // Points/Mint Balance (Coins)
                         binding.tvPoints.text = "${it.mintBalance}"
                         sessionManager.saveMintBalance(it.mintBalance)
                         
+                        // Update Contribution Graph
+                        try {
+                            // Uses dailyStats map now
+                            binding.viewContributionGraph.setActivityData(it.dailyStats)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        
                         // Solved Stats
                         // Fetch Total Questions Count asynchronously
                         db.collection("questions").get().addOnSuccessListener { questionsSnapshot ->
                              val totalQuestions = questionsSnapshot.size()
                              binding.viewSolvedStats.setData(it.solvedEasy, it.solvedMedium, it.solvedHard, totalQuestions)
+                             
+                             // Animate progress bars
+                             animateProgressBar(binding.pbEasy, it.solvedEasy, 50)
+                             animateProgressBar(binding.pbMedium, it.solvedMedium, 30)
+                             animateProgressBar(binding.pbHard, it.solvedHard, 20)
                         }.addOnFailureListener { _ ->
                              // Fallback if fails
                              binding.viewSolvedStats.setData(it.solvedEasy, it.solvedMedium, it.solvedHard, 0)
+                             
+                             // Animate progress bars
+                             animateProgressBar(binding.pbEasy, it.solvedEasy, 50)
+                             animateProgressBar(binding.pbMedium, it.solvedMedium, 30)
+                             animateProgressBar(binding.pbHard, it.solvedHard, 20)
                         }
                         
                         binding.tvServedEasy.text = "${it.solvedEasy}"
-                        binding.pbEasy.max = 50 // Placeholder Max
-                        binding.pbEasy.progress = it.solvedEasy
-                        
                         binding.tvServedMedium.text = "${it.solvedMedium}"
-                        binding.pbMedium.max = 30 // Placeholder Max
-                        binding.pbMedium.progress = it.solvedMedium
-                        
                         binding.tvServedHard.text = "${it.solvedHard}"
-                        binding.pbHard.max = 20 // Placeholder Max
-                        binding.pbHard.progress = it.solvedHard
                         
                         // Level and XP
                         binding.tvXP.text = "${it.totalXP}"
@@ -142,38 +171,38 @@ class ProfileActivity : AppCompatActivity() {
                                                 // Do nothing
                                             }
                                         })
-                                } else {
-                                    // "otherwise, don’t display the image"
-                                    chip.chipIcon = null
-                                    chip.isChipIconVisible = false
                                 }
                                 
                                 binding.chipGroupCategories.addView(chip)
                             }
                         } else {
                             val chip = com.google.android.material.chip.Chip(this@ProfileActivity)
-                            chip.text = "None selected"
+                            chip.text = "No categories selected"
                             chip.isCheckable = false
                             chip.isClickable = false
-                            chip.isChipIconVisible = false
                             binding.chipGroupCategories.addView(chip)
                         }
                     }
                 }
             }
-            .addOnFailureListener {
-                // Ignore errors or show toast
+            .addOnFailureListener { exception ->
+                exception.printStackTrace()
             }
     }
 
     private fun setupListeners() {
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
+        binding.btnSettings.setOnClickListener {
+            // Navigate to settings
+        }
+
         binding.cardLogout.setOnClickListener {
+            auth.signOut()
             sessionManager.logout()
             navigateToLogin()
-        }
-        
-        binding.btnBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
         }
 
         binding.cardGamePreferences.setOnClickListener {
@@ -183,9 +212,19 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, AuthActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val intent = Intent(this, com.digitar.mintx.auth.AuthActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
         finish()
+    }
+    
+    private fun animateProgressBar(progressBar: android.widget.ProgressBar, targetProgress: Int, max: Int) {
+        progressBar.max = max
+        progressBar.progress = 0
+        
+        val animator = android.animation.ObjectAnimator.ofInt(progressBar, "progress", 0, targetProgress)
+        animator.duration = 1000 // 1 second animation
+        animator.interpolator = android.view.animation.DecelerateInterpolator()
+        animator.start()
     }
 }

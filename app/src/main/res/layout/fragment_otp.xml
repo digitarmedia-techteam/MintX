@@ -19,15 +19,17 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:layout_marginStart="-12dp"
             android:src="@drawable/ic_arrow_back_black"
             app:tint="@color/text_headline" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="4dp"
             android:text="OTP Verification"
             android:textColor="@color/text_headline"
             android:textSize="20sp"
@@ -71,17 +73,17 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/tvPhoneNumber">
 
-        <EditText android:id="@+id/otp1" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp1" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/otp2" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp2" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/otp3" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp3" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/otp4" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp4" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/otp5" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp5" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/otp6" style="@style/OtpBoxStyleRef" />
+        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp6" style="@style/OtpBoxStyleRef" />
     </LinearLayout>
 
     <!-- Resend Text -->

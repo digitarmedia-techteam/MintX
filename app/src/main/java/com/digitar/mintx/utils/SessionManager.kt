@@ -16,6 +16,8 @@ class SessionManager(context: Context) {
         private const val KEY_USER_AGE = "userAge"
         private const val KEY_IS_CATEGORIES_SELECTED = "isCategoriesSelected"
         private const val KEY_MINT_BALANCE = "mintBalance"
+        private const val KEY_USER_EMAIL = "userEmail"
+        private const val KEY_USER_PHOTO = "userPhoto"
     }
 
     fun createLoginSession(mobileNumber: String) {
@@ -26,11 +28,22 @@ class SessionManager(context: Context) {
         }
     }
 
-    fun completeProfile(name: String, age: Int) {
+    fun createGoogleSession(email: String, photoUrl: String) {
+        prefs.edit().apply {
+            putBoolean(KEY_IS_LOGGED_IN, true)
+            putString(KEY_USER_EMAIL, email)
+            putString(KEY_USER_PHOTO, photoUrl)
+            apply()
+        }
+    }
+
+    fun completeProfile(name: String, age: Int, email: String = "", photoUrl: String = "") {
         prefs.edit().apply {
             putBoolean(KEY_IS_PROFILE_COMPLETED, true)
             putString(KEY_USER_NAME, name)
             putInt(KEY_USER_AGE, age)
+            if (email.isNotEmpty()) putString(KEY_USER_EMAIL, email)
+            if (photoUrl.isNotEmpty()) putString(KEY_USER_PHOTO, photoUrl)
             apply()
         }
     }
@@ -40,6 +53,10 @@ class SessionManager(context: Context) {
     fun isProfileCompleted(): Boolean = prefs.getBoolean(KEY_IS_PROFILE_COMPLETED, false)
 
     fun getUserMobile(): String? = prefs.getString(KEY_MOBILE_NUMBER, null)
+
+    fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, "")
+
+    fun getUserPhoto(): String? = prefs.getString(KEY_USER_PHOTO, "")
 
     fun getUserName(): String? = prefs.getString(KEY_USER_NAME, "User")
 

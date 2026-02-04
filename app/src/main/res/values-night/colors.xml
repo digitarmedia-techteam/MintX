@@ -2,51 +2,64 @@
 <resources>
     <!-- ===================== -->
     <!-- Brand Colors (Dark Mode) -->
-    <!-- Slightly brighter for visibility on dark bg -->
+    <!-- High Contrast Neon Styles -->
     <!-- ===================== -->
-    <color name="mint_primary">#5EEAD4</color>
-    <color name="mint_secondary">#60A5FA</color>
+    <!-- Primary: Neon Mint Green -->
+    <color name="mint_primary">#00FFA3</color>
+    <!-- Secondary: Electric Blue -->
+    <color name="mint_secondary">#3B82F6</color>
+    <!-- Accent: Bright Gold for rewards -->
+    <color name="mint_gold">#FFD700</color>
+    <!-- Quiz: Hot Orange -->
     <color name="quiz_orange">#FB923C</color>
-    <color name="mint_gold">#FBBF24</color>
-    <color name="mint_green">#34D399</color>
-    <color name="accent_red">#F87171</color>
-    <color name="yellow">#FDE047</color>
+    
+    <!-- Functional Semantic Colors -->
+    <color name="mint_green">#34D399</color> <!-- Success -->
+    <color name="accent_red">#F87171</color>   <!-- Error -->
+    <color name="yellow">#FDE047</color>      <!-- Warning -->
 
     <!-- ===================== -->
-    <!-- UI Colors (Dark Mode) -->
-    <!-- Softer dark backgrounds -->
+    <!-- UI Backgrounds & Surfaces (Dark Mode) -->
+    <!-- Deep Black / Charcoal Theme -->
     <!-- ===================== -->
-    <!-- Deep blue-gray background -->
-    <color name="mint_background">#0F172A</color>
-    <!-- Slightly lighter surface -->
-    <color name="mint_surface">#1E293B</color>
-    <!-- Even lighter for elevated surfaces -->
-    <color name="mint_surface_light">#334155</color>
+    <!-- Main Background: Almost Black -->
+    <color name="mint_background">#0B0F15</color>
+    <!-- Surface: Dark Charcoal (Card Backgrounds) -->
+    <color name="mint_surface">#151C28</color> 
+    <!-- Secondary Surface: Lighter Charcoal for elevated items - Made lighter for visibility -->
+    <color name="mint_surface_light">#263346</color>
+    
+    <!-- Floating Hints/Timer Background (Pure Black in Dark Mode) -->
+    <color name="mint_floating_card_bg">#000000</color>
 
     <!-- ===================== -->
-    <!-- Text Colors (Dark Mode) -->
+    <!-- Typography (Dark Mode) -->
     <!-- ===================== -->
-    <!-- Very light slate for primary text -->
-    <color name="text_headline">#F1F5F9</color>
-    <!-- Medium gray for secondary text -->
+    <!-- High Emphasis: Soft White -->
+    <color name="text_headline">#F8FAFC</color>
+    <!-- Medium Emphasis: Light Gray -->
     <color name="text_subtext">#94A3B8</color>
-    <!-- Darker gray for hints -->
+    <!-- Low Emphasis: Darker Gray -->
     <color name="text_hint">#64748B</color>
-    <!-- White for special cases -->
+    <!-- Inverse: Dark text on light buttons -->
     <color name="text_inverse">#0F172A</color>
 
     <!-- ===================== -->
-    <!-- Glass/Borders (Dark Mode) -->
+    <!-- Glass / Borders (Dark Mode) -->
     <!-- ===================== -->
-    <!-- Subtle white overlay for glass effect -->
-    <color name="accent_glass">#0DFFFFFF</color>
-    <!-- Soft border that's visible on dark -->
-    <color name="accent_glass_border">#334155</color>
+    <!-- Glass Overlay: Subtle white tint -->
+    <color name="accent_glass">#14FFFFFF</color>
+    <!-- Border: Distinct but subtle edge - Made lighter for definition -->
+    <color name="accent_glass_border">#3F4C60</color>
 
     <!-- ===================== -->
-    <!-- Soft Palette Colors (Dark Mode) -->
-    <!-- Brighter variants for visibility -->
+    <!-- Splash Screen Colors -->
     <!-- ===================== -->
+    <color name="splash_bg_start">#111827</color>
+    <color name="splash_bg_end">#000000</color>
+    <color name="splash_text">#FFFFFF</color>
+
+    <!-- Soft Palette (Optimized for Dark Mode Contrast) -->
     <color name="red">#F87171</color>
     <color name="green">#34D399</color>
     <color name="blue">#60A5FA</color>
@@ -58,17 +71,32 @@
     <color name="brown">#D97706</color>
 
     <!-- ===================== -->
-    <!-- Status Colors (Dark Mode) -->
+    <!-- Soothing Gray Scale -->
+    <!-- Using Tailwind's slate palette -->
     <!-- ===================== -->
+    <color name="gray_50">#F8FAFC</color>
+    <color name="gray_100">#F1F5F9</color>
+    <color name="gray_200">#E2E8F0</color>
+    <color name="gray_300">#CBD5E1</color>
+    <color name="gray_400">#94A3B8</color>
+    <color name="gray_500">#64748B</color>
+    <color name="gray_600">#475569</color>
+    <color name="gray_700">#334155</color>
+    <color name="gray_800">#1E293B</color>
+    <color name="gray_900">#0F172A</color>
+
+    <!-- Status States -->
     <color name="success">#34D399</color>
     <color name="warning">#FBBF24</color>
     <color name="error">#F87171</color>
     <color name="info">#60A5FA</color>
 
-    <!-- Status Background Colors (Darker for dark mode) -->
     <color name="success_background">#064E3B</color>
     <color name="error_background">#7F1D1D</color>
     <color name="warning_background">#78350F</color>
     <color name="info_background">#1E3A8A</color>
+    
+    <color name="shimmer_placeholder">#1E293B</color>
 
+    <color name="glass_background">#CC0F172A</color>
 </resources>

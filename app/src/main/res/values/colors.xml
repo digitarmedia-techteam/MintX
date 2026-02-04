@@ -4,55 +4,70 @@
     <!-- ===================== -->
     <!-- Brand Colors (Light Mode) -->
     <!-- ===================== -->
-    <!-- Soft, pleasant teal/mint as primary -->
-    <color name="mint_primary">#14B8A6</color>
-    <!-- Softer blue secondary -->
-    <color name="mint_secondary">#3B82F6</color>
-    <!-- Warm, soft orange for quiz -->
-    <color name="quiz_orange">#F97316</color>
-    <!-- Softer gold/amber -->
+    <!-- Primary: Vibrant Mint Green for actions/highlights -->
+    <color name="mint_primary">#00C896</color> 
+    <!-- Secondary: Rich Blue (Complementary to Mint) -->
+    <color name="mint_secondary">#2563EB</color>
+    <!-- Accent: Premium Gold for rewards/coins -->
     <color name="mint_gold">#F59E0B</color>
-    <!-- Pleasant emerald green -->
-    <color name="mint_green">#10B981</color>
-    <!-- Softer red for errors -->
-    <color name="accent_red">#EF4444</color>
-    <!-- Soft amber instead of harsh yellow -->
-    <color name="yellow">#FCD34D</color>
+    <!-- Quiz/Game specific: Warm Orange -->
+    <color name="quiz_orange">#F97316</color>
+    
+    <!-- Functional Semantic Colors -->
+    <color name="mint_green">#10B981</color> <!-- Success/Correct -->
+    <color name="accent_red">#EF4444</color>   <!-- Error/Wrong -->
+    <color name="yellow">#FBBF24</color>      <!-- Warning/Stars -->
 
     <!-- ===================== -->
-    <!-- UI Colors (Light Mode) -->
+    <!-- UI Backgrounds & Surfaces (Light Mode) -->
     <!-- ===================== -->
-    <!-- Very light gray-blue background (easy on eyes) -->
-    <color name="mint_background">#F1F5F9</color>
-    <!-- Pure white for cards -->
+    <!-- Main App Background: Very soft gray for eye comfort -->
+    <color name="mint_background">#F8FAFC</color>
+    <!-- Card Surface: Pure White -->
     <color name="mint_surface">#FFFFFF</color>
-    <!-- Slightly darker for contrast -->
-    <color name="mint_surface_light">#E2E8F0</color>
+    <!-- Secondary Surface: Lighter/Solid Gray for elevated items -->
+    <color name="mint_surface_light">#EEF2F6</color>
+    
+    <!-- Floating Hints/Timer Background (Pure White in Light Mode) -->
+    <color name="mint_floating_card_bg">#FFFFFF</color>
 
     <!-- ===================== -->
-    <!-- Text Colors (Light Mode) -->
+    <!-- Typography (Light Mode) -->
     <!-- ===================== -->
-    <!-- Dark slate instead of pure black -->
-    <color name="text_headline">#1E293B</color>
-    <!-- Medium gray for secondary text -->
-    <color name="text_subtext">#64748B</color>
-    <!-- Lighter gray for hints -->
+    <!-- High Emphasis: Deep Charcoal for headlines -->
+    <color name="text_headline">#0F172A</color>
+    <!-- Medium Emphasis: Slate Gray for body text -->
+    <color name="text_subtext">#475569</color>
+    <!-- Low Emphasis: Lighter Gray for hints/disabled -->
     <color name="text_hint">#94A3B8</color>
-    <!-- White for text on dark backgrounds -->
+    <!-- Inverse: White text on dark buttons/backgrounds -->
     <color name="text_inverse">#FFFFFF</color>
 
     <!-- ===================== -->
-    <!-- Glass / Border (Light Mode) -->
+    <!-- Elements & Borders -->
     <!-- ===================== -->
-    <!-- Subtle dark overlay -->
-    <color name="accent_glass">#0A000000</color>
-    <!-- Soft border color -->
+    <!-- Subtle separator/border color -->
     <color name="accent_glass_border">#E2E8F0</color>
+    <!-- Shadow/Glass Overlay (Very subtle) -->
+    <color name="accent_glass">#0A000000</color>
 
     <!-- ===================== -->
-    <!-- Soft Palette Colors -->
-    <!-- Replacing harsh RGB colors with pleasant alternatives -->
+    <!-- Splash Screen Colors -->
+    <!-- Keeping consistent Premium Dark branding -->
     <!-- ===================== -->
+    <color name="splash_bg_start">#111827</color> <!-- Deep Charcoal -->
+    <color name="splash_bg_end">#000000</color>   <!-- Pure Black -->
+    <color name="splash_text">#FFFFFF</color>
+
+    <!-- ===================== -->
+    <!-- Legacy/Fixed Colors -->
+    <!-- ===================== -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="fixed_white">#FFFFFF</color>
+    <color name="fixed_black">#000000</color>
+    
+    <!-- Soft Palette (Tailored for Light Mode) -->
     <color name="red">#EF4444</color>
     <color name="green">#10B981</color>
     <color name="blue">#3B82F6</color>
@@ -61,7 +76,7 @@
     <color name="orange">#F97316</color>
     <color name="pink">#EC4899</color>
     <color name="purple">#8B5CF6</color>
-    <color name="brown">#A16207</color>
+    <color name="brown">#B45309</color>
 
     <!-- ===================== -->
     <!-- Soothing Gray Scale -->
@@ -78,40 +93,24 @@
     <color name="gray_800">#1E293B</color>
     <color name="gray_900">#0F172A</color>
 
-    <!-- ===================== -->
-    <!-- Status Colors (Softer) -->
-    <!-- ===================== -->
+    <!-- Status States -->
     <color name="success">#10B981</color>
     <color name="warning">#F59E0B</color>
     <color name="error">#EF4444</color>
     <color name="info">#3B82F6</color>
 
-    <!-- Status Background Colors -->
     <color name="success_background">#D1FAE5</color>
     <color name="error_background">#FEE2E2</color>
     <color name="warning_background">#FEF3C7</color>
     <color name="info_background">#DBEAFE</color>
 
-    <!-- ===================== -->
-    <!-- Fixed / Legacy -->
-    <!-- ===================== -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="fixed_white">#FFFFFF</color>
-    <color name="fixed_black">#000000</color>
+    <color name="shimmer_placeholder">#CBD5E1</color>
 
-    <!-- ===================== -->
-    <!-- Material Default -->
-    <!-- ===================== -->
+    <!-- Material Default Overrides -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-
-    <!-- ===================== -->
-    <!-- Shimmer Colors -->
-    <!-- ===================== -->
-    <color name="shimmer_placeholder">#E2E8F0</color>
-
+    <color name="glass_background">#E6FFFFFF</color>
 </resources>

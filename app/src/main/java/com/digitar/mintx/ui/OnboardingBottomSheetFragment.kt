@@ -70,15 +70,60 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.tvSkip.setOnClickListener {
-            sessionManager.setCategoriesSelected(true) 
-            dismiss()
+            if (selectedCategories.isNotEmpty()) {
+                sessionManager.setCategoriesSelected(true)
+                dismiss()
+            } else {
+                Toast.makeText(context, "Please select at least 1 category to continue", Toast.LENGTH_SHORT).show()
+            }
+        }
+        
+        // Select All checkbox
+        binding.cbSelectAll.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                selectAllCategories()
+            } else {
+                deselectAllCategories()
+            }
         }
     }
 
     private fun updateContinueButton() {
-        val isEnabled = selectedCategories.size >= 3
+        val isEnabled = selectedCategories.isNotEmpty()
         binding.btnContinue.isEnabled = isEnabled
         binding.btnContinue.alpha = if (isEnabled) 1.0f else 0.5f
+        
+        // Update Select All checkbox state
+        binding.cbSelectAll.setOnCheckedChangeListener(null) // Temporarily remove listener
+        binding.cbSelectAll.isChecked = selectedCategories.size == categories.size && categories.isNotEmpty()
+        binding.cbSelectAll.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                selectAllCategories()
+            } else {
+                deselectAllCategories()
+            }
+        }
+        
+        updateStepIndicator()
+    }
+    
+    private fun selectAllCategories() {
+        selectedCategories.clear()
+        selectedCategories.addAll(categories.map { it.id })
+        adapter.notifyDataSetChanged()
+        updateContinueButton()
+    }
+    
+    private fun deselectAllCategories() {
+        selectedCategories.clear()
+        adapter.notifyDataSetChanged()
+        updateContinueButton()
+    }
+    
+    private fun updateStepIndicator() {
+        val count = selectedCategories.size
+        val total = categories.size
+        binding.tvStepIndicator.text = "Selected $count / Total $total"
     }
 
     private fun saveCategoriesAndDismiss() {
@@ -123,6 +168,7 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
                 categories.sortBy { it.name }
 
                 adapter.notifyDataSetChanged()
+                binding.tvSubtitle.text = "Select at least 1 category to continue"
                 
                 // 2. Fetch User Selection after categories are loaded
                 fetchUserSelection()
@@ -133,6 +179,9 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun fetchUserSelection() {
+        // Initial update
+        updateStepIndicator()
+        
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         FirebaseFirestore.getInstance().collection("users").document(uid).get()
             .addOnSuccessListener { document ->
@@ -161,7 +210,7 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
         inner class CategoryViewHolder(val binding: ItemOnboardingCategoryBinding) :
             RecyclerView.ViewHolder(binding.root) {
             
-            fun bind(category: Category) {
+            fun bind(category: Category, animate: Boolean = false) {
                 binding.tvCategoryName.text = category.name
                 
                 // Load Image if available
@@ -169,31 +218,59 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
                     binding.ivCategoryIcon.visibility = View.VISIBLE
                     Glide.with(binding.root.context)
                         .load(category.imageUrl)
-                         // Optional: .placeholder(R.drawable.loading_spinner)
-                        .error(R.drawable.ic_category_generic) // Fallback
+                        .error(R.drawable.ic_category_generic)
                         .into(binding.ivCategoryIcon)
                 } else {
-                    // "otherwise, don’t display the image" - User req
-                    // But we likely need SOMETHING or logic simply hides it?
-                    // The XML has an ImageView. If we hide it, layout might break if not constrained properly.
-                    // The user said "If an image is available, then show it; otherwise, don’t display the image"
-                    // checking XML: iv_category_icon is constrained to top of parent. tv_category_name is below it.
-                    // If we set visibility GONE to icon, text moves to top.
-                    // I will set it to GONE if no image.
                     binding.ivCategoryIcon.visibility = View.GONE
                 }
                 
                 val isSelected = selectedCategories.contains(category.id)
                 binding.ivCheck.visibility = if (isSelected) View.VISIBLE else View.GONE
-                binding.cardCategory.strokeColor = if (isSelected) 
-                    binding.root.context.getColor(R.color.mint_gold) 
-                else 
-                    binding.root.context.getColor(R.color.accent_glass_border)
+                
+                val context = binding.root.context
+                if (isSelected) {
+                    binding.cardCategory.setCardBackgroundColor(context.getColor(R.color.mint_primary))
+                    binding.cardCategory.strokeColor = context.getColor(R.color.mint_primary)
+                    binding.tvCategoryName.setTextColor(context.getColor(R.color.text_inverse))
+                } else {
+                    binding.cardCategory.setCardBackgroundColor(context.getColor(R.color.mint_surface))
+                    binding.cardCategory.strokeColor = context.getColor(R.color.accent_glass_border)
+                    binding.tvCategoryName.setTextColor(context.getColor(R.color.text_headline))
+                }
+                
+                if (animate) {
+                    if (isSelected) {
+                        // Pop effect for Card
+                        binding.root.scaleX = 0.9f
+                        binding.root.scaleY = 0.9f
+                        binding.root.animate()
+                            .scaleX(1.0f).scaleY(1.0f)
+                            .setDuration(300)
+                            .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
+                            .start()
+                            
+                        // Pop effect for Check Icon
+                        binding.ivCheck.scaleX = 0f
+                        binding.ivCheck.scaleY = 0f
+                        binding.ivCheck.animate()
+                            .scaleX(1f).scaleY(1f)
+                            .setDuration(300)
+                            .setStartDelay(50) // Slight delay for satisfaction
+                            .setInterpolator(android.view.animation.OvershootInterpolator(2.0f))
+                            .start()
+                    } else {
+                         // Reset scale smoothly if needed
+                        binding.root.animate()
+                            .scaleX(1.0f).scaleY(1.0f)
+                            .setDuration(200)
+                            .start()
+                    }
+                }
                 
                 binding.root.setOnClickListener {
                     val newState = !selectedCategories.contains(category.id)
                     onItemClick(category, newState)
-                    notifyItemChanged(adapterPosition)
+                    notifyItemChanged(adapterPosition, "SELECTION_ANIM")
                 }
             }
         }
@@ -205,6 +282,14 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
                 false
             )
             return CategoryViewHolder(binding)
+        }
+        
+        override fun onBindViewHolder(holder: CategoryViewHolder, position: Int, payloads: MutableList<Any>) {
+            if (payloads.isNotEmpty() && payloads.contains("SELECTION_ANIM")) {
+                holder.bind(items[position], animate = true)
+            } else {
+                super.onBindViewHolder(holder, position, payloads)
+            }
         }
 
         override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {

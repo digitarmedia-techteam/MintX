@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+
+    <!-- Glass Background Container -->
+    <FrameLayout
+        android:id="@+id/nav_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_glass_bottom_nav"
+        android:paddingTop="4dp"
+        android:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Sliding Pill Indicator -->
+        <!-- Initial width/position will be set programmatically or via Constraints -->
+        <View
+            android:id="@+id/view_nav_indicator"
+            android:layout_width="75dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical|start"
+            android:background="@drawable/bg_nav_pill_glow"
+            android:translationX="0dp"
+            android:visibility="invisible" /> 
+            <!-- Visibility invisible initially, we will fade it in once measured -->
+
+        <LinearLayout
+            android:id="@+id/ll_menu_items"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/_10sdp"
+            android:weightSum="5">
+
+            <!-- Home Item -->
+            <FrameLayout
+                android:id="@+id/nav_item_home"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/icon_home"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/text_subtext" />
+                <TextView
+                    android:id="@+id/label_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:text="Home"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_subtext" />
+            </FrameLayout>
+
+            <!-- Quiz Item -->
+            <FrameLayout
+                android:id="@+id/nav_item_quiz"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/icon_quiz"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_help"
+                    app:tint="@color/text_subtext" />
+                <TextView
+                     android:id="@+id/label_quiz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:text="Quiz"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_subtext" />
+            </FrameLayout>
+
+            <!-- Predict Item -->
+            <FrameLayout
+                android:id="@+id/nav_item_predict"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/icon_predict"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/data_model"
+                    app:tint="@color/text_subtext" />
+                 <TextView
+                     android:id="@+id/label_predict"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:text="Predict"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_subtext" />
+            </FrameLayout>
+
+            <!-- Earn Item -->
+            <FrameLayout
+                android:id="@+id/nav_item_earn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/icon_earn"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/salary"
+                    app:tint="@color/text_subtext" />
+                 <TextView
+                     android:id="@+id/label_earn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:text="Earn"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_subtext" />
+            </FrameLayout>
+
+            <!-- Wallet Item -->
+            <FrameLayout
+                android:id="@+id/nav_item_wallet"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/icon_wallet"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_wallet"
+                    app:tint="@color/text_subtext" />
+                 <TextView
+                     android:id="@+id/label_wallet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:text="Wallet"
+                    android:textSize="10sp"
+                    android:textColor="@color/text_subtext" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

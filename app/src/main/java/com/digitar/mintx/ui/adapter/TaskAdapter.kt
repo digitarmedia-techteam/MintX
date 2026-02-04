@@ -31,13 +31,15 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallba
             binding.tvTaskStatus.text = task.status
             binding.ivTaskIcon.setImageResource(task.iconResId)
 
-            // Step 1 & 2 placeholder text (can be specialized per task if needed)
-            // For now, using the data from the model
-            
             // Set initial state without animation
             binding.clInstructionDetails.visibility = if (task.isExpanded) View.VISIBLE else View.GONE
             binding.ivInstructionArrow.rotation = if (task.isExpanded) 180f else 0f
 
+            // Card click listener triggers expansion
+            binding.root.setOnClickListener {
+                toggleExpansion(task)
+            }
+            
             binding.llInstructionHeader.setOnClickListener {
                 toggleExpansion(task)
             }
@@ -56,11 +58,14 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(TaskDiffCallba
                 TransitionManager.beginDelayedTransition(recyclerView, transition)
             }
 
-            // Update UI
+            // Update Visibility
             binding.clInstructionDetails.visibility = if (task.isExpanded) View.VISIBLE else View.GONE
+            
+            // Animate Arrow Rotation
             binding.ivInstructionArrow.animate()
                 .rotation(if (task.isExpanded) 180f else 0f)
                 .setDuration(300)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
         }
     }

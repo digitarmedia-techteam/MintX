@@ -100,6 +100,39 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun handleGoogleSignInResult(task: com.google.android.gms.tasks.Task<com.google.android.gms.auth.api.signin.GoogleSignInAccount>) {
+        try {
+            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+            if (account != null) {
+                firebaseAuthWithGoogle(account)
+            } else {
+                _loginState.value = LoginUiState.Error("Google Sign-In failed")
+            }
+        } catch (e: com.google.android.gms.common.api.ApiException) {
+            _loginState.value = LoginUiState.Error("Google Sign-In failed: ${e.message}")
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(acct: com.google.android.gms.auth.api.signin.GoogleSignInAccount) {
+        _loginState.value = LoginUiState.Loading
+        val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(acct.idToken, null)
+        
+        viewModelScope.launch {
+            repository.signInWithCredential(credential).collect { result ->
+                result.onSuccess { uid ->
+                    // For Google, we have extra info immediately
+                    val name = acct.displayName ?: "User"
+                    val email = acct.email ?: ""
+                    val photoUrl = acct.photoUrl?.toString() ?: ""
+                    
+                    checkUserAndNavigate(uid, name, email, photoUrl)
+                }.onFailure {
+                    _loginState.value = LoginUiState.Error(it.message ?: "Sign In Failed")
+                }
+            }
+        }
+    }
+
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         _loginState.value = LoginUiState.Loading
         viewModelScope.launch {
@@ -113,23 +146,55 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    private suspend fun checkUserAndNavigate(uid: String) {
-        val phone = currentPhoneNumber ?: return
+    private suspend fun checkUserAndNavigate(uid: String, googleName: String? = null, googleEmail: String? = null, googlePhoto: String? = null) {
+        val phone = currentPhoneNumber 
         val exists = repository.checkUserExists(uid) // Check by UID
         
-        sessionManager.createLoginSession(phone) // Basic session
+        if (phone != null) {
+             sessionManager.createLoginSession(phone) // Basic session
+        } else if (googleEmail != null) {
+             // Google Login Session
+             sessionManager.createGoogleSession(googleEmail, googlePhoto ?: "")
+        }
         
         if (exists) {
             val user = repository.getUser(uid) // Get by UID
             if (user != null) {
-                sessionManager.completeProfile(user.name, user.age)
+                // Determine if we need to update profile with Google info if it was missing?
+                // For now, just complete session.
+                val nameToUse = if (user.name.isNotEmpty()) user.name else googleName ?: "User"
+                val emailToUse = if (user.email.isNotEmpty()) user.email else googleEmail ?: ""
+                val photoToUse = if (user.photoUrl.isNotEmpty()) user.photoUrl else googlePhoto ?: ""
+                
+                sessionManager.completeProfile(nameToUse, user.age, emailToUse, photoToUse)
                 _loginState.value = LoginUiState.LoginSuccess
             } else {
-                // Should exist but data missing? Treat as profile incomplete
+                // User exists in auth but not db?
                  _loginState.value = LoginUiState.NavigateToProfile
             }
         } else {
-            _loginState.value = LoginUiState.NavigateToProfile
+            // New User
+            if (googleName != null) {
+                // If Google, we can auto-create the user!
+                val newUser = User(
+                    firebaseUid = uid,
+                    name = googleName,
+                    email = googleEmail ?: "",
+                    photoUrl = googlePhoto ?: "",
+                    createdAt = System.currentTimeMillis()
+                )
+                
+                // Save immediately
+                val saveResult = repository.createUser(newUser)
+                if (saveResult.isSuccess) {
+                    sessionManager.completeProfile(googleName, 0, googleEmail ?: "", googlePhoto ?: "")
+                    _loginState.value = LoginUiState.LoginSuccess
+                } else {
+                    _loginState.value = LoginUiState.Error("Failed to create profile")
+                }
+            } else {
+                _loginState.value = LoginUiState.NavigateToProfile
+            }
         }
     }
 
@@ -192,6 +257,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _isResendEnabled.value = true
             }
         }.start()
+    }
+
+    fun resetLoginState() {
+        _loginState.value = LoginUiState.Idle
     }
 
     override fun onCleared() {

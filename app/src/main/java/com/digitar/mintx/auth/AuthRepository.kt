@@ -43,7 +43,7 @@ class AuthRepository {
     }
 
     // Sign in with Credential
-    suspend fun signInWithCredential(credential: PhoneAuthCredential): Flow<Result<String>> = callbackFlow {
+    suspend fun signInWithCredential(credential: com.google.firebase.auth.AuthCredential): Flow<Result<String>> = callbackFlow {
         try {
             auth.signInWithCredential(credential)
                 .addOnCompleteListener { task ->

@@ -11,49 +11,54 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 
 object AdManager {
 
-    private var rewardedAd: RewardedAd? = null
+    private var rewardedInterstitialAd: RewardedInterstitialAd? = null
     private var interstitialAd: InterstitialAd? = null
 
     // Test Ad Unit IDs
-    private const val REWARDED_AD_ID = "ca-app-pub-3940256099942544/5224354917"
-    private const val BANNER_AD_ID = "ca-app-pub-3940256099942544/9214589741"
-    private const val INTERSTITIAL_AD_ID = "ca-app-pub-3940256099942544/1033173712"
+//    private const val REWARDED_INTERSTITIAL_AD_ID = ""
+//    private const val BANNER_AD_ID = ""
+//    private const val INTERSTITIAL_AD_ID = ""
+
+    private const val REWARDED_INTERSTITIAL_AD_ID = "ca-app-pub-7084079995330446/9316348004"
+    private const val BANNER_AD_ID = "ca-app-pub-7084079995330446/6665008207"
+    private const val INTERSTITIAL_AD_ID = "ca-app-pub-7084079995330446/4056282468"
 
     fun initialize(context: Context) {
         MobileAds.initialize(context) {}
     }
 
-    // --- Rewarded Ad ---
+    // --- Rewarded Interstitial Ad ---
 
     fun loadRewardedAd(context: Context) {
         val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(context, REWARDED_AD_ID, adRequest, object : RewardedAdLoadCallback() {
+        RewardedInterstitialAd.load(context, REWARDED_INTERSTITIAL_AD_ID, adRequest, object : RewardedInterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                rewardedAd = null
-                android.util.Log.e("AdManager", "Rewarded Ad failed to load: ${adError.message}")
+                rewardedInterstitialAd = null
+                android.util.Log.e("AdManager", "Rewarded Interstitial Ad failed to load: ${adError.message}")
             }
 
-            override fun onAdLoaded(ad: RewardedAd) {
-                rewardedAd = ad
-                android.util.Log.d("AdManager", "Rewarded Ad loaded")
+            override fun onAdLoaded(ad: RewardedInterstitialAd) {
+                rewardedInterstitialAd = ad
+                android.util.Log.d("AdManager", "Rewarded Interstitial Ad loaded")
             }
         })
     }
 
     fun showRewardedAd(activity: Activity, onRewardEarned: () -> Unit, onAdClosed: () -> Unit) {
-        if (rewardedAd != null) {
+        if (rewardedInterstitialAd != null) {
             var rewardEarned = false
             
-            rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            rewardedInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
-                    rewardedAd = null
+                    rewardedInterstitialAd = null
                     loadRewardedAd(activity) // Preload next
                     
                     // Call appropriate callback based on whether reward was earned
@@ -69,18 +74,18 @@ object AdManager {
                 }
             }
 
-            rewardedAd?.show(activity) { rewardItem ->
+            rewardedInterstitialAd?.show(activity) { rewardItem ->
                 // Mark that reward was earned, but don't call callback yet
                 rewardEarned = true
             }
         } else {
-            android.util.Log.d("AdManager", "Rewarded Ad not ready, reloading...")
+            android.util.Log.d("AdManager", "Rewarded Interstitial Ad not ready, reloading...")
             loadRewardedAd(activity)
             onAdClosed() // Or handle as error
         }
     }
     
-    fun isRewardedAdReady(): Boolean = rewardedAd != null
+    fun isRewardedAdReady(): Boolean = rewardedInterstitialAd != null
 
     // --- Interstitial Ad ---
 
