@@ -5,59 +5,86 @@
     android:layout_height="match_parent"
     android:background="@color/mint_background">
 
+    <!-- Fixed Header Section -->
+    <TextView
+        android:id="@+id/tv_greeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/dashboard_greeting"
+        android:textColor="@color/text_subtext"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_greeting_emoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="👋"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/tv_greeting"
+        app:layout_constraintBottom_toBottomOf="@id/tv_greeting"
+        app:layout_constraintTop_toTopOf="@id/tv_greeting" />
+    
+    <TextView
+        android:id="@+id/tv_dashboard_title"
+        style="@style/MintX.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/dashboard_title"
+        android:textSize="28sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_greeting" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/navHeaderAvatar"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:padding="12dp"
+        android:src="@drawable/user_gif"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+        app:strokeWidth="2dp" />
+
+    <!-- Initials overlay for when no profile image exists -->
+    <TextView
+        android:id="@+id/tv_avatar_initials"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:visibility="gone"
+        android:background="@drawable/bg_initials_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
-
-            <!-- Header Section -->
-            <TextView
-                android:id="@+id/tv_greeting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dashboard_greeting"
-                android:textColor="@color/text_subtext"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_greeting_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="👋"
-                android:textSize="16sp"
-                app:layout_constraintStart_toEndOf="@id/tv_greeting"
-                app:layout_constraintBottom_toBottomOf="@id/tv_greeting"
-                app:layout_constraintTop_toTopOf="@id/tv_greeting" />
-            
-            <TextView
-                android:id="@+id/tv_dashboard_title"
-                style="@style/MintX.Headline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dashboard_title"
-                android:textSize="28sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_greeting" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/navHeaderAvatar"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:padding="12dp"
-                android:src="@drawable/user_gif"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                app:strokeWidth="2dp" />
+            android:padding="20dp"
+            android:paddingTop="10dp">
 
             <!-- Wallet Card (Glassmorphism) -->
             <com.google.android.material.card.MaterialCardView
@@ -68,7 +95,7 @@
                 app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title"
+                app:layout_constraintTop_toTopOf="parent"
                 app:strokeWidth="0dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -328,6 +355,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:background="@drawable/btn_predict_bg"
+                android:foreground="@drawable/ripple_predict_button"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:paddingHorizontal="24dp"
                 android:orientation="horizontal"
@@ -347,6 +377,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/iv_cricket_ball"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginBottom="4dp"

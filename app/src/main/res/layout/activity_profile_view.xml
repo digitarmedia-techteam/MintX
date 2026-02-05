@@ -73,8 +73,20 @@
             android:id="@+id/ivAvatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/user_gif" />
-            <!-- Padding creates a white ring effect -->
+            android:src="@drawable/user_gif"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/tvAvatarInitials"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:visibility="gone"
+            android:background="@drawable/bg_initials_avatar" />
     </androidx.cardview.widget.CardView>
 
     <!-- User Name & Handle -->

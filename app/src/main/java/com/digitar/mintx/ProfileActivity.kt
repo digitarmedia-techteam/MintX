@@ -92,13 +92,39 @@ class ProfileActivity : AppCompatActivity() {
                         }
                         
                         // Photo Logic from DB
+                        // Photo Logic from DB
                         if (it.photoUrl.isNotEmpty()) {
                              Glide.with(this@ProfileActivity)
                                 .load(it.photoUrl)
                                 .circleCrop()
                                 .placeholder(R.drawable.user_gif)
                                 .error(R.drawable.user_gif)
+                                .listener(object : com.bumptech.glide.request.RequestListener<Drawable> {
+                                    override fun onLoadFailed(
+                                        e: com.bumptech.glide.load.engine.GlideException?,
+                                        model: Any?,
+                                        target: com.bumptech.glide.request.target.Target<Drawable>,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        showInitialsAvatar(it.name)
+                                        return false
+                                    }
+
+                                    override fun onResourceReady(
+                                        resource: Drawable,
+                                        model: Any,
+                                        target: com.bumptech.glide.request.target.Target<Drawable>?,
+                                        dataSource: com.bumptech.glide.load.DataSource,
+                                        isFirstResource: Boolean
+                                    ): Boolean {
+                                        binding.tvAvatarInitials.visibility = android.view.View.GONE
+                                        binding.ivAvatar.visibility = android.view.View.VISIBLE
+                                        return false
+                                    }
+                                })
                                 .into(binding.ivAvatar)
+                        } else {
+                            showInitialsAvatar(it.name)
                         }
 
                         binding.tvAge.text = "${it.age} Years"
@@ -216,6 +242,38 @@ class ProfileActivity : AppCompatActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
         finish()
+    }
+    
+    private fun showInitialsAvatar(userName: String?) {
+        if (userName.isNullOrEmpty()) {
+            binding.tvAvatarInitials.visibility = android.view.View.GONE
+            binding.ivAvatar.visibility = android.view.View.VISIBLE
+            return
+        }
+        
+        // Extract initials: first letter of first name + first letter of last name
+        val nameParts = userName.trim().split(" ")
+        val initials = when {
+            nameParts.size >= 2 -> {
+                // First name initial + Last name initial
+                "${nameParts.first().firstOrNull()?.uppercaseChar() ?: ""}${nameParts.last().firstOrNull()?.uppercaseChar() ?: ""}"
+            }
+            nameParts.size == 1 -> {
+                // Only one name - take first two letters or just first letter
+                val name = nameParts.first()
+                if (name.length >= 2) {
+                    "${name[0].uppercaseChar()}${name[1].uppercaseChar()}"
+                } else {
+                    "${name.firstOrNull()?.uppercaseChar() ?: ""}"
+                }
+            }
+            else -> "?"
+        }
+        
+        // Set initials text
+        binding.tvAvatarInitials.text = initials
+        binding.ivAvatar.visibility = android.view.View.GONE
+        binding.tvAvatarInitials.visibility = android.view.View.VISIBLE
     }
     
     private fun animateProgressBar(progressBar: android.widget.ProgressBar, targetProgress: Int, max: Int) {

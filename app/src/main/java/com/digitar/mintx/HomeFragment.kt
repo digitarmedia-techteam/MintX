@@ -60,6 +60,45 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
         
+        // Setup Profile Click for initials overlay
+        binding.tvAvatarInitials.setOnClickListener {
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Setup Predict & Win button with cricket ball animation
+        binding.btnPredictWin.setOnClickListener { view ->
+            // Spring bounce animation - stays in place, no elevation changes
+            view.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(100)
+                .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .withEndAction {
+                    // Bounce back with overshoot for spring effect
+                    view.animate()
+                        .scaleX(1.05f)
+                        .scaleY(1.05f)
+                        .setDuration(150)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .withEndAction {
+                            // Settle back to normal
+                            view.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(100)
+                                .setInterpolator(android.view.animation.LinearInterpolator())
+                                .start()
+                        }
+                        .start()
+                }
+                .start()
+            
+            // Trigger cricket ball animation and dialog
+            animateCricketBall()
+            showComingSoonDialog()
+        }
+        
         // Show basic user data
         val sessionManager = com.digitar.mintx.utils.SessionManager(requireContext())
         val name = sessionManager.getUserName()
@@ -71,12 +110,42 @@ class HomeFragment : Fragment() {
         // Avatar Logic
         val photoUrl = sessionManager.getUserPhoto()
         if (!photoUrl.isNullOrEmpty()) {
+            // Load profile image
             com.bumptech.glide.Glide.with(this)
                 .load(photoUrl)
                 .circleCrop()
                 .placeholder(R.drawable.user_gif)
                 .error(R.drawable.user_gif)
+                .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                    override fun onLoadFailed(
+                        e: com.bumptech.glide.load.engine.GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        // Show initials if image loading fails
+                        showInitialsAvatar(name)
+                        binding.navHeaderAvatar.visibility = android.view.View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: android.graphics.drawable.Drawable,
+                        model: Any,
+                        target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                        dataSource: com.bumptech.glide.load.DataSource,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        // Hide initials when image loads successfully
+                        binding.tvAvatarInitials.visibility = android.view.View.GONE
+                        binding.navHeaderAvatar.visibility = android.view.View.VISIBLE
+                        return false
+                    }
+                })
                 .into(binding.navHeaderAvatar)
+        } else {
+            // No photo URL - show initials
+            showInitialsAvatar(name)
         }
         // Load Live GIF
         try {
@@ -159,22 +228,132 @@ class HomeFragment : Fragment() {
     }
 
     private fun animateGreetingEmoji() {
-        // Pivot at bottom center gives a better "wave" feel
-        binding.tvGreetingEmoji.pivotX = binding.tvGreetingEmoji.width / 2f
-        binding.tvGreetingEmoji.pivotY = binding.tvGreetingEmoji.height.toFloat()
-
-        val scaleX = android.animation.PropertyValuesHolder.ofFloat(android.view.View.SCALE_X, 1.0f, 1.2f)
-        val scaleY = android.animation.PropertyValuesHolder.ofFloat(android.view.View.SCALE_Y, 1.0f, 1.2f)
+        // Pivot at bottom center (wrist position) for natural waving
+        binding.tvGreetingEmoji.post {
+            binding.tvGreetingEmoji.pivotX = binding.tvGreetingEmoji.width / 2f
+            binding.tvGreetingEmoji.pivotY = binding.tvGreetingEmoji.height.toFloat()
+            
+            // Create a natural waving animation
+            performWaveAnimation()
+        }
+    }
+    
+    private fun performWaveAnimation() {
+        // Natural hand wave: quick back-and-forth rotations, then pause
+        val waveSequence = android.animation.AnimatorSet()
         
-        // Let's keep it simple smooth shake
-        val simpleRotate = android.animation.PropertyValuesHolder.ofFloat(android.view.View.ROTATION, -15f, 15f)
+        // Wave cycle: 0° -> 20° -> -20° -> 20° -> -20° -> 20° -> 0°
+        // This creates 3 quick waves
+        val wave = android.animation.ObjectAnimator.ofFloat(
+            binding.tvGreetingEmoji,
+            "rotation",
+            0f, 20f, -20f, 20f, -20f, 20f, 0f
+        ).apply {
+            duration = 600 // Total wave duration: 600ms (quick waving)
+            interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+        }
+        
+        // Small scale pulse on first wave for emphasis (optional)
+        val scaleUpX = android.animation.ObjectAnimator.ofFloat(
+            binding.tvGreetingEmoji,
+            "scaleX",
+            1f, 1.1f
+        ).apply {
+            duration = 100
+            interpolator = android.view.animation.DecelerateInterpolator()
+        }
+        
+        val scaleDownX = android.animation.ObjectAnimator.ofFloat(
+            binding.tvGreetingEmoji,
+            "scaleX",
+            1.1f, 1f
+        ).apply {
+            duration = 100
+            interpolator = android.view.animation.AccelerateInterpolator()
+        }
+        
+        val scaleUpY = android.animation.ObjectAnimator.ofFloat(
+            binding.tvGreetingEmoji,
+            "scaleY",
+            1f, 1.1f
+        ).apply {
+            duration = 100
+            interpolator = android.view.animation.DecelerateInterpolator()
+        }
+        
+        val scaleDownY = android.animation.ObjectAnimator.ofFloat(
+            binding.tvGreetingEmoji,
+            "scaleY",
+            1.1f, 1f
+        ).apply {
+            duration = 100
+            interpolator = android.view.animation.AccelerateInterpolator()
+        }
+        
+        // Combine scale animations
+        val scaleUp = android.animation.AnimatorSet().apply {
+            playTogether(scaleUpX, scaleUpY)
+        }
+        
+        val scaleDown = android.animation.AnimatorSet().apply {
+            playTogether(scaleDownX, scaleDownY)
+        }
+        
+        // Play wave with subtle scale
+        waveSequence.apply {
+            playSequentially(scaleUp, scaleDown)
+            playTogether(wave)
+            
+            // Add a listener to repeat after pause
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    // Pause for 2 seconds, then wave again
+                    binding.tvGreetingEmoji.postDelayed({
+                        if (_binding != null) {
+                            performWaveAnimation()
+                        }
+                    }, 2000) // 2 second pause between wave cycles
+                }
+            })
+            
+            start()
+        }
+    }
 
-        val animator = android.animation.ObjectAnimator.ofPropertyValuesHolder(binding.tvGreetingEmoji, scaleX, scaleY, simpleRotate)
-        animator.duration = 1200
-        animator.repeatCount = android.animation.ObjectAnimator.INFINITE
-        animator.repeatMode = android.animation.ObjectAnimator.REVERSE
-        animator.interpolator = android.view.animation.AccelerateDecelerateInterpolator()
-        animator.start()
+
+    private fun showInitialsAvatar(userName: String?) {
+        if (userName.isNullOrEmpty()) {
+            // If no name, just hide the avatar image and show default
+            binding.navHeaderAvatar.visibility = android.view.View.GONE
+            binding.tvAvatarInitials.visibility = android.view.View.GONE
+            return
+        }
+        
+        // Extract initials: first letter of first name + first letter of last name
+        val nameParts = userName.trim().split(" ")
+        val initials = when {
+            nameParts.size >= 2 -> {
+                // First name initial + Last name initial
+                "${nameParts.first().firstOrNull()?.uppercaseChar() ?: ""}${nameParts.last().firstOrNull()?.uppercaseChar() ?: ""}"
+            }
+            nameParts.size == 1 -> {
+                // Only one name - take first two letters or just first letter
+                val name = nameParts.first()
+                if (name.length >= 2) {
+                    "${name[0].uppercaseChar()}${name[1].uppercaseChar()}"
+                } else {
+                    "${name.firstOrNull()?.uppercaseChar() ?: ""}"
+                }
+            }
+            else -> "?"
+        }
+        
+        // Set initials text
+        binding.tvAvatarInitials.text = initials
+        
+        // Hide the image avatar and show initials
+        binding.navHeaderAvatar.visibility = android.view.View.GONE
+        binding.tvAvatarInitials.visibility = android.view.View.VISIBLE
     }
 
     override fun onResume() {
@@ -368,6 +547,124 @@ class HomeFragment : Fragment() {
                 animateStreakDotsLoader()
             }
         }, (dotIds.size * 200 + 600).toLong()) // Restart after all dots finish
+    }
+
+
+    private fun animateCricketBall() {
+        val cricketBall = binding.root.findViewById<android.widget.ImageView>(R.id.iv_cricket_ball)
+        cricketBall?.let { ball ->
+            // Create a realistic cricket ball bounce animation with spin
+            
+            // First bounce
+            val bounce1 = android.animation.ObjectAnimator.ofFloat(ball, "translationY", 0f, -120f, 0f).apply {
+                duration = 400
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            }
+            
+            // Second bounce (smaller)
+            val bounce2 = android.animation.ObjectAnimator.ofFloat(ball, "translationY", 0f, -80f, 0f).apply {
+                duration = 350
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            }
+            
+            // Third bounce (smallest)
+            val bounce3 = android.animation.ObjectAnimator.ofFloat(ball, "translationY", 0f, -40f, 0f).apply {
+                duration = 300
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            }
+            
+            // Continuous rotation for spinning effect
+            val spin = android.animation.ObjectAnimator.ofFloat(ball, "rotation", 0f, 1080f).apply {
+                duration = 1050 // Total duration of all bounces
+                interpolator = android.view.animation.LinearInterpolator()
+            }
+            
+            // Scale effect for depth perception
+            val scaleX = android.animation.ObjectAnimator.ofFloat(ball, "scaleX", 1f, 1.4f, 1f, 1.3f, 1f, 1.2f, 1f).apply {
+                duration = 1050
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            }
+            
+            val scaleY = android.animation.ObjectAnimator.ofFloat(ball, "scaleY", 1f, 1.4f, 1f, 1.3f, 1f, 1.2f, 1f).apply {
+                duration = 1050
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+            }
+            
+            // Sequence the bounces
+            val bounceSequence = android.animation.AnimatorSet().apply {
+                playSequentially(bounce1, bounce2, bounce3)
+            }
+            
+            // Play all animations together
+            android.animation.AnimatorSet().apply {
+                playTogether(bounceSequence, spin, scaleX, scaleY)
+                start()
+            }
+        }
+    }
+    
+    private fun showComingSoonDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_coming_soon, null)
+        
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+        
+        // Make dialog background transparent
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        
+        // Animate the cricket ball icon in the dialog
+        val dialogBall = dialogView.findViewById<android.widget.ImageView>(R.id.iv_cricket_ball_dialog)
+        dialogBall?.let { ball ->
+            // Cute continuous rotation
+            ball.animate()
+                .rotation(360f)
+                .setDuration(2000)
+                .setInterpolator(android.view.animation.LinearInterpolator())
+                .withEndAction {
+                    // Loop the rotation
+                    ball.rotation = 0f
+                    ball.animate()
+                        .rotation(360f)
+                        .setDuration(2000)
+                        .setInterpolator(android.view.animation.LinearInterpolator())
+                        .start()
+                }
+                .start()
+            
+            // Add a subtle scale pulse
+            ball.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(800)
+                .setInterpolator(android.view.animation.AccelerateDecelerateInterpolator())
+                .withEndAction {
+                    ball.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(800)
+                        .setInterpolator(android.view.animation.AccelerateDecelerateInterpolator())
+                        .start()
+                }
+                .start()
+        }
+        
+        // Setup OK button
+        val btnOk = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_ok)
+        btnOk?.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+        
+        // Animate dialog entrance
+        dialogView.startAnimation(
+            android.view.animation.AnimationUtils.loadAnimation(
+                requireContext(),
+                R.anim.coming_soon_enter
+            )
+        )
     }
 
     override fun onDestroyView() {
