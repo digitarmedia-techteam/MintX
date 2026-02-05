@@ -73,17 +73,17 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/tvPhoneNumber">
 
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp1" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp1" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp2" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp2" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp3" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp3" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp4" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp4" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp5" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp5" style="@style/OtpBoxStyleRef" />
         <Space android:layout_width="8dp" android:layout_height="wrap_content" />
-        <com.digitar.mintx.utils.OtpEditText android:id="@+id/otp6" style="@style/OtpBoxStyleRef" />
+        <com.appslabs.mintx.utils.OtpEditText android:id="@+id/otp6" style="@style/OtpBoxStyleRef" />
     </LinearLayout>
 
     <!-- Resend Text -->
@@ -152,3 +152,4 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

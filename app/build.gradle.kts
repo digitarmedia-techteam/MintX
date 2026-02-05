@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.digitar.mintx"
+    namespace = "com.appslabs.mintx"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.digitar.mintx"
+        applicationId = "com.appslabs.mintx"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -74,4 +74,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("com.google.android.gms:play-services-ads:23.0.0")
+    
+    // In-App Updates
+    implementation(libs.play.app.update)
+    implementation(libs.play.app.update.ktx)
 }

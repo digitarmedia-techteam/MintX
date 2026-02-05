@@ -19,3 +19,4 @@
         android:pivotY="50%"
         android:interpolator="@android:anim/accelerate_interpolator" />
 </set>
+

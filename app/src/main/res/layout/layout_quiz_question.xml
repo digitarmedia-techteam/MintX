@@ -7,7 +7,7 @@
     android:layout_marginVertical="@dimen/_8sdp">
 
     <!-- The Progress Border (sits behind) -->
-    <com.digitar.mintx.ui.widget.BorderProgressView
+    <com.appslabs.mintx.ui.widget.BorderProgressView
         android:id="@+id/view_timer_border"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -132,3 +132,4 @@
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

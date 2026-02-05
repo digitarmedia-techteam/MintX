@@ -40,3 +40,4 @@
         layout="@layout/layout_quiz_summary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

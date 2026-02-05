@@ -10,3 +10,4 @@
         android:toAlpha="0.8"
         android:duration="500" />
 </set>
+

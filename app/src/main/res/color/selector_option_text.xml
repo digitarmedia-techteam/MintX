@@ -4,3 +4,4 @@
     <item android:color="@color/accent_red" android:state_selected="true"/>
     <item android:color="@color/text_headline"/> <!-- Default Black/Dark -->
 </selector>
+

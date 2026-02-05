@@ -6,7 +6,7 @@
     android:paddingTop="16dp"
     android:paddingBottom="8dp">
 
-    <com.digitar.mintx.ui.widget.AnalogTimerView
+    <com.appslabs.mintx.ui.widget.AnalogTimerView
         android:id="@+id/view_analog_timer"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -17,3 +17,4 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.digitar.mintx" />
-                  <option name="mobileSdkAppId" value="1:150365317778:android:3de1b2a2c3d2a1471a944b" />
-                  <option name="projectId" value="mintx-a0bf2" />
-                  <option name="projectNumber" value="150365317778" />
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

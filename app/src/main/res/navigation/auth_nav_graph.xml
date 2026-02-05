@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.digitar.mintx.auth.LoginFragment"
+        android:name="com.appslabs.mintx.auth.LoginFragment"
         android:label="LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/otpFragment"
-        android:name="com.digitar.mintx.auth.OtpFragment"
+        android:name="com.appslabs.mintx.auth.OtpFragment"
         android:label="OtpFragment"
         tools:layout="@layout/fragment_otp">
         <argument
@@ -38,7 +38,8 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.digitar.mintx.auth.ProfileFragment"
+        android:name="com.appslabs.mintx.auth.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile" />
 </navigation>
+

@@ -129,7 +129,7 @@
         app:strokeColor="@color/accent_glass_border"
         app:strokeWidth="@dimen/_1sdp">
 
-        <com.digitar.mintx.ui.widget.AnalogTimerView
+        <com.appslabs.mintx.ui.widget.AnalogTimerView
             android:id="@+id/view_floating_timer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -138,3 +138,4 @@
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

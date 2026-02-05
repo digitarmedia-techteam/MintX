@@ -1,160 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_summary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/mint_background"
-    android:elevation="@dimen/_10sdp"
-    android:padding="@dimen/_24sdp"
+    android:fillViewport="true"
     android:visibility="gone">
 
-    <TextView
-        android:id="@+id/tv_summary_title"
-        style="@style/MintX.Headline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_16sdp"
-        android:text="Quiz Complete!"
-        android:textSize="@dimen/_24ssp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_summary_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_summary_title">
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/pb_summary_ring"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:progress="0"
-            app:indicatorSize="@dimen/_100sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:trackColor="@color/accent_glass_border"
-            app:trackCornerRadius="@dimen/_8sdp"
-            app:trackThickness="@dimen/_10sdp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tv_summary_accuracy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0%"
-                android:textColor="@color/text_headline"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Accuracy"
-                android:textColor="@color/text_subtext"
-                android:textSize="@dimen/_10ssp" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Level Progress Bar -->
-    <LinearLayout
-        android:id="@+id/layout_level_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cl_summary_progress">
+        android:padding="@dimen/_20sdp"
+        android:paddingBottom="@dimen/_80sdp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tv_summary_title"
+            style="@style/MintX.Headline"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="@dimen/_24sdp"
+            android:text="🎉 Quiz Complete!"
+            android:textSize="@dimen/_26ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_level_current"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Level 1"
-                android:textColor="@color/text_headline"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+        <!-- Accuracy Ring -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_summary_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_24sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_summary_title">
 
-            <TextView
-                android:id="@+id/tv_level_points"
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/pb_summary_ring"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 / 30 XP"
-                android:textColor="@color/text_subtext"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:progress="0"
+                app:indicatorSize="@dimen/_120sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:trackColor="@color/accent_glass_border"
+                app:trackCornerRadius="@dimen/_8sdp"
+                app:trackThickness="@dimen/_12sdp" />
 
-        <ProgressBar
-            android:id="@+id/pb_level_progress"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:progressDrawable="@drawable/progress_level"
-            android:progress="0" />
-        
-            <TextView
-                android:id="@+id/tv_level_next_info"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Keep playing to level up!"
-                android:textColor="@color/mint_primary"
-                android:textSize="12sp" 
-                android:gravity="end"
-                android:layout_marginTop="4dp"/>
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_summary_accuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textColor="@color/text_headline"
+                    android:textSize="@dimen/_28ssp"
+                    android:textStyle="bold" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_summary_stats"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/mint_surface"
-        app:cardCornerRadius="@dimen/_24sdp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toTopOf="@id/ll_actions"
-        app:layout_constraintTop_toBottomOf="@id/layout_level_info"
-        app:strokeColor="@color/accent_glass_border"
-        app:strokeWidth="@dimen/_1sdp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Accuracy"
+                    android:textColor="@color/text_subtext"
+                    android:textSize="@dimen/_12ssp" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ScrollView
+        <!-- Stats Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_summary_stats"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_24sdp"
+            app:cardBackgroundColor="@color/mint_surface"
+            app:cardCornerRadius="@dimen/_20sdp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/cl_summary_progress"
+            app:strokeColor="@color/accent_glass_border"
+            app:strokeWidth="@dimen/_1sdp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/_16sdp">
 
                 <include
                     android:id="@+id/row_total"
                     layout="@layout/item_summary_row" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:background="@color/accent_glass_border" />
 
                 <include
                     android:id="@+id/row_correct"
@@ -164,6 +116,12 @@
                     android:id="@+id/row_correct_points"
                     layout="@layout/item_summary_row" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:background="@color/accent_glass_border" />
+
                 <include
                     android:id="@+id/row_wrong"
                     layout="@layout/item_summary_row" />
@@ -172,15 +130,22 @@
                     android:id="@+id/row_negative_points"
                     layout="@layout/item_summary_row" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:background="@color/accent_glass_border" />
+
                 <include
                     android:id="@+id/row_skipped"
                     layout="@layout/item_summary_row" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="8dp"
-                    android:background="@color/accent_glass_border" />
+                    android:layout_height="@dimen/_2sdp"
+                    android:layout_marginTop="@dimen/_12sdp"
+                    android:layout_marginBottom="@dimen/_8sdp"
+                    android:background="@color/mint_gold" />
 
                 <TextView
                     android:id="@+id/tv_total_points"
@@ -189,57 +154,132 @@
                     android:text="Total Points: 0"
                     android:textAlignment="center"
                     android:textColor="@color/mint_gold"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/_20ssp"
                     android:textStyle="bold" />
             </LinearLayout>
-        </ScrollView>
-    </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
 
-    <LinearLayout
-        android:id="@+id/ll_actions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="50dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_watch_ad"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_56sdp"
-            android:layout_marginBottom="@dimen/_12sdp"
-            android:text="Watch Ad &amp; Get 2X Points"
-            android:textColor="@color/mint_gold"
-            app:strokeColor="@color/mint_gold"
-            app:strokeWidth="@dimen/_1sdp" />
-
-        <LinearLayout
+        <!-- Level Progress -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layout_level_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginTop="@dimen/_16sdp"
+            app:cardBackgroundColor="@color/mint_surface"
+            app:cardCornerRadius="@dimen/_20sdp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/card_summary_stats"
+            app:strokeColor="@color/accent_glass_border"
+            app:strokeWidth="@dimen/_1sdp">
 
-            <Button
-                android:id="@+id/btn_play_again"
-                style="@style/MintX.Button"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/mint_surface"
-                android:text="Play Again"
-                android:textColor="@color/text_headline"
-                app:strokeColor="@color/accent_glass_border"
-                app:strokeWidth="1dp" />
+                android:orientation="vertical"
+                android:padding="@dimen/_16sdp">
 
-            <Button
-                android:id="@+id/btn_finish"
-                style="@style/MintX.Button"
-                android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_8sdp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_level_current"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Level 1"
+                        android:textColor="@color/text_headline"
+                        android:textSize="@dimen/_16ssp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_level_points"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 / 30 XP"
+                        android:textColor="@color/text_subtext"
+                        android:textSize="@dimen/_14ssp" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pb_level_progress"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_10sdp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/progress_level" />
+
+                <TextView
+                    android:id="@+id/tv_level_next_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:gravity="end"
+                    android:text="Keep playing to level up!"
+                    android:textColor="@color/mint_primary"
+                    android:textSize="@dimen/_11ssp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:id="@+id/ll_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layout_level_info">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_watch_ad"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_56sdp"
+                android:layout_marginBottom="@dimen/_12sdp"
+                android:text="📺 Watch Ad &amp; Get 2X Points"
+                android:textColor="@color/mint_gold"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:cornerRadius="@dimen/_16sdp"
+                app:strokeColor="@color/mint_gold"
+                app:strokeWidth="@dimen/_2sdp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Finish" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_play_again"
+                    style="@style/MintX.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_56sdp"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/mint_surface"
+                    android:text="🔄 Play Again"
+                    android:textColor="@color/text_headline"
+                    android:textSize="@dimen/_14ssp"
+                    app:cornerRadius="@dimen/_16sdp"
+                    app:strokeColor="@color/accent_glass_border"
+                    app:strokeWidth="@dimen/_1sdp" />
+
+                <Button
+                    android:id="@+id/btn_finish"
+                    style="@style/MintX.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_56sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:layout_weight="1"
+                    android:text="✓ Finish"
+                    android:textSize="@dimen/_14ssp"
+                    app:cornerRadius="@dimen/_16sdp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+

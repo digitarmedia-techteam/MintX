@@ -247,7 +247,7 @@
                     android:gravity="center_horizontal">
                     
                     <!-- Circular Graph -->
-                    <com.digitar.mintx.ui.widget.SolvedStatsView
+                    <com.appslabs.mintx.ui.widget.SolvedStatsView
                         android:id="@+id/viewSolvedStats"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
@@ -382,7 +382,7 @@
                     android:scrollbars="none"
                     android:padding="16dp">
 
-                    <com.digitar.mintx.ui.widget.ContributionGraphView
+                    <com.appslabs.mintx.ui.widget.ContributionGraphView
                         android:id="@+id/viewContributionGraph"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -604,3 +604,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -339,6 +339,84 @@
                 </div>
             </div>
 
+            <!-- Rewards/Redemptions View (Hidden) -->
+            <div id="view-rewards" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Rewards & Redemptions</h1>
+                    <button class="btn-primary" id="btn-add-reward"><i class="fa-solid fa-plus"></i> Add Reward</button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Left: Rewards Management -->
+                    <div class="content-card large">
+                        <div class="card-header">
+                            <h3>Available Rewards</h3>
+                            <span class="stat-  change positive" id="rewards-count">Loading...</span>
+                        </div>
+                        <div id="rewards-list" style="min-height: 200px;">
+                            <!-- Populated by JS -->
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                                <p style="margin-top: 1rem;">Loading rewards...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Redemption Requests -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3>Redemption Requests</h3>
+                            <select id="filter-redemption-status"
+                                style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main);">
+                                <option value="pending">Pending Only</option>
+                                <option value="all">All Requests</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div id="redemptions-list" style="max-height: 600px; overflow-y: auto;">
+                            <!-- Populated by JS -->
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                                <p style="margin-top: 1rem;">Loading redemption requests...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions View (Hidden) -->
+            <div id="view-transactions" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Transaction Management</h1>
+                </div>
+                <div class="content-card full">
+                    <div class="card-header">
+                        <h3>Recent Transactions</h3>
+                    </div>
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-wallet" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p style="margin-top: 1rem;">Transaction management coming soon...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View (Hidden) -->
+            <div id="view-settings" class="view-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="content-card full">
+                    <div class="card-header">
+                        <h3>Application Settings</h3>
+                    </div>
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-gear" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p style="margin-top: 1rem;">Settings panel coming soon...</p>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -719,10 +797,127 @@
             </div>
         </div>
     </div>
+
+    <!-- Add/Edit Reward Modal -->
+    <div id="modal-add-reward" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-modal">&times;</span>
+            <h2 id="reward-modal-title">Add New Reward</h2>
+            <form id="form-add-reward">
+                <input type="hidden" id="reward-id">
+
+                <div class="form-group">
+                    <label>Reward Name</label>
+                    <input type="text" id="reward-name" required placeholder="e.g. Amazon Gift Card">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <input type="text" id="reward-brand" required placeholder="e.g. Amazon">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (Mints)</label>
+                        <input type="number" id="reward-price" required placeholder="5000" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Logo URL</label>
+                        <input type="url" id="reward-logo-url" required placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Brand Color (Hex)</label>
+                        <input type="text" id="reward-color" required placeholder="#FF9900" pattern="^#[0-9A-Fa-f]{6}$">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Redemption Steps</label>
+                    <textarea id="reward-redemption-steps" rows="3"
+                        placeholder="1. Click Redeem&#10;2. Confirm your choice&#10;3. Copy the code"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Instructions</label>
+                    <textarea id="reward-instructions" rows="2"
+                        placeholder="Use this code at the checkout page..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Verification Timeline</label>
+                    <input type="text" id="reward-timeline" placeholder="Instant / 24 Hours / Manual Review">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="reward-is-active" checked>
+                        <span>Active (visible to users)</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Save Reward</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Process Redemption Modal -->
+    <div id="modal-process-redemption" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal">&times;</span>
+            <h2>Process Redemption Request</h2>
+
+            <div id="redemption-details"
+                style="background: var(--bg-card); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <!-- Populated by JS -->
+            </div>
+
+            <form id="form-process-redemption">
+                <input type="hidden" id="process-redemption-id">
+                <input type="hidden" id="process-user-id">
+                <input type="hidden" id="process-reward-price">
+
+                <div class="form-group">
+                    <label>Action</label>
+                    <select id="redemption-action" required onchange="toggleRedemptionFields()">
+                        <option value="">-- Select Action --</option>
+                        <option value="approve">✓ Approve Request</option>
+                        <option value="reject">✗ Reject Request</option>
+                    </select>
+                </div>
+
+                <div id="approval-fields" style="display: none;">
+                    <div class="form-group">
+                        <label>Redemption Code <span style="color: var(--red);">*</span></label>
+                        <input type="text" id="redemption-code" placeholder="Enter gift card code or UPI reference">
+                        <small style="color: var(--text-muted);">This will be sent to the user</small>
+                    </div>
+                </div>
+
+                <div id="rejection-fields" style="display: none;">
+                    <div class="form-group">
+                        <label>Reason for Rejection <span style="color: var(--red);">*</span></label>
+                        <textarea id="rejection-reason" rows="3"
+                            placeholder="Explain why this request was rejected..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Admin Notes (Optional)</label>
+                    <textarea id="admin-notes" rows="2" placeholder="Internal notes..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Process Request</button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/rewards.js"></script>
 </body>
 
 </html>

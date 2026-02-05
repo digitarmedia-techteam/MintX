@@ -4,3 +4,4 @@
     <solid android:color="@color/mint_surface_light"/>
     <size android:width="32dp" android:height="32dp"/>
 </shape>
+
