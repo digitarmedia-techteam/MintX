@@ -121,6 +121,20 @@ class AuthRepository {
         }
     }
     
+    // Firestore: Update User Profile (Name & Age) safely
+    suspend fun updateUserProfile(uid: String, name: String, age: Int): Result<Boolean> {
+        return try {
+            val updates = mapOf(
+                "name" to name,
+                "age" to age
+            )
+            firestore.collection("users").document(uid).update(updates).await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun getCurrentUser() = auth.currentUser
     
     fun signOut() {

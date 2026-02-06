@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "150365317778-h0pmcs6inctrfnjngau2blenejkkgee8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.appslabs.mintx",
+            "certificate_hash": "8d069ab603d5cbd4ea84590c19f3b563302ad9b0"
+          }
+        },
+        {
           "client_id": "150365317778-g2du8au7kf79i5kcus2lv6csikm256qj.apps.googleusercontent.com",
           "client_type": 3
         }

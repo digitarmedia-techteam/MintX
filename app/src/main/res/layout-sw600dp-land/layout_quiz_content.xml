@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_quiz_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
+    <!-- Header (Fixed at top) -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_quiz_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 3-Column Body: 25% | 50% | 25% -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="100dp"
+        android:baselineAligned="false"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/footer_spacer">
+
+        <!-- Left Column: Question Info (25%) -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            
+             <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                     android:paddingBottom="24dp">
+                     
+                    <include
+                        android:id="@+id/question"
+                        layout="@layout/layout_quiz_question"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
+
+        <!-- Center Column: Options (50%) -->
+        <FrameLayout
+             android:layout_width="0dp"
+             android:layout_height="match_parent"
+             android:layout_weight="2"
+             android:paddingHorizontal="16dp">
+
+             <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"  
+                    android:paddingBottom="24dp">
+                    
+                    <include
+                        android:id="@+id/options"
+                        layout="@layout/layout_quiz_options"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                 </LinearLayout>
+             </ScrollView>
+        </FrameLayout>
+
+        <!-- Right Column: Controls Placeholder (25%) -->
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/footer_spacer"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

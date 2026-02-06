@@ -37,6 +37,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     // Store temporarily
     var currentPhoneNumber: String? = null
 
+    private val _currentUser = MutableLiveData<User?>()
+    val currentUser: LiveData<User?> = _currentUser
+
     // Firebase Phone Auth Callbacks
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
@@ -145,7 +148,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    
+
+
     private suspend fun checkUserAndNavigate(uid: String, googleName: String? = null, googleEmail: String? = null, googlePhoto: String? = null) {
         val phone = currentPhoneNumber 
         val exists = repository.checkUserExists(uid) // Check by UID
@@ -160,8 +164,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         if (exists) {
             val user = repository.getUser(uid) // Get by UID
             if (user != null) {
-                // Determine if we need to update profile with Google info if it was missing?
-                // For now, just complete session.
+                // Allow login regardless of age - will be handled in MainActivity
                 val nameToUse = if (user.name.isNotEmpty()) user.name else googleName ?: "User"
                 val emailToUse = if (user.email.isNotEmpty()) user.email else googleEmail ?: ""
                 val photoToUse = if (user.photoUrl.isNotEmpty()) user.photoUrl else googlePhoto ?: ""
@@ -170,69 +173,108 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _loginState.value = LoginUiState.LoginSuccess
             } else {
                 // User exists in auth but not db?
-                 _loginState.value = LoginUiState.NavigateToProfile
+                 _loginState.value = LoginUiState.NavigateToProfile(isUpdate = false)
             }
         } else {
             // New User
             if (googleName != null) {
-                // If Google, we can auto-create the user!
-                val newUser = User(
-                    firebaseUid = uid,
-                    name = googleName,
-                    email = googleEmail ?: "",
-                    photoUrl = googlePhoto ?: "",
-                    createdAt = System.currentTimeMillis()
-                )
+                // If Google, we can auto-create the user with all required fields!
+                // But wait! We need to enforce Age for new users too.
+                // Since we don't have age yet, we MUST force them to Profile screen.
                 
-                // Save immediately
-                val saveResult = repository.createUser(newUser)
-                if (saveResult.isSuccess) {
-                    sessionManager.completeProfile(googleName, 0, googleEmail ?: "", googlePhoto ?: "")
-                    _loginState.value = LoginUiState.LoginSuccess
-                } else {
-                    _loginState.value = LoginUiState.Error("Failed to create profile")
-                }
+                // We'll create a temp user object or just navigate.
+                // If we auto-create with 0, checkUserAndNavigate logic above would catch it next time,
+                // BUT better to just send them to Profile screen first to enter age.
+                
+                // However, the request says "users who have not entered their age... update their age".
+                // For new Google users, we can prompt them immediately.
+                
+                // Strategy: Don't auto-create with 0 anymore. Send to Profile.
+                // Pre-fill name from Google.
+                 _currentUser.value = User(firebaseUid = uid, name = googleName, email = googleEmail ?: "", photoUrl = googlePhoto ?: "")
+                 _loginState.value = LoginUiState.NavigateToProfile(isUpdate = false)
+                 
+                 // Previously we auto-created. Now we stop that to enforce age.
+                 /*
+                val newUser = User(...)
+                ...
+                */
             } else {
-                _loginState.value = LoginUiState.NavigateToProfile
+                _loginState.value = LoginUiState.NavigateToProfile(isUpdate = false)
             }
         }
     }
 
-    // 4. Create Profile
+    // 4. Create or Update Profile
     fun createProfile(name: String, age: String) {
         val ageInt = age.toIntOrNull()
         val phone = currentPhoneNumber ?: sessionManager.getUserMobile()
+        val uid = repository.getCurrentUser()?.uid
         
-        if (name.isBlank() || ageInt == null || phone == null) {
+        if (name.isBlank() || ageInt == null) {
             _loginState.value = LoginUiState.Error("Please fill all fields")
+            return
+        }
+
+        if (ageInt < 13 || ageInt > 80) {
+            _loginState.value = LoginUiState.Error("Age must be between 13 and 80 years")
+            return
+        }
+        
+        if (uid == null) {
+            _loginState.value = LoginUiState.Error("User not authenticated")
             return
         }
         
         _loginState.value = LoginUiState.Loading
-        val user = User(
-            firebaseUid = repository.getCurrentUser()?.uid ?: "",
-            phone = phone,
-            name = name,
-            age = ageInt,
-            countryCode = "", // Can parse from phone if key
-            createdAt = System.currentTimeMillis()
-        )
 
         viewModelScope.launch {
-            Log.d("CreateUser", "Request started for user: $user")
+            // Check if we are updating existing or creating new
+            // We can infer from _currentUser or check DB again. checking DB is safer.
+            val exists = repository.checkUserExists(uid)
+            
+            if (exists) {
+                // Update
+                val result = repository.updateUserProfile(uid, name, ageInt)
+                result.onSuccess {
+                     // Refresh session
+                     val user = repository.getUser(uid)
+                     if (user != null) {
+                         sessionManager.completeProfile(user.name, user.age, user.email, user.photoUrl)
+                         _loginState.value = LoginUiState.LoginSuccess
+                     } else {
+                         _loginState.value = LoginUiState.LoginSuccess // Fallback
+                     }
+                }.onFailure {
+                    _loginState.value = LoginUiState.Error("Failed to update profile: ${it.message}")
+                }
+            } else {
+                // Create New
+                // Logic to handle Google extras if we have them in _currentUser
+                val preFilled = _currentUser.value
+                val user = User(
+                    firebaseUid = uid,
+                    phone = phone ?: "",
+                    name = name,
+                    age = ageInt,
+                    email = preFilled?.email ?: "",
+                    photoUrl = preFilled?.photoUrl ?: "",
+                    mintBalance = 100, // Welcome Bonus
+                    createdAt = System.currentTimeMillis(),
+                    activityDates = listOf(System.currentTimeMillis())
+                )
 
-            val result = repository.createUser(user)
+                Log.d("CreateUser", "Creating user: $user")
+                val result = repository.createUser(user)
 
-            result.onSuccess {
-                Log.d("CreateUser", "User saved successfully in Firebase")
-
-                sessionManager.completeProfile(name, ageInt)
-                _loginState.value = LoginUiState.LoginSuccess
-            }.onFailure { error ->
-                Log.e("CreateUser", "Failed to save user", error)
-
-                _loginState.value =
-                    LoginUiState.Error("Failed to save profile: ${error.message}")
+                result.onSuccess {
+                    Log.d("CreateUser", "User saved successfully")
+                    sessionManager.completeProfile(name, ageInt, user.email, user.photoUrl)
+                    _loginState.value = LoginUiState.LoginSuccess
+                }.onFailure { error ->
+                    Log.e("CreateUser", "Failed to save user", error)
+                    _loginState.value = LoginUiState.Error("Failed to save profile: ${error.message}")
+                }
             }
         }
 
@@ -274,7 +316,7 @@ sealed class LoginUiState {
     object Loading : LoginUiState()
     object OtpSent : LoginUiState()
     object LoginSuccess : LoginUiState()
-    object NavigateToProfile : LoginUiState()
+    data class NavigateToProfile(val isUpdate: Boolean = false) : LoginUiState()
     data class Error(val message: String) : LoginUiState()
 }
 

@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.appslabs.mintx.databinding.FragmentOffersBinding
+import com.appslabs.mintx.utils.NativeAdHelper
 
 class OffersFragment : Fragment() {
     private var _binding: FragmentOffersBinding? = null
     private val binding get() = _binding!!
+    
+    private var nativeAdHelper: NativeAdHelper? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,6 +27,7 @@ class OffersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        loadNativeAd()
 
         binding.tabLayout.addOnTabSelectedListener(object :
             com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
@@ -34,6 +38,23 @@ class OffersFragment : Fragment() {
             override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
             override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
         })
+    }
+    
+    private fun loadNativeAd() {
+        nativeAdHelper = NativeAdHelper(requireContext())
+        nativeAdHelper?.loadAd(
+            onAdLoaded = { nativeAd ->
+                // Check if view still exists (fragment not destroyed)
+                if (_binding != null) {
+                    // Pass the ad to the adapter to display after every 2 cards
+                    val adapter = binding.rvTasks.adapter as? com.appslabs.mintx.ui.adapter.TaskAdapter
+                    adapter?.setNativeAd(nativeAd)
+                }
+            },
+            onAdFailed = { error ->
+                android.util.Log.e("OffersFragment", "Native ad failed to load: ${error.message}")
+            }
+        )
     }
 
     private fun setupRecyclerView() {
@@ -148,6 +169,8 @@ class OffersFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        nativeAdHelper?.destroy()
+        nativeAdHelper = null
         _binding = null
     }
 }

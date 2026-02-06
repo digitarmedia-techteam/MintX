@@ -133,7 +133,8 @@ class OnboardingBottomSheetFragment : BottomSheetDialogFragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid != null) {
             val userRef = FirebaseFirestore.getInstance().collection("users").document(uid)
-            userRef.update("categories", selectedCategories.toList())
+            val data = mapOf("categories" to selectedCategories.toList())
+            userRef.set(data, com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener {
                     sessionManager.setCategoriesSelected(true)
                     Toast.makeText(context, "Preferences saved!", Toast.LENGTH_SHORT).show()

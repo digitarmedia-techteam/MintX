@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import android.widget.Toast
@@ -48,6 +49,7 @@ class QuizActivity : AppCompatActivity() {
     private var isTogglingHint = false
     private var hintTapCount = 0
     private var hasShownHintInstruction = false
+    private var lastClickedView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -210,6 +212,31 @@ class QuizActivity : AppCompatActivity() {
                 onAdClosed = { isShowingAd = false }
             )
         }
+
+        binding.clSummary.btnWatchAd.setOnClickListener {
+            binding.clSummary.btnWatchAd.isEnabled = false
+            com.appslabs.mintx.utils.AdManager.showRewardedAd(this,
+                onRewardEarned = {
+                    binding.root.post {
+                        viewModel.applyAdReward { newTotal ->
+                            binding.clSummary.tvTotalPoints.text = "Total Points: $newTotal"
+                            
+                             if (newTotal > 0) {
+                                  binding.clSummary.tvTotalPoints.setTextColor(ContextCompat.getColor(this, R.color.mint_gold))
+                             } else {
+                                  binding.clSummary.tvTotalPoints.setTextColor(ContextCompat.getColor(this, R.color.text_headline))
+                             }
+
+                            binding.clSummary.btnWatchAd.visibility = View.GONE
+                            Toast.makeText(this, "Reward Applied!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                onAdClosed = {
+                    binding.clSummary.btnWatchAd.isEnabled = true
+                }
+            )
+        }
     }
 
     private fun handleHintUsed() {
@@ -266,18 +293,7 @@ class QuizActivity : AppCompatActivity() {
         }
 
         viewModel.scoreUpdateEvent.observe(this) { delta ->
-            val animView = binding.clQuizContent.header.tvScoreAnim
-            animView.text = if (delta > 0) "+$delta" else "$delta"
-            animView.setTextColor(ContextCompat.getColor(this, if (delta > 0) R.color.mint_green else R.color.accent_red))
-            animView.visibility = View.VISIBLE
-            animView.alpha = 0f
-            animView.translationY = 20f
-
-            animView.animate().alpha(1f).translationY(-20f).setDuration(400).setInterpolator(DecelerateInterpolator())
-                .withEndAction {
-                    animView.animate().alpha(0f).setDuration(300).setStartDelay(200)
-                        .withEndAction { animView.visibility = View.GONE }.start()
-                }.start()
+             animateFloatingScore(delta, lastClickedView, binding.clQuizContent.header.tvCurrentScore)
         }
 
         viewModel.error.observe(this) { errorMsg ->
@@ -356,6 +372,7 @@ class QuizActivity : AppCompatActivity() {
 
             container.setOnClickListener {
                 stopTimer()
+                lastClickedView = container
                 viewModel.selectAnswer(questionIndex, key)
                 highlightSelection(container, key, question)
                 optionContainers.forEach { it.isEnabled = false }
@@ -475,6 +492,12 @@ class QuizActivity : AppCompatActivity() {
             isShowingInterstitial = false
             binding.clSummary.root.visibility = View.VISIBLE
             binding.clQuizContent.root.visibility = View.GONE
+            
+            // Reset Ad Button
+            val showAdButton = summary.totalPoints != 0
+            binding.clSummary.btnWatchAd.visibility = if (showAdButton) View.VISIBLE else View.GONE
+            binding.clSummary.btnWatchAd.isEnabled = true
+            binding.clSummary.tvTotalPoints.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_gold))
             
             binding.clSummary.rowTotal.apply { tvLabel.text = "Total Questions"; tvValue.text = summary.totalQuestions.toString() }
             binding.clSummary.rowCorrect.apply { tvLabel.text = "Correct Answers"; tvValue.text = summary.correctCount.toString(); tvValue.setTextColor(ContextCompat.getColor(this@QuizActivity, R.color.mint_green)) }
@@ -653,6 +676,74 @@ class QuizActivity : AppCompatActivity() {
         binding.layoutSkeleton.root.visibility = View.VISIBLE
         binding.layoutSkeleton.root.alpha = 0f
         binding.layoutSkeleton.root.animate().alpha(1f).setDuration(300).start()
+    }
+    private fun animateFloatingScore(delta: Int, startView: View?, targetView: View) {
+        if (startView == null) return
+
+        val rootLayout = binding.root as ViewGroup
+        val floatingText = TextView(this)
+        floatingText.text = if (delta > 0) "+$delta" else "$delta"
+        floatingText.textSize = 28f
+        floatingText.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        floatingText.setTextColor(ContextCompat.getColor(this, if (delta > 0) R.color.mint_green else R.color.accent_red))
+        floatingText.setShadowLayer(4f, 2f, 2f, ContextCompat.getColor(this, R.color.black)) // Add shadow for visibility
+
+        val startLoc = IntArray(2)
+        startView.getLocationInWindow(startLoc)
+        val targetLoc = IntArray(2)
+        targetView.getLocationInWindow(targetLoc)
+        val rootLoc = IntArray(2)
+        binding.root.getLocationInWindow(rootLoc)
+        
+        val startX = startLoc[0] - rootLoc[0] + startView.width / 2f
+        val startY = startLoc[1] - rootLoc[1] + startView.height / 2f
+        
+        
+        rootLayout.addView(floatingText)
+        
+        // Measure to center exactly
+        floatingText.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        val w = floatingText.measuredWidth
+        val h = floatingText.measuredHeight
+        
+        floatingText.x = startX - w / 2f
+        floatingText.y = startY - h / 2f
+        
+        // Initial State
+        floatingText.alpha = 0f
+        floatingText.scaleX = 0f
+        floatingText.scaleY = 0f
+        
+        // Animation Sequence: Pop -> Fly -> Hit
+        floatingText.animate()
+            .alpha(1f)
+            .scaleX(1.5f).scaleY(1.5f)
+            .translationYBy(-80f)
+            .setDuration(250)
+            .setInterpolator(android.view.animation.OvershootInterpolator())
+            .withEndAction {
+                 val destX = targetLoc[0] - rootLoc[0] + targetView.width / 2f - w / 2f
+                 val destY = targetLoc[1] - rootLoc[1] + targetView.height / 2f - h / 2f
+                 
+                 floatingText.animate()
+                    .x(destX)
+                    .y(destY)
+                    .scaleX(0.8f).scaleY(0.8f) 
+                    .alpha(0.6f)
+                    .setDuration(500)
+                    .setInterpolator(android.view.animation.AccelerateDecelerateInterpolator())
+                    .withEndAction {
+                        rootLayout.removeView(floatingText)
+                        
+                        // Impact Effect
+                        targetView.animate()
+                            .scaleX(1.3f).scaleY(1.3f)
+                            .setDuration(100)
+                            .withEndAction {
+                                targetView.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                            }.start()
+                    }.start()
+            }.start()
     }
 }
 

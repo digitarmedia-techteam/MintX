@@ -15,48 +15,63 @@
         app:layout_constraintBottom_toTopOf="@id/footer_spacer"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="vertical">
+            android:paddingBottom="120dp">
 
             <!-- Header (Moves inside) -->
             <include
                 android:id="@+id/header"
                 layout="@layout/layout_quiz_header"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/_8sdp" />
+                android:layout_marginBottom="@dimen/_8sdp"
+                app:layout_constraintWidth_max="@dimen/quiz_header_max_width"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Timer (Hidden, replaced by floating) -->
             <include
                 android:id="@+id/timer"
                 layout="@layout/layout_quiz_timer"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_2sdp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:layout_constraintWidth_max="@dimen/quiz_max_width"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/header" />
 
             <!-- Question Card -->
             <include
                 android:id="@+id/question"
                 layout="@layout/layout_quiz_question"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
-                android:layout_marginBottom="@dimen/_8sdp" />
+                android:layout_marginBottom="@dimen/_8sdp"
+                app:layout_constraintWidth_max="@dimen/quiz_max_width"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/timer" />
 
             <!-- Options -->
             <include
                 android:id="@+id/options"
                 layout="@layout/layout_quiz_options"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginEnd="@dimen/_10sdp"/>
+                android:layout_marginEnd="@dimen/_10sdp"
+                app:layout_constraintWidth_max="@dimen/quiz_max_width"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/question" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
     <!-- Spacer or Footer area if needed -->

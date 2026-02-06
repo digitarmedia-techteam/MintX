@@ -210,6 +210,64 @@ class QuizViewModel(private val repository: QuizRepository, private val question
 
 
 
+    fun applyAdReward(onComplete: (Int) -> Unit) {
+        val summary = getQuizSummary()
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+        
+        var bonusPoints = 0
+        var newTotalPoints = 0
+                
+        if (summary.totalPoints > 0) {
+            bonusPoints = summary.totalPoints
+            newTotalPoints = summary.totalPoints * 2
+        } else if (summary.totalPoints < 0) {
+            bonusPoints = 1 // Refund the -1 balance penalty
+            newTotalPoints = 0
+        } else {
+             onComplete(0)
+             return
+        }
+        
+        viewModelScope.launch {
+            if (bonusPoints > 0) {
+                // Update Balance
+                val currentBalance = _mintBalance.value ?: 0
+                val newBalance = currentBalance + bonusPoints
+                _mintBalance.value = newBalance
+                repository.updateUserBalance(uid, newBalance)
+                
+                // Update XP
+                var xpRefund = 0L
+                if (summary.totalPoints < 0) {
+                    xpRefund = kotlin.math.abs(summary.totalPoints).toLong()
+                } else {
+                    xpRefund = bonusPoints.toLong()
+                }
+                
+                val currentXP = _totalXP.value ?: 0
+                val newXP = currentXP + xpRefund
+                _totalXP.value = newXP
+                repository.updateUserXP(uid, newXP)
+
+                // Save Transaction
+                val title = if (summary.totalPoints > 0) "Video Reward: 2x Bonus" else "Video Reward: Forgiveness"
+                val description = if (summary.totalPoints > 0) "Doubled quiz points" else "Reset negative score to 0"
+
+                val transaction = com.appslabs.mintx.data.model.Transaction(
+                    id = java.util.UUID.randomUUID().toString(),
+                    title = title,
+                    description = description,
+                    amount = bonusPoints.toDouble(),
+                    timestamp = System.currentTimeMillis(),
+                    type = "credit",
+                    status = "completed"
+                )
+                repository.saveTransaction(uid, transaction)
+            }
+            onComplete(newTotalPoints)
+        }
+    }
+
     fun fetchQuestions(categories: List<String> = emptyList()) {
         this.currentCategories = categories
         viewModelScope.launch {

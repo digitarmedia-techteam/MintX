@@ -42,8 +42,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/navHeaderAvatar"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="@dimen/_62sdp"
+        android:layout_height="@dimen/_62sdp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
         android:padding="12dp"

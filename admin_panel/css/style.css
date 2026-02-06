@@ -871,3 +871,137 @@ textarea:focus {
     background: var(--primary);
     color: #000;
 }
+
+/* Responsive Design for Edit User Modal */
+@media (max-width: 900px) {
+
+    /* Stack columns vertically on tablets */
+    #modal-edit-user .modal-content {
+        max-width: 600px !important;
+        width: 95% !important;
+    }
+
+    #modal-edit-user form>div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    /* Mobile optimization */
+    #modal-edit-user .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    #modal-edit-user form {
+        max-height: calc(100vh - 70px) !important;
+    }
+
+    /* Stack action buttons vertically on mobile */
+    #modal-edit-user form>div[style*="grid-template-columns: 2fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Adjust card padding for mobile */
+    #modal-edit-user .modal-content>div>div[style*="padding: 24px"],
+    #modal-edit-user .modal-content>div>div[style*="padding: 20px"] {
+        padding: 16px !important;
+    }
+
+    /* Make quiz stats stack better on mobile */
+    #modal-edit-user div[style*="grid-template-columns: repeat(3, 1fr)"] {
+        gap: 8px !important;
+    }
+}
+
+/* Hover effects for cards */
+#modal-edit-user .modal-content>form>div>div>div {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#modal-edit-user .modal-content>form>div>div>div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Button hover effects */
+#modal-edit-user button:not([type="submit"]):hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+}
+
+#modal-edit-user button[type="submit"]:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 4px 16px rgba(52, 211, 153, 0.4);
+}
+
+/* Responsive Design for Transaction History Modal */
+@media (max-width: 700px) {
+    #modal-user-history .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    #modal-user-history .modal-content>div:first-child {
+        padding: 20px 20px !important;
+    }
+
+    #modal-user-history .modal-content>div:first-child h2 {
+        font-size: 1.3rem !important;
+    }
+
+    #modal-user-history .modal-content>div:first-child p {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Responsive Design for Bulk Upload Modal */
+@media (max-width: 900px) {
+    #modal-bulk-upload .modal-content {
+        max-width: 95% !important;
+        height: 95vh !important;
+    }
+
+    #modal-bulk-upload .code-editor-container {
+        height: 350px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    #modal-bulk-upload .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    #modal-bulk-upload .modal-content>div:first-child {
+        padding: 20px !important;
+    }
+
+    #modal-bulk-upload .modal-content>div:first-child h2 {
+        font-size: 1.3rem !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    #modal-bulk-upload .modal-content>div:first-child p {
+        padding-left: 0 !important;
+    }
+
+    #modal-bulk-upload .code-editor-container {
+        height: 300px !important;
+    }
+
+    /* Stack buttons vertically on mobile */
+    #modal-bulk-upload button[type="submit"] {
+        font-size: 0.95rem !important;
+        padding: 12px !important;
+    }
+}

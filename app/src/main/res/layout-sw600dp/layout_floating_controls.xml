@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:clipToPadding="false">
+
+    <!-- Timer HIDDEN in Portrait (Use Border Timer in Question Card) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_floating_timer"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="100dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardBackgroundColor="@color/mint_floating_card_bg"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/accent_glass_border"
+        app:strokeWidth="1dp">
+
+        <com.appslabs.mintx.ui.widget.AnalogTimerView
+            android:id="@+id/view_floating_timer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Hint Button: Bottom Right Fixed Position -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_hint"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="90dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardBackgroundColor="@color/mint_floating_card_bg"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/accent_glass_border"
+        app:strokeWidth="1dp">
+
+        <ImageView
+            android:id="@+id/iv_hint_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_hint_bulb"
+            app:tint="@color/mint_gold" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Hint Options -->
+    <LinearLayout
+        android:id="@+id/layout_hint_options"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/card_hint"
+        app:layout_constraintEnd_toStartOf="@+id/card_hint"
+        app:layout_constraintTop_toTopOf="@+id/card_hint"
+        android:layout_marginEnd="16dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_hint_points"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="@color/mint_floating_card_bg"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="6dp"
+            app:strokeColor="@color/accent_glass_border"
+            app:strokeWidth="1dp">
+             <LinearLayout
+                 android:layout_width="wrap_content"
+                 android:layout_height="match_parent"
+                 android:gravity="center"
+                 android:paddingHorizontal="16dp">
+                 <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/mint_coin" />
+                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="-10" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/text_headline" android:fontFamily="sans-serif-medium"/>
+             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_hint_ad"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            app:cardBackgroundColor="@color/mint_floating_card_bg"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="6dp"
+            app:strokeColor="@color/accent_glass_border"
+            app:strokeWidth="1dp">
+             <LinearLayout
+                 android:layout_width="wrap_content"
+                 android:layout_height="match_parent"
+                 android:gravity="center"
+                 android:paddingHorizontal="16dp">
+                 <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_launcher_foreground" app:tint="@color/mint_primary" />
+                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="Watch Ad" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/text_headline" android:fontFamily="sans-serif-medium"/>
+             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

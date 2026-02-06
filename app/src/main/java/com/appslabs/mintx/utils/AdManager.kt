@@ -16,11 +16,14 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 object AdManager {
 
     private var rewardedInterstitialAd: RewardedInterstitialAd? = null
     private var interstitialAd: InterstitialAd? = null
+    private var videoRewardedAd: RewardedAd? = null
 
 //     Ad Unit IDs
 //    private const val REWARDED_INTERSTITIAL_AD_ID = ""
@@ -30,6 +33,7 @@ object AdManager {
     private const val REWARDED_INTERSTITIAL_AD_ID = "ca-app-pub-7084079995330446/9316348004"
     private const val BANNER_AD_ID = "ca-app-pub-7084079995330446/6665008207"
     private const val INTERSTITIAL_AD_ID = "ca-app-pub-7084079995330446/4056282468"
+    private const val VIDEO_REWARDED_AD_ID = "ca-app-pub-7084079995330446/2863825570"
 
     fun initialize(context: Context) {
         MobileAds.initialize(context) {}
@@ -86,6 +90,54 @@ object AdManager {
     }
     
     fun isRewardedAdReady(): Boolean = rewardedInterstitialAd != null
+
+    // --- Video Rewarded Ad ---
+
+    fun loadVideoRewardedAd(context: Context) {
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(context, VIDEO_REWARDED_AD_ID, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                videoRewardedAd = null
+                android.util.Log.e("AdManager", "Video Rewarded Ad failed to load: ${adError.message}")
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                videoRewardedAd = ad
+                android.util.Log.d("AdManager", "Video Rewarded Ad loaded")
+            }
+        })
+    }
+
+    fun showVideoRewardedAd(activity: Activity, onRewardEarned: () -> Unit, onAdClosed: () -> Unit) {
+        if (videoRewardedAd != null) {
+            var rewardEarned = false
+            
+            videoRewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    videoRewardedAd = null
+                    loadVideoRewardedAd(activity)
+                    if (rewardEarned) {
+                        onRewardEarned()
+                    } else {
+                        onAdClosed()
+                    }
+                }
+
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    onAdClosed()
+                }
+            }
+
+            videoRewardedAd?.show(activity) { _ ->
+                rewardEarned = true
+            }
+        } else {
+            loadVideoRewardedAd(activity)
+            onAdClosed()
+        }
+    }
+    
+    fun isVideoRewardedAdReady(): Boolean = videoRewardedAd != null
 
     // --- Interstitial Ad ---
 

@@ -6,16 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/mint_background">
 
-    <!-- Header Gradient Background -->
+    <!-- Header Background -->
     <View
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="180dp"
         android:background="@color/mint_gold"
         app:layout_constraintTop_toTopOf="parent" />
-        <!-- Hardcoded teal just in case mint_primary behaves oddly, but will update if needed -->
 
-    <!-- Back Button -->
+    <!-- Top Bar -->
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="40dp"
@@ -25,7 +24,7 @@
         android:background="@drawable/pill_choice_selector" 
         android:backgroundTint="#20000000"
         android:padding="8dp"
-        android:src="@android:drawable/ic_menu_revert"
+        android:src="@drawable/ic_arrow_back"
         app:tint="@color/fixed_white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -51,20 +50,20 @@
         android:background="@drawable/pill_choice_selector"
         android:backgroundTint="#20000000"
         android:padding="8dp"
-        android:src="@drawable/setings"
+        android:src="@drawable/ic_settings"
         app:tint="@color/fixed_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Avatar Card (Overlapping Header) -->
+    <!-- Avatar Section -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardAvatar"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="110dp"
         app:cardCornerRadius="55dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/mint_surface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -89,7 +88,6 @@
             android:background="@drawable/bg_initials_avatar" />
     </androidx.cardview.widget.CardView>
 
-    <!-- User Name & Handle -->
     <TextView
         android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
@@ -114,306 +112,332 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUserName" />
 
-    <!-- Stats Row -->
-    <LinearLayout
-        android:id="@+id/layoutStats"
+    <!-- Stats Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardStats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/mint_surface"
         app:layout_constraintTop_toBottomOf="@id/tvUserHandle">
 
-        <!-- Stat 1 -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/layoutStats"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:paddingVertical="12dp"
             android:gravity="center"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvLevel"
-                android:layout_width="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Stat 1 -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="1"
-                android:textColor="@color/text_headline"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <TextView
-                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textColor="@color/text_headline"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Level"
+                    android:textColor="@color/text_subtext"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="@color/mint_surface_light" />
+
+            <!-- Stat 2 -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Level"
-                android:textColor="@color/text_subtext"
-                android:textSize="12sp" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2.3k"
+                    android:textColor="@color/text_headline"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Coins"
+                    android:textColor="@color/text_subtext"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="@color/mint_surface_light" />
+
+            <!-- Stat 3 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvXP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/text_headline"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="XP"
+                    android:textColor="@color/text_subtext"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="24dp"
-            android:background="@color/accent_glass_border" />
-
-        <!-- Stat 2 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvPoints"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2.3k"
-                android:textColor="@color/text_headline"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Coins"
-                android:textColor="@color/text_subtext"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="24dp"
-            android:background="@color/accent_glass_border" />
-
-        <!-- Stat 3 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvXP"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/text_headline"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="XP"
-                android:textColor="@color/text_subtext"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <!-- Content Scroll -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:paddingBottom="24dp"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutStats">
+        app:layout_constraintTop_toBottomOf="@id/cardStats">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp">
 
             <!-- Solved Problems Stats -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Solved Problems"
-                android:textColor="@color/text_headline"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSolvedStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="#E2E8F0">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center_horizontal">
-                    
-                    <!-- Circular Graph -->
-                    <com.appslabs.mintx.ui.widget.SolvedStatsView
-                        android:id="@+id/viewSolvedStats"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_marginBottom="20dp" />
-                        
-                    <!-- Stats List -->
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Solved Problems"
+                        android:textColor="@color/text_headline"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
                         
-                        <!-- Easy -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="4dp">
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Easy"
-                                android:textColor="@color/text_subtext"
-                                android:textSize="12sp"/>
-                            <TextView
-                                android:id="@+id/tvServedEasy"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="@color/text_headline"
-                                android:textStyle="bold"
-                                android:textSize="13sp"/>
-                        </LinearLayout>
-                         <ProgressBar
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="6dp"
-                            android:progressDrawable="@drawable/progress_easy"
-                            android:progress="0"
-                            android:id="@+id/pbEasy"
-                            android:layout_marginBottom="8dp"/>
+                        <com.appslabs.mintx.ui.widget.SolvedStatsView
+                            android:id="@+id/viewSolvedStats"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_marginBottom="24dp" />
                             
-                        <!-- Medium -->
+                        <!-- Stats List -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="4dp">
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Medium"
-                                android:textColor="@color/text_subtext"
-                                android:textSize="12sp"/>
-                            <TextView
-                                android:id="@+id/tvServedMedium"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="@color/text_headline"
-                                android:textStyle="bold"
-                                android:textSize="13sp"/>
-                        </LinearLayout>
-                         <ProgressBar
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="6dp"
-                            android:progressDrawable="@drawable/progress_medium"
-                            android:progress="0"
-                            android:id="@+id/pbMedium"
-                            android:layout_marginBottom="8dp"/>
+                            android:orientation="vertical">
                             
-                        <!-- Hard -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="4dp">
-                            <TextView
-                                android:layout_width="0dp"
+                            <!-- Easy -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Hard"
-                                android:textColor="@color/text_subtext"
-                                android:textSize="12sp"/>
-                            <TextView
-                                android:id="@+id/tvServedHard"
-                                android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="4dp">
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Easy"
+                                    android:textColor="@color/text_subtext"
+                                    android:textSize="12sp"/>
+                                <TextView
+                                    android:id="@+id/tvServedEasy"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textColor="@color/text_headline"
+                                    android:textStyle="bold"
+                                    android:textSize="13sp"/>
+                            </LinearLayout>
+                             <ProgressBar
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:progressDrawable="@drawable/progress_easy"
+                                android:progress="0"
+                                android:id="@+id/pbEasy"
+                                android:layout_marginBottom="12dp"/>
+                                
+                            <!-- Medium -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="@color/text_headline"
-                                android:textStyle="bold"
-                                android:textSize="13sp"/>
-                        </LinearLayout>
-                         <ProgressBar
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="6dp"
-                            android:progressDrawable="@drawable/progress_hard"
-                            android:progress="0"
-                            android:id="@+id/pbHard"/>
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="4dp">
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Medium"
+                                    android:textColor="@color/text_subtext"
+                                    android:textSize="12sp"/>
+                                <TextView
+                                    android:id="@+id/tvServedMedium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textColor="@color/text_headline"
+                                    android:textStyle="bold"
+                                    android:textSize="13sp"/>
+                            </LinearLayout>
+                             <ProgressBar
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:progressDrawable="@drawable/progress_medium"
+                                android:progress="0"
+                                android:id="@+id/pbMedium"
+                                android:layout_marginBottom="12dp"/>
+                                
+                            <!-- Hard -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="4dp">
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Hard"
+                                    android:textColor="@color/text_subtext"
+                                    android:textSize="12sp"/>
+                                <TextView
+                                    android:id="@+id/tvServedHard"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textColor="@color/text_headline"
+                                    android:textStyle="bold"
+                                    android:textSize="13sp"/>
+                            </LinearLayout>
+                             <ProgressBar
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:progressDrawable="@drawable/progress_hard"
+                                android:progress="0"
+                                android:id="@+id/pbHard"/>
 
+                        </LinearLayout>
                     </LinearLayout>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Activity Map -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Activity Map"
-                android:textColor="@color/text_headline"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardActivityMap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="#E2E8F0">
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:padding="16dp">
-
-                    <com.appslabs.mintx.ui.widget.ContributionGraphView
-                        android:id="@+id/viewContributionGraph"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp" />
-
-                </HorizontalScrollView>
-            </androidx.cardview.widget.CardView>
-
-            <!-- GitHub-Style Pinned / Info Card -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Personal Information"
-                android:textColor="@color/text_headline"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Activity Map"
+                        android:textColor="@color/text_headline"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <com.appslabs.mintx.ui.widget.ContributionGraphView
+                            android:id="@+id/viewContributionGraph"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="4dp" />
+
+                    </HorizontalScrollView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Personal Information -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPersonalInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Personal Information"
+                        android:textColor="@color/text_headline"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
 
                     <!-- Mobile -->
                     <LinearLayout
@@ -422,11 +446,11 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/mobile"
                             app:tint="@color/mint_secondary"
-                            android:padding="4dp"
+                            android:padding="6dp"
                             android:background="@drawable/pill_choice_selector"
                             android:backgroundTint="#100EA5E9"/>
                         
@@ -464,11 +488,11 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/age"
                             app:tint="@color/mint_gold"
-                            android:padding="4dp"
+                            android:padding="6dp"
                             android:background="@drawable/pill_choice_selector"
                             android:backgroundTint="#10D97706"/>
 
@@ -497,84 +521,112 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Game Preferences -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Game Preferences"
-                android:textColor="@color/text_headline"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardGamePreferences"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="#E2E8F0">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:strokeWidth="0dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="20dp">
 
+                    <!-- Header Icon & Title -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:id="@+id/layoutPrefHeader"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btnEditPreferences">
+                        
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/ic_category_generic"
                             app:tint="@color/mint_primary"
-                            android:padding="4dp"
+                            android:padding="6dp"
                             android:background="@drawable/pill_choice_selector"
-                            android:backgroundTint="#102DD4BF"/>
+                            android:backgroundTint="#1500C896"/>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Favorite Categories"
-                                android:textColor="@color/text_subtext"
-                                android:textSize="12sp"/>
-                            <com.google.android.material.chip.ChipGroup
-                                android:id="@+id/chipGroupCategories"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
+                            android:text="Favorite Categories"
+                            android:textColor="@color/text_headline"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="12dp"/>
                     </LinearLayout>
-                </LinearLayout>
+
+                    <!-- Edit Action (Visual Cue) -->
+                    <ImageView
+                        android:id="@+id/btnEditPreferences"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/text_hint"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/layoutPrefHeader"
+                        app:layout_constraintBottom_toBottomOf="@id/layoutPrefHeader" />
+
+                    <TextView
+                        android:id="@+id/tvPrefSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Topics you follow and excel in"
+                        android:textColor="@color/text_subtext"
+                        android:textSize="12sp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginStart="44dp" 
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layoutPrefHeader" />
+
+                    <!-- Divider -->
+                    <View
+                        android:id="@+id/dividerPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/mint_surface_light"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvPrefSubtitle" />
+
+                    <!-- Chip Group -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupCategories"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:chipSpacingHorizontal="8dp"
+                        app:chipSpacingVertical="8dp"
+                        app:layout_constraintTop_toBottomOf="@id/dividerPref"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.cardview.widget.CardView>
 
-            <!-- Actions -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Account"
-                android:textColor="@color/text_headline"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
+            <!-- Account Actions -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#FECACA"
-                app:strokeWidth="1dp">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/mint_surface"
+                app:strokeWidth="0dp">
                 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -594,7 +646,8 @@
                         android:text="Log Out"
                         android:textColor="@color/accent_red"
                         android:textStyle="bold"
-                        android:layout_marginStart="16dp"/>
+                        android:layout_marginStart="16dp"
+                        android:textSize="16sp"/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -604,4 +657,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

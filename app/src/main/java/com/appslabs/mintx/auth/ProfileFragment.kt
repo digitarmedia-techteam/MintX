@@ -48,17 +48,52 @@ class ProfileFragment : Fragment() {
         binding.btnProfileContinue.setOnClickListener {
             val name = binding.etFullName.text.toString()
             val age = binding.etAge.text.toString()
+            
+            // Final validation before submit
+            val ageInt = age.toIntOrNull()
+            if (ageInt == null || ageInt < 13 || ageInt > 80) {
+                binding.etAge.error = "Age must be between 13 and 80"
+                return@setOnClickListener
+            }
+            
             viewModel.createProfile(name, age)
         }
     }
 
     private fun validateInput() {
         val name = binding.etFullName.text.toString()
-        val age = binding.etAge.text.toString()
-        binding.btnProfileContinue.isEnabled = name.isNotBlank() && age.isNotBlank()
+        val ageStr = binding.etAge.text.toString()
+        
+        var isAgeValid = false
+        if (ageStr.isNotBlank()) {
+            val age = ageStr.toIntOrNull()
+            if (age != null && age >= 13 && age <= 80) {
+                isAgeValid = true
+            }
+        }
+        
+        binding.btnProfileContinue.isEnabled = name.isNotBlank() && isAgeValid
     }
 
     private fun setupObservers() {
+        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
+            if (user != null) {
+                if (binding.etFullName.text.isBlank()) {
+                    binding.etFullName.setText(user.name)
+                }
+                // Don't pre-fill age if it's 0 (invalid)
+                if (user.age in 13..80) {
+                    // It shouldn't be valid if we are here usually, but just in case
+                     if (binding.etAge.text.isBlank()) {
+                         binding.etAge.setText(user.age.toString())
+                     }
+                }
+                
+                binding.tvProfileTitle.text = "Update Profile"
+                binding.btnProfileContinue.text = "Update & Continue"
+            }
+        }
+
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is LoginUiState.Loading -> {

@@ -41,6 +41,59 @@ class ProfileActivity : AppCompatActivity() {
         setupUI()
         setupListeners()
         fetchAllData()
+        
+        binding.root.post { runEntryAnimations() }
+    }
+
+    private fun runEntryAnimations() {
+        val interpolator = android.view.animation.OvershootInterpolator()
+        val decel = android.view.animation.DecelerateInterpolator()
+
+        // 1. Header Elements (Avatar Pop)
+        binding.cardAvatar.alpha = 0f
+        binding.cardAvatar.scaleX = 0f
+        binding.cardAvatar.scaleY = 0f
+        binding.cardAvatar.animate()
+            .alpha(1f).scaleX(1f).scaleY(1f)
+            .setDuration(600).setStartDelay(100)
+            .setInterpolator(interpolator).start()
+
+        // Name & Handle (Slide Up)
+        val texts = listOf(binding.tvUserName, binding.tvUserHandle)
+        texts.forEachIndexed { index, view ->
+            view.translationY = 50f
+            view.alpha = 0f
+            view.animate()
+                .translationY(0f).alpha(1f)
+                .setDuration(500).setStartDelay(300L + (index * 50))
+                .setInterpolator(decel).start()
+        }
+
+        // 2. Stats Row (Slide/Fade)
+        binding.cardStats.translationY = 100f
+        binding.cardStats.alpha = 0f
+        binding.cardStats.animate()
+            .translationY(0f).alpha(1f)
+            .setDuration(600).setStartDelay(400)
+            .setInterpolator(decel).start()
+
+        // 3. Content Cards (Staggered Slide Up)
+        val cards = listOf(
+            binding.cardSolvedStats,
+            binding.cardActivityMap,
+            binding.cardPersonalInfo,
+            binding.cardGamePreferences,
+            binding.cardLogout
+        )
+
+        cards.forEachIndexed { index, view ->
+            view.translationY = 150f
+            view.alpha = 0f
+            view.animate()
+                .translationY(0f).alpha(1f)
+                .setDuration(500).setStartDelay(500L + (index * 100))
+                .setInterpolator(decel).start()
+        }
     }
 
     private fun setupUI() {

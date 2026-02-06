@@ -74,6 +74,10 @@ class SessionManager(context: Context) {
 
     fun getMintBalance(): Long = prefs.getLong(KEY_MINT_BALANCE, 0L)
 
+    fun updateAge(age: Int) {
+        prefs.edit().putInt(KEY_USER_AGE, age).apply()
+    }
+
     fun logout() {
         com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
         prefs.edit().clear().apply()

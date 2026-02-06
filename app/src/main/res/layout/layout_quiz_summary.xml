@@ -6,13 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/mint_background"
     android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false"
     android:visibility="gone">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/_20sdp"
-        android:paddingBottom="@dimen/_80sdp">
+        android:paddingBottom="@dimen/_40sdp">
 
         <!-- Title -->
         <TextView
@@ -82,9 +84,12 @@
         <!-- Stats Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_summary_stats"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_24sdp"
+            app:layout_constraintWidth_max="@dimen/quiz_max_width"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:cardBackgroundColor="@color/mint_surface"
             app:cardCornerRadius="@dimen/_20sdp"
             app:cardElevation="0dp"
@@ -162,9 +167,12 @@
         <!-- Level Progress -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/layout_level_info"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_16sdp"
+            app:layout_constraintWidth_max="@dimen/quiz_max_width"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:cardBackgroundColor="@color/mint_surface"
             app:cardCornerRadius="@dimen/_20sdp"
             app:cardElevation="0dp"
@@ -227,9 +235,12 @@
         <!-- Action Buttons -->
         <LinearLayout
             android:id="@+id/ll_actions"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"
+            app:layout_constraintWidth_max="@dimen/quiz_max_width"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/layout_level_info">
 

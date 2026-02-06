@@ -19,6 +19,7 @@ import com.appslabs.mintx.ui.adapter.RewardAdapter
 import com.appslabs.mintx.ui.viewmodel.RewardsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
+import com.appslabs.mintx.utils.NativeAdHelper
 
 class RewardsStoreActivity : AppCompatActivity() {
 
@@ -27,6 +28,7 @@ class RewardsStoreActivity : AppCompatActivity() {
     private lateinit var rewardAdapter: RewardAdapter
     private lateinit var redemptionAdapter: RedemptionAdapter
     
+    private var nativeAdHelper: NativeAdHelper? = null
     private var selectedReward: Reward? = null
     private var currentTab = TAB_AVAILABLE
     
@@ -59,6 +61,20 @@ class RewardsStoreActivity : AppCompatActivity() {
         setupClickListeners()
         observeViewModel()
         loadInitialData()
+        loadNativeAd()
+    }
+    
+    private fun loadNativeAd() {
+        nativeAdHelper = NativeAdHelper(this)
+        nativeAdHelper?.loadAd(
+            onAdLoaded = { nativeAd ->
+                // Pass the ad to the adapter to display at the end
+                rewardAdapter.setNativeAd(nativeAd)
+            },
+            onAdFailed = { error ->
+                android.util.Log.e("RewardsStoreActivity", "Native ad failed to load: ${error.message}")
+            }
+        )
     }
 
     private fun setupRecyclerView() {
@@ -72,8 +88,20 @@ class RewardsStoreActivity : AppCompatActivity() {
         // Setup redemption adapter (for Pending/Completed tabs)
         redemptionAdapter = RedemptionAdapter(emptyList())
         
-        // Initially show rewards adapter
-        binding.rvRewards.layoutManager = GridLayoutManager(this, 2)
+        // Initially show rewards adapter with GridLayoutManager
+        val gridLayoutManager = GridLayoutManager(this, 2)
+        
+        // Make native ad span full width (2 columns)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (rewardAdapter.getItemViewType(position)) {
+                    1 -> 2 // VIEW_TYPE_NATIVE_AD = 1, span 2 columns
+                    else -> 1 // VIEW_TYPE_REWARD = 0, span 1 column
+                }
+            }
+        }
+        
+        binding.rvRewards.layoutManager = gridLayoutManager
         binding.rvRewards.adapter = rewardAdapter
     }
 
@@ -322,6 +350,12 @@ class RewardsStoreActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        nativeAdHelper?.destroy()
+        nativeAdHelper = null
     }
 }
 

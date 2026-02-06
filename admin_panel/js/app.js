@@ -367,7 +367,7 @@ function setupModals() {
 async function loadUsers() {
     const tableBody = document.getElementById('users-table-body');
     if (!tableBody) return;
-    tableBody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="10">Loading...</td></tr>';
 
     try {
         const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
@@ -381,7 +381,59 @@ async function loadUsers() {
             const initials = user.name ? getInitials(user.name) : '?';
             const color = getRandomColor();
             const status = user.status || 'Active';
-            const statusClass = status.toLowerCase() === 'active' ? 'active' : 'pending'; // simple logic
+            const statusClass = status.toLowerCase() === 'active' ? 'active' : 'pending';
+
+            // Detect if this is a Google user (has email but no phone)
+            const isGoogleUser = user.email && !user.phone;
+
+            // Age - Show placeholder for Google users with age 0
+            const age = user.age && user.age > 0 ? user.age : (isGoogleUser ? '<span style="color: var(--text-muted); font-style: italic;">Not set</span>' : '-');
+
+            // Phone/Email - Show email for Google users, phone for others
+            let contactInfo = user.phone || '-';
+            if (isGoogleUser && user.email) {
+                contactInfo = `<div style="display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-brands fa-google" style="color: #4285F4; font-size: 0.9rem;"></i>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">${user.email}</span>
+                </div>`;
+            }
+
+            // XP
+            const totalXP = user.totalXP || 0;
+
+            // Quiz Stats (Easy/Medium/Hard)
+            const solvedEasy = user.solvedEasy || 0;
+            const solvedMedium = user.solvedMedium || 0;
+            const solvedHard = user.solvedHard || 0;
+            const quizStats = `<span style="color: #4ADE80;">${solvedEasy}</span> / <span style="color: #FBBF24;">${solvedMedium}</span> / <span style="color: #F87171;">${solvedHard}</span>`;
+
+            // Last Active - Get the most recent date from activityDates array
+            let lastActive = '-';
+            if (user.activityDates && Array.isArray(user.activityDates) && user.activityDates.length > 0) {
+                // Sort dates in descending order and get the most recent
+                const sortedDates = user.activityDates.sort((a, b) => b - a);
+                const mostRecentTimestamp = sortedDates[0];
+
+                // Convert timestamp to readable date
+                const date = new Date(mostRecentTimestamp);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    lastActive = 'Today';
+                } else if (diffDays === 1) {
+                    lastActive = 'Yesterday';
+                } else if (diffDays < 7) {
+                    lastActive = `${diffDays}d ago`;
+                } else {
+                    lastActive = date.toLocaleDateString();
+                }
+            } else if (user.createdAt) {
+                // Fallback to createdAt if no activity dates
+                const date = new Date(user.createdAt);
+                lastActive = `<span style="color: var(--text-muted); font-style: italic;">Registered: ${date.toLocaleDateString()}</span>`;
+            }
 
             html += `
             <tr onclick="openEditUser('${doc.id}')" style="cursor: pointer; transition: background 0.2s;">
@@ -392,9 +444,12 @@ async function loadUsers() {
                         <span>${user.name || 'Anonymous'}</span>
                     </div>
                 </td>
-                <td>${user.phone || '-'}</td>
+                <td>${age}</td>
+                <td>${contactInfo}</td>
                 <td style="font-weight: bold; color: var(--gold);">${(user.mintBalance || 0).toLocaleString()}</td>
-                <td>${user.categories ? user.categories.length : 0}</td>
+                <td style="font-weight: bold; color: var(--primary);">${totalXP}</td>
+                <td>${quizStats}</td>
+                <td><span style="color: var(--text-muted); font-size: 0.9rem;">${lastActive}</span></td>
                 <td><span class="status-pill ${statusClass}">${status}</span></td>
                 <td>
                     <button class="btn-sm" style="color: var(--text-muted);"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -405,9 +460,9 @@ async function loadUsers() {
     } catch (error) {
         console.error("Error loading users:", error);
         if (error.code === 'permission-denied') {
-            tableBody.innerHTML = '<tr><td colspan="7" style="color:#F87171; text-align:center; padding: 20px;"><strong>⚠️ Permission Denied</strong><br>Go to Firebase Console &gt; Firestore &gt; Rules and set:<br><code>allow read, write: if true;</code></td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10" style="color:#F87171; text-align:center; padding: 20px;"><strong>⚠️ Permission Denied</strong><br>Go to Firebase Console &gt; Firestore &gt; Rules and set:<br><code>allow read, write: if true;</code></td></tr>';
         } else {
-            tableBody.innerHTML = '<tr><td colspan="7" style="color:red">Error loading data: ' + error.message + '</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10" style="color:red">Error loading data: ' + error.message + '</td></tr>';
         }
     }
 }
@@ -422,18 +477,62 @@ window.openEditUser = function (id) {
 
     window.currentEditingUserId = id;
 
+    // Detect if this is a Google user
+    const isGoogleUser = user.email && !user.phone;
+
     document.getElementById('edit-user-id').value = id;
     document.getElementById('edit-user-name').value = user.name || '';
-    document.getElementById('edit-user-phone').value = user.phone || '';
+
+    // Show email for Google users, phone for others
+    const phoneInput = document.getElementById('edit-user-phone');
+    if (isGoogleUser) {
+        phoneInput.value = user.email || 'No contact info';
+        phoneInput.style.color = 'var(--text-muted)';
+        phoneInput.style.fontStyle = 'italic';
+    } else {
+        phoneInput.value = user.phone || '';
+        phoneInput.style.color = '';
+        phoneInput.style.fontStyle = '';
+    }
+
     document.getElementById('edit-user-balance').value = user.mintBalance || 0;
 
     // Display fields
     if (document.getElementById('edit-user-display-name')) document.getElementById('edit-user-display-name').innerText = user.name || 'User';
-    if (document.getElementById('edit-user-display-phone')) document.getElementById('edit-user-display-phone').innerText = user.phone || '';
+    if (document.getElementById('edit-user-display-phone')) {
+        if (isGoogleUser && user.email) {
+            document.getElementById('edit-user-display-phone').innerHTML = `<i class="fa-brands fa-google" style="color: #4285F4; margin-right: 6px;"></i>${user.email}`;
+        } else {
+            document.getElementById('edit-user-display-phone').innerText = user.phone || '';
+        }
+    }
 
     // Status
     const statusSelect = document.getElementById('edit-user-status');
     statusSelect.value = user.status || 'Active';
+
+    // Populate User Stats
+    if (document.getElementById('edit-user-age-display')) {
+        const ageDisplay = user.age && user.age > 0 ? user.age : 'Not set';
+        document.getElementById('edit-user-age-display').innerText = ageDisplay;
+        if (!user.age || user.age === 0) {
+            document.getElementById('edit-user-age-display').style.opacity = '0.5';
+        } else {
+            document.getElementById('edit-user-age-display').style.opacity = '1';
+        }
+    }
+    if (document.getElementById('edit-user-xp-display')) {
+        document.getElementById('edit-user-xp-display').innerText = user.totalXP || 0;
+    }
+    if (document.getElementById('edit-user-easy-display')) {
+        document.getElementById('edit-user-easy-display').innerText = user.solvedEasy || 0;
+    }
+    if (document.getElementById('edit-user-medium-display')) {
+        document.getElementById('edit-user-medium-display').innerText = user.solvedMedium || 0;
+    }
+    if (document.getElementById('edit-user-hard-display')) {
+        document.getElementById('edit-user-hard-display').innerText = user.solvedHard || 0;
+    }
 
     // Stats Preview
     const categories = user.categories || [];

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="quiz_max_width">1000dp</dimen>
+    <dimen name="quiz_content_width">1000dp</dimen>
+    <dimen name="quiz_header_max_width">1000dp</dimen>
+    <dimen name="quiz_vertical_spacing">16dp</dimen>
+</resources>

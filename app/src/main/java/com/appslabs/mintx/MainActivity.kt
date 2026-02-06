@@ -14,6 +14,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.appslabs.mintx.utils.SessionManager
 import com.appslabs.mintx.auth.AuthActivity
 import com.appslabs.mintx.ui.OnboardingBottomSheetFragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,6 +79,133 @@ class MainActivity : AppCompatActivity() {
             if (!sessionManager.isCategoriesSelected()) {
                 val onboardingFragment = OnboardingBottomSheetFragment()
                 onboardingFragment.show(supportFragmentManager, "OnboardingBottomSheet")
+            }
+            
+            // Check if user needs to set their Date of Birth
+            checkAndPromptForDOB()
+        }
+    }
+    
+    private fun checkAndPromptForDOB() {
+        val sessionManager = SessionManager(this)
+        val userAge = sessionManager.getUserAge()
+        
+        // Show DOB dialog if age is not set or invalid (0 or outside 13-80)
+        if (userAge == 0 || userAge < 13 || userAge > 80) {
+            showDOBDialog()
+        }
+    }
+    
+    private fun showDOBDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_dob_picker, null)
+        val datePicker = dialogView.findViewById<android.widget.DatePicker>(R.id.datePicker)
+        
+        // Set maximum date to today
+        datePicker.maxDate = System.currentTimeMillis()
+        
+        // Set minimum date to 130 years ago (reasonable limit)
+        val calendar = java.util.Calendar.getInstance()
+        calendar.add(java.util.Calendar.YEAR, -130)
+        datePicker.minDate = calendar.timeInMillis
+        
+        // Set initial date to 18 years ago (reasonable default)
+        val defaultCalendar = java.util.Calendar.getInstance()
+        defaultCalendar.add(java.util.Calendar.YEAR, -18)
+        datePicker.init(
+            defaultCalendar.get(java.util.Calendar.YEAR),
+            defaultCalendar.get(java.util.Calendar.MONTH),
+            defaultCalendar.get(java.util.Calendar.DAY_OF_MONTH),
+            null
+        )
+        
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Set Your Date of Birth")
+            .setMessage("Please select your date of birth to continue using the app.")
+            .setView(dialogView)
+            .setCancelable(false) // Non-dismissible
+            .setPositiveButton("Confirm") { _, _ ->
+                val day = datePicker.dayOfMonth
+                val month = datePicker.month
+                val year = datePicker.year
+                
+                val age = calculateAge(year, month, day)
+                
+                if (age < 13 || age > 80) {
+                    android.widget.Toast.makeText(
+                        this,
+                        "Age must be between 13 and 80 years",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                    // Show dialog again
+                    showDOBDialog()
+                } else {
+                    // Save age to Firestore
+                    saveAgeToFirestore(age)
+                }
+            }
+            .create()
+        
+        dialog.show()
+    }
+    
+    private fun calculateAge(year: Int, month: Int, day: Int): Int {
+        val dob = java.util.Calendar.getInstance()
+        dob.set(year, month, day)
+        
+        val today = java.util.Calendar.getInstance()
+        
+        var age = today.get(java.util.Calendar.YEAR) - dob.get(java.util.Calendar.YEAR)
+        
+        // Check if birthday hasn't occurred yet this year
+        if (today.get(java.util.Calendar.DAY_OF_YEAR) < dob.get(java.util.Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+        
+        return age
+    }
+    
+    private fun saveAgeToFirestore(age: Int) {
+        val sessionManager = SessionManager(this)
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        val userName = sessionManager.getUserName() ?: "User" // Handle nullable
+        
+        if (uid == null) {
+            android.widget.Toast.makeText(this, "Failed to update age. Please try again.", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Show loading
+        val progressDialog = android.app.ProgressDialog(this).apply {
+            setMessage("Updating your profile...")
+            setCancelable(false)
+            show()
+        }
+        
+        // Use lifecycleScope for proper coroutine management
+        lifecycleScope.launch(Dispatchers.IO) {
+            val repository = com.appslabs.mintx.auth.AuthRepository()
+            val result = repository.updateUserProfile(uid, userName, age)
+            
+            withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+                
+                result.onSuccess {
+                    // Update session
+                    sessionManager.updateAge(age)
+                    android.widget.Toast.makeText(
+                        this@MainActivity,
+                        "Age updated successfully!",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }.onFailure {
+                    android.widget.Toast.makeText(
+                        this@MainActivity,
+                        "Failed to update age: ${it.message}",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                    // Show dialog again on failure
+                    showDOBDialog()
+                }
             }
         }
     }

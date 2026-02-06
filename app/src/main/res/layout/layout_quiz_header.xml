@@ -21,12 +21,16 @@
 
     <TextView
         android:id="@+id/tv_quiz_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/fun_with_quiz"
         android:textColor="@color/white"
         android:textSize="@dimen/_20ssp"
         android:textStyle="bold"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginHorizontal="@dimen/_4sdp"
         app:layout_constraintBottom_toBottomOf="@id/btn_back"
         app:layout_constraintEnd_toStartOf="@id/tv_current_score"
         app:layout_constraintStart_toEndOf="@id/btn_back"
